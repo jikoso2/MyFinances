@@ -60,9 +60,9 @@
 				{
 				<tr>
 					<td>@row.Month</td>
-					<td>@row.Loan</td>
-					<td>@row.Interest</td>
-					<td>@row.Capital</td>
+					<td>@MoneyFormat(row.Loan)</td>
+					<td>@MoneyFormat(row.Interest)</td>
+					<td>@MoneyFormat(row.Capital)</td>
 				</tr>
 				}
 			</tbody>
@@ -82,5 +82,9 @@
 	{
 		calculatedLoan.Calculate(model);
 		HideComponent = false;
+	}
+	private string MoneyFormat(double value)
+	{
+		return value.ToString("0.00") + " zł";
 	}
 }
