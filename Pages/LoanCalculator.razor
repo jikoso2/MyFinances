@@ -1,0 +1,57 @@
+﻿@page "/loancalculator"
+
+@using MyFinances.Models
+
+
+
+<div class="card mx-auto mt-5" style="width: 50rem;">
+	<div class="card-header">
+		Kalkulator Kredytu
+	</div>
+	<div class="card-body">
+		<EditForm Model="@model" OnValidSubmit="HandleValueSubmit">
+
+			<DataAnnotationsValidator />
+			<ValidationSummary />
+
+			<div class="form-group">
+				<label>Kwota Kredytu</label>
+				<InputNumber @bind-Value="model.Amount" class="form-control" />
+			</div>
+
+			<div class="form-group">
+				<label>Czas trwania w miesiącach</label>
+				<InputNumber @bind-Value="model.Duration" class="form-control" />
+			</div>
+
+			<div class="form-group">
+				<label>Oprocentowanie</label>
+				<InputNumber @bind-Value="model.Percentage" class="form-control" />
+			</div>
+
+			<button type="submit" class="btn btn-primary btn-block">Oblicz</button>
+		</EditForm>
+	</div>
+
+	<div class="card-footer">
+		<div class="row">
+			<div class="col">Wysokość raty kredytu</div>
+			<div class="col text-right">@calculatedLoan.Instalment.ToString("N")</div>
+			<div class="col">Całkowity koszt kredytu</div>
+			<div class="col text-right">@calculatedLoan.TotalAmount.ToString("N")</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+@code {
+	private LoanModel model = new LoanModel();
+	private Data.CalculatedLoan calculatedLoan = new Data.CalculatedLoan();
+
+	private void HandleValueSubmit()
+	{
+		calculatedLoan.Calculate(model);
+	}
+}

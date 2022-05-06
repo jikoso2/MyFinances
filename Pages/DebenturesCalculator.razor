@@ -1,0 +1,56 @@
+﻿@page "/debenturescalculator"
+
+@using MyFinances.Models
+
+
+
+<div class="card mx-auto mt-5" style="width: 50rem;">
+	<div class="card-header">
+		Kalkulator Obligacji
+	</div>
+	<div class="card-body">
+		<EditForm Model="@model" OnValidSubmit="HandleValueSubmit">
+
+			<DataAnnotationsValidator />
+			<ValidationSummary />
+
+			<div class="form-group">
+				<label>TypObligacji</label>
+				<InputSelect id="debentureType" @bind-Value="model.Type">
+					@foreach (var DebentureType in Enum.GetValues(typeof(DebentureType)))
+					{
+					<option value="@DebentureType">@DebentureType</option>
+					}
+				</InputSelect>
+			</div>
+
+			<div class="form-group">
+				<label>Ilość Obligacji</label>
+				<InputNumber @bind-Value="model.Amount" class="form-control" />
+			</div>
+
+			<button type="submit" class="btn btn-primary btn-block">Oblicz</button>
+		</EditForm>
+	</div>
+
+	<div class="card-footer">
+		<div class="row">
+			<div class="col">Całkowity koszt obligacji</div>
+			<div class="col text-right">@calculatedDebenture.TotalAmount.ToString("N")</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+@code {
+	private DebenturesModel model = new DebenturesModel();
+	private Data.CalculatedDebenture calculatedDebenture = new Data.CalculatedDebenture();
+
+
+	private void HandleValueSubmit()
+	{
+		calculatedDebenture.Calculate(model);
+	}
+}
