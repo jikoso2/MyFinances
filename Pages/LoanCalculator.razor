@@ -14,33 +14,60 @@
 			<DataAnnotationsValidator />
 			<ValidationSummary />
 
-			<div class="form-group">
-				<label>Kwota Kredytu</label>
-				<InputNumber @bind-Value="model.Amount" class="form-control" />
-			</div>
+			<div class="row justify-content-center">
 
-			<div class="form-group">
-				<label>Czas trwania w miesiącach</label>
-				<InputNumber @bind-Value="model.Duration" class="form-control" />
-			</div>
+				<div class="form-group" style="margin: 15px">
+					<label>Kwota Kredytu</label>
+					<InputNumber @bind-Value="model.Amount" class="form-control" />
+				</div>
 
-			<div class="form-group">
-				<label>Oprocentowanie</label>
-				<InputNumber @bind-Value="model.Percentage" class="form-control" />
-			</div>
+				<div class="form-group" style="margin: 15px">
+					<label>Czas trwania w miesiącach</label>
+					<InputNumber @bind-Value="model.Duration" class="form-control" />
+				</div>
 
-			<button type="submit" class="btn btn-primary btn-block">Oblicz</button>
+				<div class="form-group" style="margin: 15px">
+					<label>Oprocentowanie</label>
+					<InputNumber @bind-Value="model.Percentage" class="form-control" />
+				</div>
+
+			</div>
+			<button type="submit" class="btn btn-primary btn-center">Oblicz</button>
 		</EditForm>
 	</div>
 
-	<div class="card-footer">
-		<div class="row">
-			<div class="col">Wysokość raty kredytu</div>
-			<div class="col text-right">@calculatedLoan.Instalment.ToString("N")</div>
-			<div class="col">Całkowity koszt kredytu</div>
-			<div class="col text-right">@calculatedLoan.TotalAmount.ToString("N")</div>
+	<p hidden="@HideComponent">
+		<div class="card-footer">
+			<div class="row">
+				<div class="col">Wysokość raty kredytu</div>
+				<div class="col text-right">@calculatedLoan.Instalment.ToString("N")</div>
+				<div class="col">Całkowity koszt kredytu</div>
+				<div class="col text-right">@calculatedLoan.TotalAmount.ToString("N")</div>
+			</div>
 		</div>
-	</div>
+
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Miesiąc</th>
+					<th>Wysokość Raty</th>
+					<th>Kwota Odsetek</th>
+					<th>Kapitał do Spłaty</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var row in calculatedLoan.RepaymentSchedule)
+				{
+				<tr>
+					<td>@row.Month</td>
+					<td>@row.Loan</td>
+					<td>@row.Interest</td>
+					<td>@row.Capital</td>
+				</tr>
+				}
+			</tbody>
+		</table>
+	</p>
 </div>
 
 
@@ -49,9 +76,11 @@
 @code {
 	private LoanModel model = new LoanModel();
 	private Data.CalculatedLoan calculatedLoan = new Data.CalculatedLoan();
+	private bool HideComponent   {get;set;} = true;
 
 	private void HandleValueSubmit()
 	{
 		calculatedLoan.Calculate(model);
+		HideComponent = false;
 	}
 }

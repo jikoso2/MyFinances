@@ -1,6 +1,6 @@
 ﻿@page "/debenturescalculator"
 
-@using MyFinances.Models
+@using MyFinances.Models;
 
 
 
@@ -29,16 +29,20 @@
 				<InputNumber @bind-Value="model.Amount" class="form-control" />
 			</div>
 
-			<button type="submit" class="btn btn-primary btn-block">Oblicz</button>
+			<button class="btn btn-primary" type="submit" >Oblicz</button>
+
 		</EditForm>
 	</div>
 
-	<div class="card-footer">
-		<div class="row">
-			<div class="col">Całkowity koszt obligacji</div>
-			<div class="col text-right">@calculatedDebenture.TotalAmount.ToString("N")</div>
+	<p hidden="@HideComponent">
+		<div class="card-footer">
+			<div class="row">
+				<div class="col">Całkowity koszt obligacji</div>
+				<div class="col text-right">@calculatedDebenture.TotalAmount.ToString("N")</div>
+			</div>
 		</div>
-	</div>
+	</p>
+
 </div>
 
 
@@ -47,10 +51,12 @@
 @code {
 	private DebenturesModel model = new DebenturesModel();
 	private Data.CalculatedDebenture calculatedDebenture = new Data.CalculatedDebenture();
+	private bool HideComponent   {get;set;} = true;
 
 
 	private void HandleValueSubmit()
 	{
 		calculatedDebenture.Calculate(model);
+		HideComponent = false;
 	}
 }

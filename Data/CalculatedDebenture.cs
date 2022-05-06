@@ -18,6 +18,53 @@ namespace MyFinances.Data
 		{
 			_type = debenturesModel.Type;
 			_totalAmount = debenturesModel.Amount * 100;
+
+			switch (debenturesModel.Type)
+			{
+				case DebentureType.OTS:
+					CalculateOTS();
+					break;
+				case DebentureType.DOS:
+					CalculateDOS();
+					break;
+				case DebentureType.TOZ:
+					CalculateTOZ();
+					break;
+				case DebentureType.COI:
+					CalculateCOI();
+					break;
+				case DebentureType.EDO:
+					CalculateEDO();
+					break;
+				default:
+					break;
+			}
+			
+		}
+
+		private void CalculateEDO()
+		{
+			//throw new NotImplementedException();
+		}
+
+		private void CalculateCOI()
+		{
+			//throw new NotImplementedException();
+		}
+
+		private void CalculateTOZ()
+		{
+			//throw new NotImplementedException();
+		}
+
+		private void CalculateDOS()
+		{
+			//throw new NotImplementedException();
+		}
+
+		private void CalculateOTS()
+		{
+			//throw new NotImplementedException();
 		}
 	}
 }

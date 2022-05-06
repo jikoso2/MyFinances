@@ -9,14 +9,13 @@ namespace MyFinances.Models
 	public class DebenturesModel
 	{
 		[Required]
-		[Range(1,100000000,ErrorMessage = "Wysokość kredytu nie może być mniejsza od zera lub większa od 10 milionów")]
-		public long Amount { get; set; }
+		[Range(1,10000,ErrorMessage = "Liczba zakupionych obligacji musi być całkowita i dodatnia")]
+		public int Amount { get; set; }
 
 		[Required]
-		[Range(0.001,30,ErrorMessage ="Wysokość oprocentowania nie może być mniejsza od zera lub większa od 30")]
 		public DebentureType Type { get; set; }
-
 	}
+
 	public enum DebentureType 
 	{ 
 		OTS,
