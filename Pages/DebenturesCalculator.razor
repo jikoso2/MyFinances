@@ -1,15 +1,16 @@
 ﻿@page "/debenturescalculator"
 
 @using MyFinances.Models;
+@inject Data.DebentureService DebentureService
 
 
 
-<div class="card mx-auto mt-5" style="width: 50rem;">
+<div class="card mx-auto mt-5" style="width: 60%;">
 	<div class="card-header">
-		Kalkulator Obligacji
+
 	</div>
 	<div class="card-body">
-		<EditForm Model="@model" OnValidSubmit="HandleValueSubmit">
+		<EditForm Model="@model" OnValidSubmit="CalculateDebentures">
 
 			<DataAnnotationsValidator />
 			<ValidationSummary />
@@ -19,29 +20,88 @@
 				<InputSelect id="debentureType" @bind-Value="model.Type">
 					@foreach (var DebentureType in Enum.GetValues(typeof(DebentureType)))
 					{
-					<option value="@DebentureType">@DebentureType</option>
+						<option value="@DebentureType">@DebentureType</option>
 					}
 				</InputSelect>
 			</div>
 
 			<div class="form-group">
+				<label>@InformationAboutDebenture()</label>
+			</div>
+
+			<h5>Wprowadź potrzebne dane:</h5>
+
+			<div class="form-group" style="width:25%">
 				<label>Ilość Obligacji</label>
 				<InputNumber @bind-Value="model.Amount" class="form-control" />
 			</div>
 
-			<button class="btn btn-primary" type="submit" >Oblicz</button>
+			@switch (model.Type)
+			{
+				case DebentureType.OTS:
+					<div class="form-group" style="width:25%">
+						<label>Wysokość rocznego oprocentowania</label>
+						<InputNumber @bind-Value="model.OTSPercentage" class="form-control" />
+					</div>
+					break;
+				case DebentureType.DOS:
+					<h3>Juz wkrótce...</h3>
+					break;
+				case DebentureType.TOZ:
+					<h3>Juz wkrótce...</h3>
+					break;
+				case DebentureType.EDO:
+					<h3>Juz wkrótce...</h3>
+					break;
+				case DebentureType.COI:
+					<h3>Juz wkrótce...</h3>
+					break;
+				default:
+					break;
+			}
+
+
+
+			<button class="btn btn-primary" type="submit">Oblicz</button>
 
 		</EditForm>
 	</div>
 
-	<p hidden="@HideComponent">
-		<div class="card-footer">
-			<div class="row">
-				<div class="col">Całkowity koszt obligacji</div>
-				<div class="col text-right">@calculatedDebenture.TotalAmount.ToString("N")</div>
+	@if (debenture == null || debenture.DebentureData == null)
+	{
+	}
+	else
+	{
+		<p>
+			<div class="card-footer">
+				<div class="row">
+					<div class="col">Całkowity koszt obligacji</div>
+					<div class="col text-right">@debenture.TotalPrice.ToString("N")</div>
+				</div>
 			</div>
-		</div>
-	</p>
+		</p>
+		<table class="table">
+			<thead>
+				<tr>
+					@foreach (var head in debenture.DebentureData.Head)
+					{
+						<th>@head</th>
+					}
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var column in debenture.DebentureData.DebentureColumns)
+				{
+				<td>
+					@foreach (var row in column.Rows)
+					{
+					<tr>@row</tr>
+					}
+				</td>
+				}
+			</tbody>
+		</table>
+		}
 
 </div>
 
@@ -49,14 +109,16 @@
 
 
 @code {
-	private DebenturesModel model = new DebenturesModel();
-	private Data.CalculatedDebenture calculatedDebenture = new Data.CalculatedDebenture();
-	private bool HideComponent   {get;set;} = true;
+	private DebentureModel model = new DebentureModel();
+	private Data.Debenture debenture;
 
 
-	private void HandleValueSubmit()
+	private async Task CalculateDebentures()
 	{
-		calculatedDebenture.Calculate(model);
-		HideComponent = false;
+		debenture = await DebentureService.GetDebentureAsync(model);
+	}
+	private string InformationAboutDebenture()
+	{
+		return DebentureService.GetInformationAboutDebenture(model.Type);
 	}
 }

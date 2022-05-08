@@ -1,6 +1,7 @@
 ﻿@page "/loancalculator"
 
 @using MyFinances.Models
+@inject Data.LoanService LoanService
 
 
 
@@ -9,7 +10,7 @@
 		Kalkulator Kredytu
 	</div>
 	<div class="card-body">
-		<EditForm Model="@model" OnValidSubmit="HandleValueSubmit">
+		<EditForm Model="@model" OnValidSubmit="CalculateLoan">
 
 			<DataAnnotationsValidator />
 			<ValidationSummary />
@@ -35,56 +36,60 @@
 			<button type="submit" class="btn btn-primary btn-center">Oblicz</button>
 		</EditForm>
 	</div>
-
-	<p hidden="@HideComponent">
+	@if (calculatedLoan == null || calculatedLoan.LoanData == null)
+	{
+	}
+	else
+	{
+	<p>
 		<div class="card-footer">
 			<div class="row">
-				<div class="col">Wysokość raty kredytu</div>
-				<div class="col text-right">@calculatedLoan.Instalment.ToString("N")</div>
+				<div class="col">Kwota zaciągniętego kredytu</div>
+				<div class="col text-right">@calculatedLoan.TotalAmount</div>
+			</div>
+			<div class="row">
 				<div class="col">Całkowity koszt kredytu</div>
-				<div class="col text-right">@calculatedLoan.TotalAmount.ToString("N")</div>
+				<div class="col text-right">@calculatedLoan.TotalPaymentAmount</div>
+			</div>
+			<div class="row">
+				<div class="col">Całkowita wartość odsetek</div>
+				<div class="col text-right">@calculatedLoan.TotalAdditionalPayment</div>
 			</div>
 		</div>
-
-		<table class="table">
-			<thead>
-				<tr>
-					<th>Miesiąc</th>
-					<th>Wysokość Raty</th>
-					<th>Kwota Odsetek</th>
-					<th>Kapitał do Spłaty</th>
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (var row in calculatedLoan.RepaymentSchedule)
+	</p>
+	<table class="table">
+		<thead>
+			<tr>
+				@foreach (var head in calculatedLoan.LoanData.Head)
 				{
-				<tr>
-					<td>@row.Month</td>
-					<td>@MoneyFormat(row.Loan)</td>
-					<td>@MoneyFormat(row.Interest)</td>
-					<td>@MoneyFormat(row.Capital)</td>
-				</tr>
+					<th>@head</th>
 				}
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var column in calculatedLoan.LoanData.LoanColumns)
+			{
+			<td>
+				@foreach (var row in column.Rows)
+				{
+				<tr>@row</tr>
+				}
+				</td>
+			}
 			</tbody>
 		</table>
-	</p>
-</div>
-
-
-
-
-@code {
-	private LoanModel model = new LoanModel();
-	private Data.CalculatedLoan calculatedLoan = new Data.CalculatedLoan();
-	private bool HideComponent   {get;set;} = true;
-
-	private void HandleValueSubmit()
-	{
-		calculatedLoan.Calculate(model);
-		HideComponent = false;
 	}
-	private string MoneyFormat(double value)
-	{
-		return value.ToString("0.00") + " zł";
+	</div>
+
+
+
+
+	@code {
+		private LoanModel model = new LoanModel();
+		private Data.Loan calculatedLoan;
+
+		private async Task CalculateLoan()
+		{
+			calculatedLoan = await LoanService.GetLoanAsync(model);
+		}
 	}
-}

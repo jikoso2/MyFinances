@@ -1,0 +1,128 @@
+﻿@page "/depositcalculator"
+
+@using MyFinances.Models
+@inject Data.DepositService DepositService
+
+
+
+<div class="card mx-auto mt-5" style="width: 50rem;">
+	<div class="card-header">
+		Kalkulator Lokaty
+	</div>
+	<div class="card-body">
+		<EditForm Model="@model" OnValidSubmit="CalculateDeposit">
+
+			<DataAnnotationsValidator />
+			<ValidationSummary />
+
+			<div class="row justify-content-center">
+				<div class="row">
+
+					<div class="col">
+						<div class="form-group" style="margin: 15px">
+							<label>Kwota ulokowana na lokacie</label>
+							<InputNumber @bind-Value="model.Amount" class="form-control" />
+						</div>
+					</div>
+
+					<div class="col">
+						<div class="form-group" style="margin: 15px">
+							<label>Czas trwania lokaty</label>
+							<InputNumber @bind-Value="model.Duration" class="form-control" />
+						</div>
+					</div>
+
+					<div class="col">
+						<div class="form-group" style="margin: 15px">
+							<label>Roczne oprocentowanie</label>
+							<InputNumber @bind-Value="model.Percentage" class="form-control" />
+						</div>
+					</div>
+
+				</div>
+
+
+				<div class="row">
+
+					<div class="col">
+						<div class="form-group" style="margin: 15px">
+							<label>Okres kapitalizacji</label>
+							<InputNumber @bind-Value="model.Period" class="form-control" />
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-group" style="margin: 15px">
+							<label>Uwzględnienie podatku 19%</label>
+							<InputCheckbox @bind-Value="model.BelkaTax" class="form-control" />
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-group" style="margin: 15px">
+							<label>Kapitalizacja </label>
+							<InputCheckbox @bind-Value="model.Capitalization" class="form-control" />
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+			<button type="submit" class="btn btn-primary btn-center">Oblicz</button>
+		</EditForm>
+	</div>
+	@if (calculatedDeposit == null || calculatedDeposit.DepositData == null)
+	{
+	}
+	else
+	{
+		<p>
+			<div class="card-footer">
+				<div class="row">
+					<div class="col">Kwota wpłacona na lokate</div>
+					<div class="col text-right">@calculatedDeposit.TotalAmount</div>
+				</div>
+				<div class="row">
+					<div class="col">Ilość Okresów rozliczeniowych</div>
+					<div class="col text-right">@calculatedDeposit.TotalPaymentAmount</div>
+				</div>
+				<div class="row">
+					<div class="col">Całkowita wartość odsetek</div>
+					<div class="col text-right">@calculatedDeposit.TotalAdditionalPayment</div>
+				</div>
+			</div>
+		</p>
+		<table class="table">
+			<thead>
+				<tr>
+					@foreach (var head in calculatedDeposit.DepositData.Head)
+					{
+						<th>@head</th>
+					}
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var column in calculatedDeposit.DepositData.DepositColumn)
+				{
+				<td>
+					@foreach (var row in column.Rows)
+					{
+					<tr>@row</tr>
+				}
+					</td>
+				}
+				</tbody>
+			</table>
+		}
+</div>
+
+
+
+
+@code {
+	private DepositModel model = new DepositModel();
+	private Data.Deposit calculatedDeposit;
+
+	private async Task CalculateDeposit()
+	{
+		calculatedDeposit = await DepositService.GetDepositAsync(model);
+	}
+}

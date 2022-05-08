@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyFinances.Models
 {
-	public class DebenturesModel
+	public class DebentureModel
 	{
 		[Required]
 		[Range(1,10000,ErrorMessage = "Liczba zakupionych obligacji musi być całkowita i dodatnia")]
@@ -14,6 +14,7 @@ namespace MyFinances.Models
 
 		[Required]
 		public DebentureType Type { get; set; }
+		public double OTSPercentage { get; set; } = 1.5;
 	}
 
 	public enum DebentureType 
