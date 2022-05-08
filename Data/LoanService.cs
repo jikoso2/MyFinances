@@ -22,21 +22,21 @@ namespace MyFinances.Data
 		{
 			var loanResult = new Loan(LoanModel);
 
-			var monthRows = new string[loanResult.Duration + 1];
-			var totalValueRows = new string[loanResult.Duration + 1];
-			var loanRows = new string[loanResult.Duration + 1];
-			var interestRows = new string[loanResult.Duration + 1];
-			var paymentsSum = new string[loanResult.Duration + 1];
+			var monthRows = new string[loanResult.Duration];
+			var totalValueRows = new string[loanResult.Duration];
+			var loanRows = new string[loanResult.Duration];
+			var interestRows = new string[loanResult.Duration];
+			var paymentsSum = new string[loanResult.Duration];
 
 			double loan = Math.Round((loanResult.Amount * loanResult.PercentageNumber) / (12 * (1 - Math.Pow((12 / (12 + loanResult.PercentageNumber)), loanResult.Duration))), 2);
 			double capital = loanResult.Amount;
 			double paymentSum = 0;
 
-			for (int i = 1; i <= loanResult.Duration; i++)
+			for (int i = 0; i < loanResult.Duration; i++)
 			{
 				double odsetki = capital * loanResult.PercentageNumber / 12;
 
-				monthRows[i] = i.ToString();
+				monthRows[i] = (i+1).ToString();
 				loanRows[i] = i==loanResult.Duration? Helper.MoneyFormat(capital+odsetki) : Helper.MoneyFormat(loan);
 				interestRows[i] = Helper.MoneyFormat(odsetki);
 				totalValueRows[i] = Helper.MoneyFormat(capital);

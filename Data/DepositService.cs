@@ -28,15 +28,31 @@ namespace MyFinances.Data
 			double capital = DepositModel.Amount;
 			double sum = 0;
 			double odsetki;
+			double withoutTaxOdsetki;
 
 			for (int i = 0; i < periods; i++)
 			{
 				periodRows[i] = (i + 1).ToString();
-				odsetki = capital * DepositModel.PercentageNumber / DepositModel.Period;
-				interestRows[i] = Helper.MoneyFormat(odsetki);
-				sum += odsetki;
+				withoutTaxOdsetki = Math.Round(capital * DepositModel.PercentageNumber * DepositModel.Period / 365,2);
+
+				if (DepositModel.BelkaTax)
+				{
+					odsetki = Math.Round((Math.Floor(withoutTaxOdsetki * 0.81 * 100) - 1) / 100, 2);
+					interestRows[i] = Helper.MoneyFormat(odsetki);
+					sum += odsetki;
+					if (DepositModel.Capitalization)
+						capital += odsetki;
+				}
+				else
+				{
+					interestRows[i] = Helper.MoneyFormat(withoutTaxOdsetki);
+					sum += withoutTaxOdsetki;
+					if (DepositModel.Capitalization)
+						capital += withoutTaxOdsetki;
+				}
+
 				profitRows[i] = Helper.MoneyFormat(sum);
-				capital += odsetki;
+				
 				
 			}
 
@@ -47,6 +63,7 @@ namespace MyFinances.Data
 				new DepositColumn() { Rows = profitRows }
 			};
 
+			depositResult.NumberOfPeriods = periods.ToString();
 			return depositResult;
 		}
 	}
@@ -60,14 +77,14 @@ namespace MyFinances.Data
 			this.Amount = depositModel.Amount;
 			this.TotalAmount = Helper.MoneyFormat(depositModel.Amount);
 			this.DepositData = new DepositResult();
-			this.DepositData.Head = new string[3] { "Okres", "Odsetki", "Zysk przy wypłacie" };
+			this.DepositData.Head = new string[3] { "Okres", depositModel.Capitalization?"Kapitalizowane Odsetki":"Wypłata", "Zysk przy wypłacie" };
 		}
 
 		public int Duration { get; set; }
 		public double Amount { get; set; }
 		public double PercentageNumber { get; set; }
 		public string TotalAmount { get; set; }
-		public string TotalPaymentAmount { get; set; }
+		public string NumberOfPeriods { get; set; }
 		public string TotalAdditionalPayment { get; set; }
 		public DepositResult DepositData { get; set; }
 	}

@@ -52,7 +52,7 @@
 					</div>
 					<div class="col">
 						<div class="form-group" style="margin: 15px">
-							<label>Uwzględnienie podatku 19%</label>
+							<label>Podatek 19%</label>
 							<InputCheckbox @bind-Value="model.BelkaTax" class="form-control" />
 						</div>
 					</div>
@@ -82,7 +82,7 @@
 				</div>
 				<div class="row">
 					<div class="col">Ilość Okresów rozliczeniowych</div>
-					<div class="col text-right">@calculatedDeposit.TotalPaymentAmount</div>
+					<div class="col text-right">@calculatedDeposit.NumberOfPeriods</div>
 				</div>
 				<div class="row">
 					<div class="col">Całkowita wartość odsetek</div>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,7 +10,9 @@ namespace MyFinances.Helpers
 	{
 		public static string MoneyFormat(double value)
 		{
-			return value.ToString("0.00") + " zł";
+			var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
+			nfi.NumberGroupSeparator = " ";
+			return value.ToString("#,0.00",nfi) + " zł";
 		}
 	}
 }
