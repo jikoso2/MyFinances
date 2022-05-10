@@ -56,6 +56,7 @@ namespace MyFinances.Data
 
 			loanResult.TotalAdditionalPayment = Helper.MoneyFormat((loanResult.Duration * loan) - loanResult.Amount);
 			loanResult.TotalPaymentAmount = Helper.MoneyFormat(loanResult.Duration * loan);
+			loanResult.TotalAdditionalPaymentDouble = (loanResult.Duration * loan) - loanResult.Amount;
 
 			return loanResult;
 		}
@@ -78,6 +79,7 @@ namespace MyFinances.Data
 		public double PercentageNumber { get; set; }
 		public string TotalAmount { get; set; }
 		public string TotalPaymentAmount { get; set; }
+		public double TotalAdditionalPaymentDouble { get; set; }
 		public string TotalAdditionalPayment { get; set; }
 		public LoanResult LoanData { get; set; }
 	}

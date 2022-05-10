@@ -1,7 +1,10 @@
 ﻿@page "/loancalculator"
 
 @using MyFinances.Models
+
+@inject NavigationManager NavigationManager
 @inject Data.LoanService LoanService
+@inject IJSRuntime jsRunTime
 
 
 
@@ -36,58 +39,61 @@
 			<button type="submit" class="btn btn-primary btn-center">Oblicz</button>
 		</EditForm>
 	</div>
+	<div id="chartdiv"></div>
 	@if (calculatedLoan == null || calculatedLoan.LoanData == null)
 	{
 	}
 	else
 	{
-	<p>
-		<div class="card-footer">
-			<div class="row">
-				<div class="col">Kwota zaciągniętego kredytu</div>
-				<div class="col text-right">@calculatedLoan.TotalAmount</div>
+		<p>
+			<div class="card-footer">
+				<div class="row">
+					<div class="col">Kwota zaciągniętego kredytu</div>
+					<div class="col text-right">@calculatedLoan.TotalAmount</div>
+				</div>
+				<div class="row">
+					<div class="col">Całkowity koszt kredytu</div>
+					<div class="col text-right">@calculatedLoan.TotalPaymentAmount</div>
+				</div>
+				<div class="row">
+					<div class="col">Całkowita wartość odsetek</div>
+					<div class="col text-right">@calculatedLoan.TotalAdditionalPayment</div>
+				</div>
 			</div>
-			<div class="row">
-				<div class="col">Całkowity koszt kredytu</div>
-				<div class="col text-right">@calculatedLoan.TotalPaymentAmount</div>
-			</div>
-			<div class="row">
-				<div class="col">Całkowita wartość odsetek</div>
-				<div class="col text-right">@calculatedLoan.TotalAdditionalPayment</div>
-			</div>
-		</div>
-	</p>
-	<table class="table">
-		<thead>
-			<tr>
-				@foreach (var head in calculatedLoan.LoanData.Head)
+		</p>
+
+		<table class="table">
+			<thead>
+				<tr>
+					@foreach (var head in calculatedLoan.LoanData.Head)
+					{
+						<th>@head</th>
+					}
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var column in calculatedLoan.LoanData.LoanColumns)
 				{
-					<th>@head</th>
+				<td>
+					@foreach (var row in column.Rows)
+					{
+					<tr>@row</tr>
 				}
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var column in calculatedLoan.LoanData.LoanColumns)
-			{
-			<td>
-				@foreach (var row in column.Rows)
-				{
-				<tr>@row</tr>
+					</td>
 				}
-				</td>
-			}
-			</tbody>
-		</table>
-	}
-	</div>
-
-
-	@code {
-		private LoanModel model = new LoanModel();
-		private Data.Loan calculatedLoan;
-
-		private async Task CalculateLoan()
-		{
-			calculatedLoan = await LoanService.GetLoanAsync(model);
+				</tbody>
+			</table>
 		}
+</div>
+
+
+@code {
+	private LoanModel model = new LoanModel();
+	private Data.Loan calculatedLoan;
+
+	private async Task CalculateLoan()
+	{
+		calculatedLoan = await LoanService.GetLoanAsync(model);
+		await jsRunTime.InvokeVoidAsync("CreatePieChart",calculatedLoan.Amount,calculatedLoan.TotalAdditionalPaymentDouble);
 	}
+}
