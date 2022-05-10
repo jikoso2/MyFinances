@@ -14,7 +14,11 @@ namespace MyFinances.Models
 
 		[Required]
 		public DebentureType Type { get; set; }
+
 		public double OTSPercentage { get; set; } = 1.5;
+
+		[Required]
+		public bool BelkaTax { get; set; }
 	}
 
 	public enum DebentureType 

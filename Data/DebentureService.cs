@@ -55,28 +55,35 @@ namespace MyFinances.Data
 		{
 			debentureResult.DebentureData = new DebentureResult();
 
-			double interestRate = DebentureModel.OTSPercentage;
 			var monthRows = new string[4];
 			var totalValueRows = new string[4];
 			var interestRateRows = new string[4];
 			var interestProfitRows = new string[4];
+			var taxRows = new string[4];
 			var totalProfitRows = new string[4];
+
+			var interestRate = DebentureModel.OTSPercentage;
+			var interestProfitAfter3Months = Math.Round(debentureResult.TotalPrice * interestRate / 100 / 4, 2);
+			var tax = (Math.Floor(interestProfitAfter3Months * 19) + 1) / 100 < 0.01 ? 0 : (Math.Floor(interestProfitAfter3Months * 19) + 1) / 100;
+
 
 			for (int i = 0; i <= 3; i++)
 			{
 				monthRows[i] = i.ToString();
 				totalValueRows[i] = Helper.MoneyFormat(debentureResult.TotalPrice);
 				interestRateRows[i] = $"{interestRate}%";
-				interestProfitRows[i] = i != 3 ? Helper.MoneyFormat(0) : Helper.MoneyFormat(debentureResult.TotalPrice * interestRate / 100 / 4);
-				totalProfitRows[i] = interestProfitRows[i];
+				taxRows[i] = i == 3 && DebentureModel.BelkaTax ? Helper.MoneyFormat(tax) : Helper.MoneyFormat(0);
+				interestProfitRows[i] = i == 3 ? Helper.MoneyFormat(interestProfitAfter3Months) : Helper.MoneyFormat(0);
+				totalProfitRows[i] = i == 3 ? Helper.MoneyFormat(DebentureModel.BelkaTax ? interestProfitAfter3Months - tax : interestProfitAfter3Months) : Helper.MoneyFormat(0);
 			}
 
-			debentureResult.DebentureData.DebentureColumns = new DebentureColumn[5]
+			debentureResult.DebentureData.DebentureColumns = new DebentureColumn[6]
 			{
 				new DebentureColumn() { Rows = monthRows },
 				new DebentureColumn() { Rows = totalValueRows },
 				new DebentureColumn() { Rows = interestRateRows },
 				new DebentureColumn() { Rows = interestProfitRows },
+				new DebentureColumn() { Rows = taxRows },
 				new DebentureColumn() { Rows = totalProfitRows }
 			};
 		}
@@ -105,7 +112,7 @@ namespace MyFinances.Data
 	{
 		public DebentureResult()
 		{
-			this.Head = new string[5] { "Miesiąc", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Zysk/Strata Netto" };
+			this.Head = new string[6] { "Miesiąc", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
 		}
 		public string[] Head { get; set; }
 		public DebentureColumn[] DebentureColumns { get; set; }

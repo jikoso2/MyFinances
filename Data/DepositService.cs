@@ -22,36 +22,39 @@ namespace MyFinances.Data
 		{
 			var depositResult = new Deposit(DepositModel);
 			int periods = (int)Math.Floor((double)DepositModel.Duration / DepositModel.Period);
+
 			var periodRows = new string[periods];
 			var interestRows = new string[periods];
 			var profitRows = new string[periods];
+
 			double capital = DepositModel.Amount;
-			double sum = 0;
-			double odsetki;
-			double withoutTaxOdsetki;
+			double interestSum = 0;
+			double interest;
+			double interestWithoutTax;
 
 			for (int i = 0; i < periods; i++)
 			{
 				periodRows[i] = (i + 1).ToString();
-				withoutTaxOdsetki = Math.Round(capital * DepositModel.PercentageNumber * DepositModel.Period / 365,2);
+				interestWithoutTax = Math.Round(capital * DepositModel.PercentageNumber * DepositModel.Period / 365,2);
 
 				if (DepositModel.BelkaTax)
 				{
-					odsetki = Math.Round((Math.Floor(withoutTaxOdsetki * 0.81 * 100) - 1) / 100, 2);
-					interestRows[i] = Helper.MoneyFormat(odsetki);
-					sum += odsetki;
+					interest = Math.Floor(interestWithoutTax * 0.81 * 100) - 1;
+					interest = Math.Round(interest<0?0:interest / 100, 2);
+					interestRows[i] = Helper.MoneyFormat(interest);
+					interestSum += interest;
 					if (DepositModel.Capitalization)
-						capital += odsetki;
+						capital += interest;
 				}
 				else
 				{
-					interestRows[i] = Helper.MoneyFormat(withoutTaxOdsetki);
-					sum += withoutTaxOdsetki;
+					interestRows[i] = Helper.MoneyFormat(interestWithoutTax);
+					interestSum += interestWithoutTax;
 					if (DepositModel.Capitalization)
-						capital += withoutTaxOdsetki;
+						capital += interestWithoutTax;
 				}
 
-				profitRows[i] = Helper.MoneyFormat(sum);
+				profitRows[i] = Helper.MoneyFormat(interestSum);
 				
 				
 			}
