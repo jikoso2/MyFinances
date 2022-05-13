@@ -1,6 +1,7 @@
 ﻿@page "/debenturescalculator"
 
 @using MyFinances.Models;
+@using MyFinances.Helpers;
 @inject Data.DebentureService DebentureService
 
 
@@ -9,7 +10,7 @@
 	<div class="card-header">
 		Kalkulator Obligacji
 	</div>
-	<div class="card-body" >
+	<div class="card-body">
 		<EditForm Model="@model" OnValidSubmit="CalculateDebentures">
 
 			<DataAnnotationsValidator />
@@ -26,11 +27,11 @@
 
 				<div class="form-check-label">
 					<InputCheckbox @bind-Value="model.BelkaTax" class="form-check-label" style="height:25px;width:25px" />
-					<label class="form-check-label" style="position:fixed;margin-left:7px"> Uwzględnienie podatku od zysków kapitałowych (19%)</label>
+					<label class="form-check-label" style="position: absolute; margin-left: 7px"> Uwzględnienie podatku od zysków kapitałowych (19%)</label>
 				</div>
 			</div>
 
-			
+
 
 			<h5>Opis:</h5>
 
@@ -48,21 +49,29 @@
 			@switch (model.Type)
 			{
 				case DebentureType.OTS:
+					SetDefaultPercentageValues();
 					<div class="form-group" style="width:25%">
 						<label>Wysokość rocznego oprocentowania</label>
 						<InputNumber @bind-Value="model.OTSPercentage" class="form-control" />
 					</div>
 					break;
 				case DebentureType.DOS:
-					<h3>Juz wkrótce...</h3>
+					SetDefaultPercentageValues();
+					<div class="form-group" style="width:25%">
+						<label>Wysokość rocznego oprocentowania</label>
+						<InputNumber @bind-Value="model.DOSPercentage" class="form-control" />
+					</div>
 					break;
 				case DebentureType.TOZ:
+					SetDefaultPercentageValues();
 					<h3>Juz wkrótce...</h3>
 					break;
 				case DebentureType.EDO:
+					SetDefaultPercentageValues();
 					<h3>Juz wkrótce...</h3>
 					break;
 				case DebentureType.COI:
+					SetDefaultPercentageValues();
 					<h3>Juz wkrótce...</h3>
 					break;
 				default:
@@ -76,7 +85,7 @@
 		</EditForm>
 	</div>
 
-	@if (debenture == null || debenture.DebentureData == null)
+	@if (debenture == null || debenture.DebentureData == null || debenture.DebentureData.DebentureColumns == null)
 	{
 	}
 	else
@@ -85,7 +94,11 @@
 			<div class="card-footer">
 				<div class="row">
 					<div class="col">Całkowity koszt obligacji</div>
-					<div class="col text-right">@debenture.TotalPrice.ToString("N")</div>
+					<div class="col text-right">@Helper.MoneyFormat(debenture.TotalPrice)</div>
+				</div>
+				<div class="row">
+					<div class="col">Przewidywany zysk na koniec okresu obligacji</div>
+					<div class="col text-right">@debenture.FinalProfit</div>
 				</div>
 			</div>
 		</p>
@@ -115,8 +128,6 @@
 </div>
 
 
-
-
 @code {
 	private DebentureModel model = new DebentureModel();
 	private Data.Debenture debenture;
@@ -129,5 +140,10 @@
 	private string InformationAboutDebenture()
 	{
 		return DebentureService.GetInformationAboutDebenture(model.Type);
+	}
+	private void SetDefaultPercentageValues()
+	{
+		model.DOSPercentage = model.Type != DebentureType.DOS ? DefaultValue.DOSPercentage : model.DOSPercentage;
+		model.OTSPercentage = model.Type != DebentureType.OTS ? DefaultValue.OTSPercentage : model.OTSPercentage;
 	}
 }

@@ -1,6 +1,7 @@
 ﻿@page "/loancalculator"
 
 @using MyFinances.Models
+@using MyFinances.Data
 
 @inject NavigationManager NavigationManager
 @inject Data.LoanService LoanService
@@ -19,34 +20,116 @@
 			<ValidationSummary />
 
 			<div class="row justify-content-center">
-
-				<div class="form-group" style="margin: 15px">
-					<label>Kwota Kredytu</label>
-					<InputNumber @bind-Value="model.Amount" class="form-control" />
+				<div class="row">
+					<div class="col">
+						<div class="form-group" style="margin: 15px">
+							<label>Kwota Kredytu</label>
+							<InputNumber @bind-Value="model.Amount" class="form-control" />
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-group" style="margin: 15px">
+							<label>Czas trwania w miesiącach</label>
+							<InputNumber @bind-Value="model.Duration" class="form-control" />
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-group" style="margin: 15px">
+							<label>Oprocentowanie</label>
+							<InputNumber @bind-Value="model.Percentage" class="form-control" />
+						</div>
+					</div>
 				</div>
-
-				<div class="form-group" style="margin: 15px">
-					<label>Czas trwania w miesiącach</label>
-					<InputNumber @bind-Value="model.Duration" class="form-control" />
-				</div>
-
-				<div class="form-group" style="margin: 15px">
-					<label>Oprocentowanie</label>
-					<InputNumber @bind-Value="model.Percentage" class="form-control" />
-				</div>
-
 			</div>
-			<button type="submit" class="btn btn-primary btn-center">Oblicz</button>
+			<div class="form-check-label">
+				<InputCheckbox @bind-Value="excessPaymentCheckBox" class="form-check-label" id="checkbox" />
+				<label class="form-check-label" id="checkbox-label"> Czy kredyt będzie nadpłacany </label>
+			</div>
+			<button type="submit" class="btn btn-primary btn-center"> Oblicz </button>
 		</EditForm>
 	</div>
-	<div id="chartdiv"></div>
-	@if (calculatedLoan == null || calculatedLoan.LoanData == null)
+
+	@if (excessPaymentCheckBox)
 	{
+
+		<div class="card-header">
+			Nadpłaty
+			@if (excessPayments.Count > 0)
+			{
+				<p align="right" style="margin-bottom:0px">
+					@if (showExcess)
+					{
+						<button class="btn btn-outline-secondary btn-sm" @onclick="ChangeShowExcess">Ukryj</button>
+					}
+					else
+					{
+						<button class="btn btn-outline-primary btn-sm" @onclick="ChangeShowExcess">Pokaż</button>
+					}
+				</p>
+			}
+		</div>
+
+		@if (showExcess)
+		{
+			<div class="card-body" style="padding:12px">
+
+				@foreach (var excessPayment in excessPayments)
+				{
+					<div class="row justify-content-center">
+						<div class="form-group" style="margin: 15px">
+							@if (excessPayment == excessPayments.First())
+							{
+								<label>Miesiąc</label>
+							}
+							<input type="number" min="1" @bind-value="excessPayment.Month" @bind-value:event="oninput" class="form-control" />
+						</div>
+
+						<div class="form-group" style="margin: 15px">
+							@if (excessPayment == excessPayments.First())
+							{
+								<label>Nadpłata</label>
+							}
+							<input type="number" min="1" @bind-value="excessPayment.Amount" @bind-value:event="oninput" class="form-control" />
+						</div>
+					</div>
+				}
+				@if (excessPayments.Count > 0)
+				{
+					<p align="right" style="margin-bottom:0px">
+						<button class="btn btn-warning btn-sm" @onclick="CleanExcess">Wyczyść</button>
+					</p>
+				}
+			</div>
+
+
+			<div class="card-footer">
+				<div class="row justify-content-center">
+
+					<div class="form-group" style="margin: 15px">
+						<label>Miesiąc</label>
+						<input @bind="monthInExcessPayment" class="form-control" />
+					</div>
+
+					<div class="form-group" style="margin: 15px">
+						<label>Kwota nadpłaty</label>
+						<input @bind="amountInExcessPayment" class="form-control" />
+					</div>
+
+				</div>
+
+				<button class="btn btn-primary btn-center" style="width:170px" @onclick="AddExcessPayment">Dodaj nadpłate</button>
+			</div>
+		}
 	}
+
+	<div id="chartdiv" hidden="@HideChart"></div>
+
+	@if (calculatedLoan == null || calculatedLoan.LoanData == null) { }
 	else
 	{
 		<p>
 			<div class="card-footer">
+
 				<div class="row">
 					<div class="col">Kwota zaciągniętego kredytu</div>
 					<div class="col text-right">@calculatedLoan.TotalAmount</div>
@@ -59,6 +142,17 @@
 					<div class="col">Całkowita wartość odsetek</div>
 					<div class="col text-right">@calculatedLoan.TotalAdditionalPayment</div>
 				</div>
+				@if (excessPaymentCheckBox)
+				{
+					<div class="row">
+						<div class="col">Kwota kredytu bez nadpłacania</div>
+						<div class="col text-right">@calculatedLoan.TotalPaymentAmountWithoutExcessPayment</div>
+					</div>
+					<div class="row">
+						<div class="col">Różnica wpłat dla nadpłacanego kredytu</div>
+						<div class="col text-right">@calculatedLoan.DifferenceBetweenOverpayments</div>
+					</div>
+				}
 			</div>
 		</p>
 
@@ -90,10 +184,42 @@
 @code {
 	private LoanModel model = new LoanModel();
 	private Data.Loan calculatedLoan;
+	bool HideChart = true;
+	bool excessPaymentCheckBox = false;
+
+	bool showExcess = true;
+	private void ChangeShowExcess() => showExcess = !showExcess;
 
 	private async Task CalculateLoan()
 	{
+		if (excessPaymentCheckBox)
+			model.ExcessPayments = excessPayments;
+		else
+			model.ExcessPayments = new List<ExcessPayment>();
+
 		calculatedLoan = await LoanService.GetLoanAsync(model);
-		await jsRunTime.InvokeVoidAsync("CreatePieChart",calculatedLoan.Amount,calculatedLoan.TotalAdditionalPaymentDouble);
+		await jsRunTime.InvokeVoidAsync("CreatePieChart", calculatedLoan.Amount, calculatedLoan.TotalAdditionalPaymentDouble);
+		HideChart = false;
+	}
+
+
+
+	private List<ExcessPayment> excessPayments = new();
+	private int monthInExcessPayment;
+	private double amountInExcessPayment;
+
+
+	private void AddExcessPayment()
+	{
+		if (amountInExcessPayment > 0 && monthInExcessPayment > 0)
+		{
+			excessPayments.Add(new ExcessPayment { Month = monthInExcessPayment, Amount = amountInExcessPayment });
+			amountInExcessPayment = 0;
+			monthInExcessPayment = 0;
+		}
+	}
+	private void CleanExcess()
+	{
+		excessPayments.Clear();
 	}
 }

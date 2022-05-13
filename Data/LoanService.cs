@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MyFinances.Helpers;
+using System.Collections;
 
 namespace MyFinances.Data
 {
@@ -13,37 +14,47 @@ namespace MyFinances.Data
 		public Task<Loan> GetLoanAsync(LoanModel loanModel)
 		{
 			LoanModel = loanModel;
-			var loanResult = CalculateLoan();
+			var loanResult = CalculateLoanResult();
 
 			return Task.FromResult(loanResult);
 		}
-
-		private Loan CalculateLoan()
+		private Loan CalculateLoanResult()
 		{
 			var loanResult = new Loan(LoanModel);
 
-			var monthRows = new string[loanResult.Duration];
-			var totalValueRows = new string[loanResult.Duration];
-			var loanRows = new string[loanResult.Duration];
-			var interestRows = new string[loanResult.Duration];
-			var paymentsSum = new string[loanResult.Duration];
+			var capital = new double[loanResult.Duration];
+			var loan = new double[loanResult.Duration];
+			var interest = new double[loanResult.Duration];
+			var paymentSum = new double[loanResult.Duration];
 
-			double loan = Math.Round((loanResult.Amount * loanResult.PercentageNumber) / (12 * (1 - Math.Pow((12 / (12 + loanResult.PercentageNumber)), loanResult.Duration))), 2);
-			double capital = loanResult.Amount;
-			double paymentSum = 0;
+			capital[0] = loanResult.Amount;
 
 			for (int i = 0; i < loanResult.Duration; i++)
 			{
-				double odsetki = capital * loanResult.PercentageNumber / 12;
+				interest[i] = capital[i] * loanResult.PercentageNumber / 12;
+				double calculatedLoan = CalculatedLoan(capital[i], loanResult.PercentageNumber, loanResult.Duration - i);
 
-				monthRows[i] = (i+1).ToString();
-				loanRows[i] = i==loanResult.Duration? Helper.MoneyFormat(capital+odsetki) : Helper.MoneyFormat(loan);
-				interestRows[i] = Helper.MoneyFormat(odsetki);
-				totalValueRows[i] = Helper.MoneyFormat(capital);
-				paymentSum += loan;
-				paymentsSum[i] = Helper.MoneyFormat(paymentSum);
-				capital -= (loan - odsetki);
+				if (LoanModel.ExcessPayments.Exists(x => x.Month == i + 1))
+					calculatedLoan += LoanModel.ExcessPayments.Find(x => x.Month == i + 1).Amount;
+
+				loan[i] = calculatedLoan;
+
+				if (i < loanResult.Duration - 1)
+				{
+					capital[i + 1] = capital[i] - calculatedLoan + interest[i];
+
+					if (capital[i + 1] <= 0)
+						capital[i + 1] = 0;
+				}
+
+				paymentSum[i] = i != 0 ? paymentSum[i - 1] + loan[i] : 0;
 			}
+
+			var paymentsSumRows = paymentSum.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var interestRows = interest.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var totalValueRows = capital.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var loanRows = loan.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var monthRows = Enumerable.Range(1, loanResult.Duration).Select(a => a.ToString()).ToArray();
 
 			loanResult.LoanData.LoanColumns = new LoanColumn[5]
 			{
@@ -51,14 +62,21 @@ namespace MyFinances.Data
 				new LoanColumn() { Rows = totalValueRows },
 				new LoanColumn() { Rows = loanRows },
 				new LoanColumn() { Rows = interestRows },
-				new LoanColumn() { Rows = paymentsSum }
+				new LoanColumn() { Rows = paymentsSumRows }
 			};
 
-			loanResult.TotalAdditionalPayment = Helper.MoneyFormat((loanResult.Duration * loan) - loanResult.Amount);
-			loanResult.TotalPaymentAmount = Helper.MoneyFormat(loanResult.Duration * loan);
-			loanResult.TotalAdditionalPaymentDouble = (loanResult.Duration * loan) - loanResult.Amount;
+			loanResult.TotalAdditionalPayment = Helper.MoneyFormat(loan.Sum() - loanResult.Amount);
+			loanResult.TotalPaymentAmount = Helper.MoneyFormat(loan.Sum());
+			loanResult.TotalAdditionalPaymentDouble = (loan.Sum()) - loanResult.Amount;
+			loanResult.TotalPaymentAmountWithoutExcessPayment = Helper.MoneyFormat(CalculatedLoan(loanResult.Amount, loanResult.PercentageNumber, loanResult.Duration) * loanResult.Duration);
+			loanResult.DifferenceBetweenOverpayments = Helper.MoneyFormat(CalculatedLoan(loanResult.Amount, loanResult.PercentageNumber, loanResult.Duration) * loanResult.Duration - loan.Sum());
 
 			return loanResult;
+		}
+
+		private double CalculatedLoan(double capital, double percentage, int duration)
+		{
+			return Math.Round((capital * percentage) / (12 * (1 - Math.Pow((12 / (12 + percentage)), duration))), 2);
 		}
 	}
 
@@ -81,6 +99,8 @@ namespace MyFinances.Data
 		public string TotalPaymentAmount { get; set; }
 		public double TotalAdditionalPaymentDouble { get; set; }
 		public string TotalAdditionalPayment { get; set; }
+		public string TotalPaymentAmountWithoutExcessPayment { get; set; }
+		public string DifferenceBetweenOverpayments { get; set; }
 		public LoanResult LoanData { get; set; }
 	}
 
@@ -93,5 +113,11 @@ namespace MyFinances.Data
 	public class LoanColumn
 	{
 		public string[] Rows { get; set; }
+	}
+
+	public class ExcessPayment
+	{
+		public int Month { get; set; }
+		public double Amount { get; set; }
 	}
 }

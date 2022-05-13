@@ -15,6 +15,15 @@
 			<DataAnnotationsValidator />
 			<ValidationSummary />
 
+			<div class="form-check-label">
+				<InputCheckbox @bind-Value="model.Capitalization" class="form-check-label" id="checkbox" />
+				<label class="form-check-label" id="checkbox-label"> Kapitalizacja </label>
+			</div>
+			<div class="form-check-label">
+				<InputCheckbox @bind-Value="model.BelkaTax" class="form-check-label" id="checkbox" />
+				<label class="form-check-label" id="checkbox-label"> Podatek 19% </label>
+			</div>
+
 			<div class="row justify-content-center">
 				<div class="row">
 
@@ -50,19 +59,6 @@
 							<InputNumber @bind-Value="model.Period" class="form-control" />
 						</div>
 					</div>
-					<div class="col">
-						<div class="form-group" style="margin: 15px">
-							<label>Podatek 19%</label>
-							<InputCheckbox @bind-Value="model.BelkaTax" class="form-control" />
-						</div>
-					</div>
-					<div class="col">
-						<div class="form-group" style="margin: 15px">
-							<label>Kapitalizacja </label>
-							<InputCheckbox @bind-Value="model.Capitalization" class="form-control" />
-						</div>
-					</div>
-
 				</div>
 
 			</div>
@@ -77,7 +73,7 @@
 		<p>
 			<div class="card-footer">
 				<div class="row">
-					<div class="col">Kwota wpłacona na lokate</div>
+					<div class="col">Kwota na lokacie</div>
 					<div class="col text-right">@calculatedDeposit.TotalAmount</div>
 				</div>
 				<div class="row">

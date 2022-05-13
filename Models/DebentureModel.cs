@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyFinances.Helpers;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,7 +16,11 @@ namespace MyFinances.Models
 		[Required]
 		public DebentureType Type { get; set; }
 
-		public double OTSPercentage { get; set; } = 1.5;
+		[Range(0.001, 30, ErrorMessage = "Wysokość oprocentowania nie może być mniejsza od zera lub większa od 30")]
+		public double OTSPercentage { get; set; } = DefaultValue.OTSPercentage;
+
+		[Range(0.001, 30, ErrorMessage = "Wysokość oprocentowania nie może być mniejsza od zera lub większa od 30")]
+		public double DOSPercentage { get; set; } = DefaultValue.DOSPercentage;
 
 		[Required]
 		public bool BelkaTax { get; set; }

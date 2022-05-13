@@ -14,5 +14,11 @@ namespace MyFinances.Helpers
 			nfi.NumberGroupSeparator = " ";
 			return value.ToString("#,0.00",nfi) + " zł";
 		}
+
+	}
+	public static class DefaultValue
+	{
+		public static double OTSPercentage = 1.5;
+		public static double DOSPercentage = 3;
 	}
 }

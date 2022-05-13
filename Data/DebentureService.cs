@@ -41,6 +41,44 @@ namespace MyFinances.Data
 
 		private void CalculateDOS(Debenture debentureResult)
 		{
+			var yearRows = new string[4];
+			var totalValueRows = new string[4];
+			var interestRateRows = new string[4];
+			var interestProfitRows = new string[4];
+			var taxRows = new string[4];
+			var totalProfitRows = new string[4];
+
+			var interestRate = (double) DebentureModel.DOSPercentage;
+			var interestProfitAfter1Year = Math.Round(debentureResult.TotalPrice * interestRate / 100, 2);
+			var interestProfitAfter2Year = Math.Round((debentureResult.TotalPrice + interestProfitAfter1Year) * interestRate / 100, 2) + interestProfitAfter1Year;
+			var tax = (Math.Floor(interestProfitAfter2Year * 19) + 1) / 100 < 0.01 ? 0 : (Math.Floor(interestProfitAfter2Year * 19) + 1) / 100;
+
+			interestProfitRows[0] = Helper.MoneyFormat(0);
+			interestProfitRows[1] = Helper.MoneyFormat(interestProfitAfter1Year);
+			interestProfitRows[2] = DebentureModel.BelkaTax ? Helper.MoneyFormat(interestProfitAfter2Year - tax) : Helper.MoneyFormat(interestProfitAfter2Year);
+
+			totalProfitRows[0] = Helper.MoneyFormat(0);
+			totalProfitRows[1] = Helper.MoneyFormat(interestProfitAfter1Year);
+			totalProfitRows[2] = Helper.MoneyFormat(DebentureModel.BelkaTax ? interestProfitAfter2Year - tax : interestProfitAfter2Year);
+
+			for (int i = 0; i <= 2; i++)
+			{
+				yearRows[i] = i.ToString();
+				totalValueRows[i] = Helper.MoneyFormat(debentureResult.TotalPrice);
+				interestRateRows[i] = $"{interestRate}%";
+				taxRows[i] = i == 2 && DebentureModel.BelkaTax ? Helper.MoneyFormat(tax) : Helper.MoneyFormat(0);
+			}
+
+			debentureResult.DebentureData.DebentureColumns = new DebentureColumn[6]
+			{
+				new DebentureColumn() { Rows = yearRows },
+				new DebentureColumn() { Rows = totalValueRows },
+				new DebentureColumn() { Rows = interestRateRows },
+				new DebentureColumn() { Rows = interestProfitRows },
+				new DebentureColumn() { Rows = taxRows },
+				new DebentureColumn() { Rows = totalProfitRows }
+			};
+			debentureResult.FinalProfit = totalProfitRows[2];
 		}
 
 		private void CalculateTOZ(Debenture debentureResult)
@@ -53,8 +91,6 @@ namespace MyFinances.Data
 
 		private void CalculateOTS(Debenture debentureResult)
 		{
-			debentureResult.DebentureData = new DebentureResult();
-
 			var monthRows = new string[4];
 			var totalValueRows = new string[4];
 			var interestRateRows = new string[4];
@@ -62,7 +98,7 @@ namespace MyFinances.Data
 			var taxRows = new string[4];
 			var totalProfitRows = new string[4];
 
-			var interestRate = DebentureModel.OTSPercentage;
+			var interestRate = (double) DebentureModel.OTSPercentage;
 			var interestProfitAfter3Months = Math.Round(debentureResult.TotalPrice * interestRate / 100 / 4, 2);
 			var tax = (Math.Floor(interestProfitAfter3Months * 19) + 1) / 100 < 0.01 ? 0 : (Math.Floor(interestProfitAfter3Months * 19) + 1) / 100;
 
@@ -86,6 +122,7 @@ namespace MyFinances.Data
 				new DebentureColumn() { Rows = taxRows },
 				new DebentureColumn() { Rows = totalProfitRows }
 			};
+			debentureResult.FinalProfit = totalProfitRows[3];
 		}
 
 		private void CalculateEDO(Debenture debentureResult)
@@ -102,17 +139,38 @@ namespace MyFinances.Data
 		public Debenture(DebentureModel debentureModel)
 		{
 			this.TotalPrice = debentureModel.Amount * 100;
+			this.DebentureData = new DebentureResult(debentureModel.Type);
 		}
 		public double TotalPrice { get; set; }
 		public DebentureResult DebentureData { get; set; }
+		public string FinalProfit { get; set; }
 		public string InformationAboutDebenture { get; set; } = "Podstawowe Informację dotyczące typu obligacji";
 	}
 
 	public class DebentureResult
 	{
-		public DebentureResult()
+		public DebentureResult(DebentureType type)
 		{
-			this.Head = new string[6] { "Miesiąc", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
+			switch (type)
+			{
+				case DebentureType.OTS:
+					this.Head = new string[6] { "Miesiąc", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
+					break;
+				case DebentureType.DOS:
+					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
+					break;
+				case DebentureType.TOZ:
+					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
+					break;
+				case DebentureType.COI:
+					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
+					break;
+				case DebentureType.EDO:
+					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
+					break;
+				default:
+					break;
+			}
 		}
 		public string[] Head { get; set; }
 		public DebentureColumn[] DebentureColumns { get; set; }
