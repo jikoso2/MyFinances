@@ -58,3 +58,17 @@ a, .btn-link {
 	transform: translate(-50%, 0%);
 }
 
+th{
+	text-align:center;
+}
+tbody{
+	font-size:16px;
+	font-style:normal;
+}
+tr{
+	text-align:center;
+}
+td{
+	text-align:-webkit-center;
+	align-content:center;
+}

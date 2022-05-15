@@ -15,6 +15,11 @@ namespace MyFinances.Helpers
 			return value.ToString("#,0.00",nfi) + " zł";
 		}
 
+		public static string PercentFormat(double valueNumber)
+		{
+			return valueNumber.ToString() + " %";
+		}
+
 	}
 	public static class DefaultValue
 	{
