@@ -45,11 +45,15 @@
 			</div>
 			<div class="form-check-label">
 				<InputCheckbox @bind-Value="isExcessPayment" class="form-check-label" id="checkbox" />
-				<label class="form-check-label" id="checkbox-label"> Czy kredyt będzie nadpłacany </label>
+				<label class="form-check-label" id="checkbox-label"> Nadpłaty kredytu </label>
 			</div>
 			<div class="form-check-label">
 				<InputCheckbox @bind-Value="isVariableInterest" class="form-check-label" id="checkbox" />
 				<label class="form-check-label" id="checkbox-label"> Zmienne oprocentowanie </label>
+			</div>
+			<div class="form-check-label">
+				<InputCheckbox @bind-Value="isPeriodicExcessPayment" class="form-check-label" id="checkbox" />
+				<label class="form-check-label" id="checkbox-label"> Cykliczne nadpłaty kredytu </label>
 			</div>
 			<button type="submit" class="btn btn-primary btn-center"> Oblicz </button>
 		</EditForm>
@@ -102,7 +106,7 @@
 					</div>
 
 					<p align="right" style="margin-bottom:0px">
-						<button class="btn btn-warning btn-sm" @onclick="CleanExcess">Wyczyść</button>
+						<button class="btn btn-warning btn-sm" @onclick="ClearExcessPayments">Wyczyść</button>
 					</p>
 
 				</div>
@@ -176,7 +180,7 @@
 					</div>
 
 					<p align="right" style="margin-bottom:0px">
-						<button class="btn btn-warning btn-sm" @onclick="CleanVariableInterest">Wyczyść</button>
+						<button class="btn btn-warning btn-sm" @onclick="ClearVariableInterest">Wyczyść</button>
 					</p>
 
 				</div>
@@ -206,6 +210,89 @@
 		}
 	}
 
+	@if (isPeriodicExcessPayment)
+	{
+		<div class="card-footer">
+			Cykliczne wpłaty
+			<p align="right" style="margin-bottom:0px">
+				@if (isPeriodicExcessPaymentVisible)
+				{
+					<button class="btn btn-outline-secondary btn-sm" @onclick="ChangeShowPeriodicVariableInterest">Ukryj</button>
+				}
+				else
+				{
+					<button class="btn btn-outline-primary btn-sm" @onclick="ChangeShowPeriodicVariableInterest">Pokaż</button>
+				}
+			</p>
+		</div>
+		@if (isPeriodicExcessPaymentVisible)
+		{
+			@if (periodicExcessPayments.Count > 0)
+			{
+				<div class="card-body" style="padding:12px;align-content:center">
+					<div class="row justify-content-center">
+						<table style="width:300px" class="table table-bordered">
+							<thead>
+								<tr>
+									<th>
+										Początek
+									</th>
+									<th>
+										Koniec
+									</th>
+									<th>
+										Nadpłaty
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var column in periodicExcessPayments)
+								{
+									<tr>
+										<th style="font-weight:normal"> @column.StartMonth </th>
+										<th style="font-weight:normal"> @column.EndMonth </th>
+										<th style="font-weight:normal"> @Helper.MoneyFormat(column.Amount)</th>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+
+					<p align="right" style="margin-bottom:0px">
+						<button class="btn btn-warning btn-sm" @onclick="ClearPeriodicExcessPayments">Wyczyść</button>
+					</p>
+
+				</div>
+			}
+
+			<div class="card-footer">
+				<EditForm Model="periodicExcessPaymentModel" OnValidSubmit="AddPeriodicExcessPayment">
+					<div class="row justify-content-center">
+
+						<div class="form-group" style="margin: 15px">
+							<label>Początek nadpłacania</label>
+							<input @bind="periodicExcessPaymentModel.StartMonth" class="form-control" />
+						</div>
+
+						<div class="form-group" style="margin: 15px">
+							<label>Koniec nadpłacania</label>
+							<input @bind="periodicExcessPaymentModel.EndMonth" class="form-control" />
+						</div>
+
+						<div class="form-group" style="margin: 15px">
+							<label>Wysokość nadpłat</label>
+							<input @bind="periodicExcessPaymentModel.Amount" class="form-control" />
+						</div>
+
+					</div>
+					<DataAnnotationsValidator />
+					<ValidationSummary />
+
+					<button class="btn btn-primary btn-center" style="width:auto" @onclick="ChangeLoanDurationInOtherModels">Dodaj zmiane oprocentowania</button>
+				</EditForm>
+			</div>
+		}
+	}
 	<div id="chartdiv" hidden="@isHidePieChart"></div>
 
 	@if (loanCalculateResult == null || loanCalculateResult.LoanData == null) { }
@@ -250,15 +337,21 @@
 @code {
 	private LoanModel model = new LoanModel();
 	private Data.Loan loanCalculateResult;
+
 	bool isHidePieChart = true;
+
 	bool isExcessPayment = false;
 	bool isVariableInterest = false;
+	bool isPeriodicExcessPayment = false;
+
 	bool isExcessVisible = true;
 	bool isVariableInterestVisible = true;
+	bool isPeriodicExcessPaymentVisible = true;
 
 
 	private void ChangeShowExcess() => isExcessVisible = !isExcessVisible;
 	private void ChangeShowVariableInterest() => isVariableInterestVisible = !isVariableInterestVisible;
+	private void ChangeShowPeriodicVariableInterest() => isPeriodicExcessPaymentVisible = !isPeriodicExcessPaymentVisible;
 
 	private async Task CalculateLoan()
 	{
@@ -272,22 +365,29 @@
 		else
 			model.VariableInterest = new Dictionary<int, double>();
 
+		if (isPeriodicExcessPayment)
+			model.PeriodicExcessPayments = periodicExcessPayments;
+		else
+			model.PeriodicExcessPayments = new List<PeriodicExcessPaymentModel>();
+
 		loanCalculateResult = await LoanService.GetCalculatedLoanAsync(model);
 		await jsRunTime.InvokeVoidAsync("CreatePieChart", model.Amount, loanCalculateResult.TotalAdditionalPaymentToPieChart);
 		isHidePieChart = false;
 	}
 
 
-
 	private List<ExcessPayment> excessPayments = new();
 	private Dictionary<int, double> variableInterest = new();
+	private List<PeriodicExcessPaymentModel> periodicExcessPayments = new();
 
-	private int monthInVariableInterest;
-	private double percentageInVariableInterest;
+
 	private ExcessPaymentModel excessPaymentModel = new();
 	private VariableInterestModel variableInterestModel = new();
+	private PeriodicExcessPaymentModel periodicExcessPaymentModel = new();
 
-	private void ChangeLoanDurationInOtherModels() { excessPaymentModel.LoanDuration = model.Duration; variableInterestModel.LoanDuration = model.Duration; }
+
+	private void ChangeLoanDurationInOtherModels() { excessPaymentModel.LoanDuration = model.Duration; variableInterestModel.LoanDuration = model.Duration; periodicExcessPaymentModel.LoanDuration = model.Duration; }
+
 
 	private void AddExcessPayment()
 	{
@@ -318,12 +418,22 @@
 		model.MinDuration = variableInterest.Last().Key;
 	}
 
-	private void CleanExcess()
+	private void AddPeriodicExcessPayment()
+	{
+		periodicExcessPayments.Add(new PeriodicExcessPaymentModel(periodicExcessPaymentModel));
+	}
+
+	private void ClearExcessPayments()
 	{
 		excessPayments.Clear();
 	}
 
-	private void CleanVariableInterest()
+	private void ClearPeriodicExcessPayments()
+	{
+		periodicExcessPayments.Clear();
+	}
+
+	private void ClearVariableInterest()
 	{
 		variableInterest.Clear();
 	}

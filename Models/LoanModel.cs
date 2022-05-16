@@ -9,6 +9,19 @@ namespace MyFinances.Models
 {
 	public class LoanModel
 	{
+		public LoanModel() { }
+
+		public LoanModel(LoanModel model)
+		{
+			Amount = model.Amount;
+			Percentage = model.Percentage;
+			Duration = model.Duration;
+			ExcessPayments = model.ExcessPayments;
+			VariableInterest = model.VariableInterest;
+			PeriodicExcessPayments = model.PeriodicExcessPayments;
+			MinDuration = model.MinDuration;
+		}
+
 		[Required]
 		[Range(1, 100000000, ErrorMessage = "Wysokość kredytu nie może być mniejsza od zera lub większa od 10 milionów")]
 		public long Amount { get; set; } = 400000;
@@ -26,6 +39,8 @@ namespace MyFinances.Models
 
 		public Dictionary<int, double> VariableInterest { get; set; } = new Dictionary<int, double>();
 
+		public List<PeriodicExcessPaymentModel> PeriodicExcessPayments { get; set; } = new List<PeriodicExcessPaymentModel>();
+
 		public double PercentageNumber { get { return Percentage / 100; } }
 
 		public int MinDuration { get; set; } = 0;
@@ -38,7 +53,11 @@ namespace MyFinances.Models
 			protected override ValidationResult IsValid(object value, ValidationContext validationContext)
 			{
 				var loanModel = (LoanModel)validationContext.ObjectInstance;
-				if (Double.Parse(value.ToString()) >= loanModel.MinDuration)
+				if (Double.Parse(value.ToString()) > loanModel.MinDuration)
+				{
+					return null;
+				}
+				if (Double.Parse(value.ToString()) == loanModel.MinDuration && loanModel.ExcessPayments.Count == 0)
 				{
 					return null;
 				}

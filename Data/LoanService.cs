@@ -10,11 +10,11 @@ namespace MyFinances.Data
 {
 	public class LoanService
 	{
-		LoanModel LoanModel;
+		LoanModel LoanModel = new LoanModel();
 
 		public Task<Loan> GetCalculatedLoanAsync(LoanModel loanModel)
 		{
-			LoanModel = loanModel;
+			LoanModel = new LoanModel(loanModel);
 			var loanResult = CalculateLoanResult();
 			return Task.FromResult(loanResult);
 		}
@@ -22,6 +22,8 @@ namespace MyFinances.Data
 		private Loan CalculateLoanResult()
 		{
 			var loanResult = new Loan(LoanModel);
+
+			ConvertPeriodicExcessPayments();
 
 			var capital = new double[LoanModel.Duration];
 			var instalment = new double[LoanModel.Duration];
@@ -46,7 +48,11 @@ namespace MyFinances.Data
 					capital[i + 1] = capital[i] - calculatedLoan + interest[i];
 
 					if (capital[i + 1] <= 0)
+					{
 						capital[i + 1] = 0;
+						paymentSum[i] = paymentSum[i - 1] + capital[i];
+						continue;
+					}
 				}
 
 				paymentSum[i] = i != 0 ? paymentSum[i - 1] + instalment[i] : instalment[i];
@@ -86,7 +92,7 @@ namespace MyFinances.Data
 				loanResult.LoanInfo.Add(Tuple.Create("Różnica wpłat dla nadpłacanego kredytu", Helper.MoneyFormat(DifferenceBetweenOverpayments)));
 
 				var TotalPaymentAmountWithoutExcessPayment = CalculatedConstantLoan(LoanModel.Amount, LoanModel.PercentageNumber, LoanModel.Duration) * LoanModel.Duration;
-				loanResult.LoanInfo.Add(Tuple.Create("Kwota kredytu bez nadpłacania", Helper.MoneyFormat(TotalPaymentAmountWithoutExcessPayment)));
+				loanResult.LoanInfo.Add(Tuple.Create("Całkowity koszt kredytu bez nadpłacania", Helper.MoneyFormat(TotalPaymentAmountWithoutExcessPayment)));
 			}
 
 			var TotalPaymentAmount = instalment.Sum();
@@ -100,6 +106,21 @@ namespace MyFinances.Data
 
 
 			return loanResult;
+		}
+
+		private void ConvertPeriodicExcessPayments()
+		{
+			foreach (var periodicPayment in LoanModel.PeriodicExcessPayments)
+			{
+				for (int i = periodicPayment.StartMonth; i <= periodicPayment.EndMonth; i++)
+				{
+					var payment = LoanModel.ExcessPayments.Where(a => a.Month == i).FirstOrDefault();
+					if (payment != null)
+						payment.Amount += periodicPayment.Amount;
+					else
+						LoanModel.ExcessPayments.Add(new ExcessPayment() { Amount = periodicPayment.Amount, Month = i });
+				}
+			}
 		}
 
 		private double[] GetVariableInterestPercentage()
