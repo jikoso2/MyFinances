@@ -9,25 +9,12 @@ namespace MyFinances.Models
 {
 	public class LoanModel
 	{
-		public LoanModel() { }
-
-		public LoanModel(LoanModel model)
-		{
-			Amount = model.Amount;
-			Percentage = model.Percentage;
-			Duration = model.Duration;
-			ExcessPayments = model.ExcessPayments;
-			VariableInterest = model.VariableInterest;
-			PeriodicExcessPayments = model.PeriodicExcessPayments;
-			MinDuration = model.MinDuration;
-		}
-
 		[Required]
-		[Range(1, 100000000, ErrorMessage = "Wysokość kredytu nie może być mniejsza od zera lub większa od 10 milionów")]
+		[Range(1, 10000000, ErrorMessage = "Wysokość kredytu nie może być mniejsza od złotówki lub większa od 10 milionów złotych")]
 		public long Amount { get; set; } = 400000;
 
 		[Required]
-		[Range(0.01, 30, ErrorMessage = "Wysokość oprocentowania nie może być bardzo mała, ujemna lub większa od 30")]
+		[Range(0.01, 30, ErrorMessage = "Wysokość oprocentowania nie może być ujemna, mniejsza od 0,01 % lub większa od 30 %")]
 		public double Percentage { get; set; } = 7.5;
 
 		[Required]
