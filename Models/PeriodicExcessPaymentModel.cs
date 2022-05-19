@@ -41,6 +41,7 @@ namespace MyFinances.Models
 			protected override ValidationResult IsValid(object value, ValidationContext validationContext)
 			{
 				var periodicExcessPaymentModel = (PeriodicExcessPaymentModel)validationContext.ObjectInstance;
+
 				if (Double.Parse(value.ToString()) <= periodicExcessPaymentModel.LoanDuration)
 				{
 					return null;
@@ -55,12 +56,14 @@ namespace MyFinances.Models
 			protected override ValidationResult IsValid(object value, ValidationContext validationContext)
 			{
 				var periodicExcessPaymentModel = (PeriodicExcessPaymentModel)validationContext.ObjectInstance;
-				if (Double.Parse(value.ToString()) < periodicExcessPaymentModel.EndMonth)
-				{
-					return null;
-				}
 
-				return new ValidationResult("Nadpłacać można jedynie w miesiącach trwania kredytu", new[] { validationContext.MemberName });
+				if (Double.Parse(value.ToString()) > periodicExcessPaymentModel.LoanDuration)
+					return new ValidationResult("Nadpłacać można jedynie w miesiącach trwania kredytu", new[] { validationContext.MemberName });
+
+				if (Double.Parse(value.ToString()) > periodicExcessPaymentModel.EndMonth)
+					return new ValidationResult("Końcowy miesiąc musi być później niż początkowy miesiąc", new[] { validationContext.MemberName });
+
+				return null;
 			}
 		}
 	}

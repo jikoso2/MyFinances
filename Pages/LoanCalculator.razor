@@ -373,13 +373,9 @@
 		else
 			model.PeriodicExcessPayments = new List<PeriodicExcessPaymentModel>();
 
-		Thread.Sleep(500);
 		loanCalculateResult = await LoanService.GetCalculatedLoanAsync(model);
 		await jsRunTime.InvokeVoidAsync("CreatePieChart", model.Amount, loanCalculateResult.TotalAdditionalPaymentToPieChart);
 		isHidePieChart = false;
-		isExcessVisible = false;
-		isPeriodicExcessPaymentVisible = false;
-		isVariableInterestVisible = false;
 	}
 
 

@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace MyFinances.Models
 {
 	public class DebentureModel
 	{
 		[Required]
-		[Range(1,10000,ErrorMessage = "Liczba zakupionych obligacji musi być całkowita i dodatnia")]
+		[Range(1, 10000, ErrorMessage = "Liczba zakupionych obligacji musi być całkowita i dodatnia")]
 		public int Amount { get; set; }
 
 		[Required]
@@ -26,8 +25,8 @@ namespace MyFinances.Models
 		public bool BelkaTax { get; set; }
 	}
 
-	public enum DebentureType 
-	{ 
+	public enum DebentureType
+	{
 		OTS,
 		DOS,
 		TOZ,

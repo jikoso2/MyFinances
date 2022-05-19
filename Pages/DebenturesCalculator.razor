@@ -6,7 +6,7 @@
 
 
 
-<div class="card mx-auto mt-5" style="width: 80%">
+<div class="card mx-auto mt-5" style="width: 65rem">
 	<div class="card-header">
 		Kalkulator Obligacji
 	</div>
@@ -78,41 +78,38 @@
 					break;
 			}
 
-
-
 			<button class="btn btn-primary" type="submit">Oblicz</button>
 
 		</EditForm>
 	</div>
 
-	@if (debenture == null || debenture.DebentureData == null || debenture.DebentureData.DebentureColumns == null)
+	@if (debentureResult == null || debentureResult.DebentureData == null || debentureResult.DebentureData.DebentureColumns == null)
 	{
 	}
 	else
 	{
 		<p>
 			<div class="card-footer">
-				<div class="row">
-					<div class="col">Całkowity koszt obligacji</div>
-					<div class="col text-right">@Helper.MoneyFormat(debenture.TotalPrice)</div>
-				</div>
-				<div class="row">
-					<div class="col">Przewidywany zysk na koniec okresu obligacji</div>
-					<div class="col text-right">@debenture.FinalProfit</div>
-				</div>
+				@foreach (var debentureInfo in debentureResult.DebentureInfo)
+				{
+					<div class="row">
+						<div class="col">@debentureInfo.Item1</div>
+						<div class="col text-right">@debentureInfo.Item2</div>
+					</div>
+				}
 			</div>
 		</p>
-		<table class="table">
+		<table class="table table-bordered" style="align-content:center">
 			<thead>
 				<tr>
-					@foreach (var head in debenture.DebentureData.Head)
+					@foreach (var head in debentureResult.DebentureData.Head)
 					{
 						<th>@head</th>
 					}
 				</tr>
 			</thead>
 			<tbody>
-				@foreach (var column in debenture.DebentureData.DebentureColumns)
+				@foreach (var column in debentureResult.DebentureData.DebentureColumns)
 				{
 				<td>
 					@foreach (var row in column.Rows)
@@ -130,12 +127,12 @@
 
 @code {
 	private DebentureModel model = new DebentureModel();
-	private Data.Debenture debenture;
+	private Data.Debenture debentureResult;
 
 
 	private async Task CalculateDebentures()
 	{
-		debenture = await DebentureService.GetDebentureAsync(model);
+		debentureResult = await DebentureService.GetDebentureAsync(model);
 	}
 	private string InformationAboutDebenture()
 	{
