@@ -1,7 +1,8 @@
 ﻿@page "/debenturescalculator"
 
-@using MyFinances.Models;
-@using MyFinances.Helpers;
+@using MyFinances.Models
+@using MyFinances.Helpers
+@using MyFinances.Components
 @inject Data.DebentureService DebentureService
 
 
@@ -25,8 +26,8 @@
 					}
 				</InputSelect>
 
-				<div class="form-check-label">
-					<InputCheckbox @bind-Value="model.BelkaTax" class="form-check-label" style="height:25px;width:25px" />
+				<div class="form-check form-switch">
+					<InputCheckbox @bind-Value="model.BelkaTax" class="form-check-switch" style="height:25px;width:25px" />
 					<label class="form-check-label" style="position: absolute; margin-left: 7px"> Uwzględnienie podatku od zysków kapitałowych (19%)</label>
 				</div>
 			</div>
@@ -42,8 +43,8 @@
 			<h5>Wprowadź informacje:</h5>
 
 			<div class="form-group" style="width:25%">
-				<label>Ilość Obligacji</label>
-				<InputNumber @bind-Value="model.Amount" class="form-control" />
+				<label>Ilość obligacji</label>
+				<div class="input-group"><input @bind="model.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">sztuk</span></div></div>
 			</div>
 
 			@switch (model.Type)
@@ -52,19 +53,23 @@
 					SetDefaultPercentageValues();
 					<div class="form-group" style="width:25%">
 						<label>Wysokość rocznego oprocentowania</label>
-						<InputNumber @bind-Value="model.OTSPercentage" class="form-control" />
+						<div class="input-group"><input @bind="model.OTSPercentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
 					</div>
 					break;
 				case DebentureType.DOS:
 					SetDefaultPercentageValues();
 					<div class="form-group" style="width:25%">
 						<label>Wysokość rocznego oprocentowania</label>
-						<InputNumber @bind-Value="model.DOSPercentage" class="form-control" />
+						<div class="input-group"><input @bind="model.DOSPercentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
 					</div>
 					break;
 				case DebentureType.TOZ:
 					SetDefaultPercentageValues();
-					<h3>Juz wkrótce...</h3>
+					<div class="form-group" style="width:25%">
+						<label>Stałe oprocentowanie w 1 okresie</label>
+						<div class="input-group"><input @bind="model.TOZPercentage[0]" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+					</div>
+					<PercentageTOZView model="model"></PercentageTOZView>
 					break;
 				case DebentureType.EDO:
 					SetDefaultPercentageValues();
@@ -142,5 +147,6 @@
 	{
 		model.DOSPercentage = model.Type != DebentureType.DOS ? DefaultValue.DOSPercentage : model.DOSPercentage;
 		model.OTSPercentage = model.Type != DebentureType.OTS ? DefaultValue.OTSPercentage : model.OTSPercentage;
+		model.TOZPercentage = model.Type != DebentureType.TOZ ? DefaultValue.TOZPercentage : model.TOZPercentage;
 	}
 }

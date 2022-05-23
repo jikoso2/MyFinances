@@ -5,7 +5,7 @@
 
 
 
-<div class="card mx-auto mt-5" style="width: 50rem;">
+<div class="card mx-auto mt-5" style="width: 65rem;">
 	<div class="card-header">
 		Kalkulator Lokaty
 	</div>
@@ -30,38 +30,33 @@
 					<div class="col">
 						<div class="form-group" style="margin: 15px">
 							<label>Kwota ulokowana na lokacie</label>
-							<InputNumber @bind-Value="model.Amount" class="form-control" />
+							<div class="input-group"><input @bind="model.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
 						</div>
 					</div>
 
 					<div class="col">
 						<div class="form-group" style="margin: 15px">
 							<label>Czas trwania lokaty</label>
-							<InputNumber @bind-Value="model.Duration" class="form-control" />
+							<div class="input-group"><input @bind="model.Duration" class="form-control"><div class="input-group-append"><span class="input-group-text">dni</span></div></div>
 						</div>
 					</div>
 
 					<div class="col">
 						<div class="form-group" style="margin: 15px">
 							<label>Roczne oprocentowanie</label>
-							<InputNumber @bind-Value="model.Percentage" class="form-control" />
+							<div class="input-group"><input @bind="model.Percentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
 						</div>
 					</div>
-
-				</div>
-
-
-				<div class="row">
-
 					<div class="col">
 						<div class="form-group" style="margin: 15px">
 							<label>Okres kapitalizacji</label>
-							<InputNumber @bind-Value="model.Period" class="form-control" />
+							<div class="input-group"><input @bind="model.Period" class="form-control"><div class="input-group-append"><span class="input-group-text">dni</span></div></div>
 						</div>
 					</div>
 				</div>
-
 			</div>
+
+			<p></p>
 			<button type="submit" class="btn btn-primary btn-center">Oblicz</button>
 		</EditForm>
 	</div>

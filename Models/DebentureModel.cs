@@ -23,6 +23,31 @@ namespace MyFinances.Models
 
 		[Required]
 		public bool BelkaTax { get; set; }
+
+		[DebentureModelValidation.TOZPercentage]
+		public List<double> TOZPercentage { get; set; } = DefaultValue.TOZPercentage;
+	}
+
+	internal class DebentureModelValidation
+	{
+		internal class TOZPercentage : ValidationAttribute
+		{
+			protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+			{
+				var debentureModel = (DebentureModel)validationContext.ObjectInstance;
+
+				if(debentureModel.TOZPercentage[0] < 0 )
+					return new ValidationResult("Oprocentowanie w pierwszym okresie musi być dodatnie", new[] { validationContext.MemberName });
+
+				for (int i = 1; i < debentureModel.TOZPercentage.Count(); i++)
+				{
+					if (debentureModel.TOZPercentage[i] <= 0)
+						return new ValidationResult("Wskaźnik WIBOR 6M musi być dodatni", new[] { validationContext.MemberName });
+				}
+
+				return null;
+			}
+		}
 	}
 
 	public enum DebentureType

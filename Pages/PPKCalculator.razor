@@ -1,0 +1,20 @@
+﻿@page "/ppkcalculator"
+
+
+<div class="card mx-auto mt-5" style="width: 65rem;">
+	<div class="card-header">
+		Kalkulator PPK
+	</div>
+	<div class="card-body">
+
+		<label for="percentageRange" class="form-label"> Wysokość wpłat własnych do PPK </label>
+		<input type="range" class="form-range" min="0.5" max="2" step="0.5" id="percentageRange" @bind="@actualNumber" @bind:event="oninput">
+		<p>@actualNumber</p>
+
+	</div>
+</div>
+
+
+@code {
+	private double actualNumber { get; set; } = 2;
+}
