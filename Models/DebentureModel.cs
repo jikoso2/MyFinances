@@ -26,6 +26,10 @@ namespace MyFinances.Models
 
 		[DebentureModelValidation.TOZPercentage]
 		public List<double> TOZPercentage { get; set; } = DefaultValue.TOZPercentage;
+
+		double rORPercentage = DefaultValue.RORPercentage;
+		[Range(0, 15)]
+		public double RORPercentage { get => rORPercentage; set => rORPercentage = value > 15.0 ? 15.0 : value; }
 	}
 
 	internal class DebentureModelValidation
@@ -36,7 +40,7 @@ namespace MyFinances.Models
 			{
 				var debentureModel = (DebentureModel)validationContext.ObjectInstance;
 
-				if(debentureModel.TOZPercentage[0] < 0 )
+				if (debentureModel.TOZPercentage[0] < 0)
 					return new ValidationResult("Oprocentowanie w pierwszym okresie musi być dodatnie", new[] { validationContext.MemberName });
 
 				for (int i = 1; i < debentureModel.TOZPercentage.Count(); i++)
@@ -56,6 +60,8 @@ namespace MyFinances.Models
 		DOS,
 		TOZ,
 		COI,
-		EDO
+		EDO,
+		ROR,
+		DOR
 	}
 }

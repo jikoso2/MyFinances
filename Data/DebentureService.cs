@@ -32,6 +32,9 @@ namespace MyFinances.Data
 				case DebentureType.EDO:
 					CalculateEDO(debentureResult);
 					break;
+				case DebentureType.ROR:
+					CalculateROR(debentureResult);
+					break;
 				default:
 					break;
 			}
@@ -181,6 +184,26 @@ namespace MyFinances.Data
 
 		private void CalculateEDO(Debenture debentureResult)
 		{
+		}
+
+		private void CalculateROR(Debenture debentureResult)
+		{
+			var totalValue = DebentureModel.Amount * 100;
+			var monthlyProfitPerDebenture = Math.Round(DebentureModel.RORPercentage / 12, 2);
+			var monthlyTaxPerDebenture = (Math.Ceiling(monthlyProfitPerDebenture * 19)) / 100 < 0.01 ? 0 : (Math.Ceiling(monthlyProfitPerDebenture * 19)) / 100;
+			var monthlyProfit = DebentureModel.BelkaTax ? monthlyProfitPerDebenture - monthlyTaxPerDebenture : monthlyProfitPerDebenture;
+			var realPercentage = monthlyProfit >= 0.01 ? Math.Round(monthlyProfit * 12,3) : 0;
+
+			debentureResult.DebentureInfo.Add(Tuple.Create("Koszt obligacji", Helper.MoneyFormat(totalValue)));
+			debentureResult.DebentureInfo.Add(Tuple.Create("Miesięczny zysk", Helper.MoneyFormat(monthlyProfit * DebentureModel.Amount)));
+			debentureResult.DebentureInfo.Add(Tuple.Create("Całkowity zysk", Helper.MoneyFormat(monthlyProfit * 12 * DebentureModel.Amount)));
+
+			if (DebentureModel.BelkaTax)
+			{
+				debentureResult.DebentureInfo.Add(Tuple.Create("Miesięczny podatek", Helper.MoneyFormat(monthlyTaxPerDebenture * DebentureModel.Amount)));
+				debentureResult.DebentureInfo.Add(Tuple.Create("Całkowity podatek", Helper.MoneyFormat(monthlyTaxPerDebenture * 12 * DebentureModel.Amount)));
+				debentureResult.DebentureInfo.Add(Tuple.Create("Rzeczywisty procent", Helper.PercentFormat(realPercentage)));
+			}
 		}
 
 		public string GetInformationAboutDebenture(DebentureType type)
