@@ -32,7 +32,7 @@ namespace MyFinances
 			services.AddSingleton<DebentureService>();
 			services.AddSingleton<LoanService>();
 			services.AddSingleton<DepositService>();
-			
+			services.AddSingleton<PPKService>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

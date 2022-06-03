@@ -30,6 +30,10 @@ namespace MyFinances.Models
 		double rORPercentage = DefaultValue.RORPercentage;
 		[Range(0, 15)]
 		public double RORPercentage { get => rORPercentage; set => rORPercentage = value > 15.0 ? 15.0 : value; }
+
+		double dORPercentage = DefaultValue.DORPercentage;
+		[Range(0, 15)]
+		public double DORPercentage { get => dORPercentage; set => dORPercentage = value > 15.0 ? 15.0 : value; }
 	}
 
 	internal class DebentureModelValidation

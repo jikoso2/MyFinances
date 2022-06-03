@@ -27,5 +27,6 @@ namespace MyFinances.Helpers
 		public static double DOSPercentage = 3;
 		public static List<double> TOZPercentage = new List<double>() {3,2,4,3,2,4};
 		public static double RORPercentage = 5.25;
+		public static double DORPercentage = 5.25;
 	}
 }

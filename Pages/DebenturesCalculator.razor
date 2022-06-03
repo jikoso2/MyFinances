@@ -50,14 +50,14 @@
 			@switch (model.Type)
 			{
 				case DebentureType.OTS:
-					SetDefaultPercentageValues();
+					SwitchDebentureTypeAction();
 					<div class="form-group" style="width:25%">
 						<label>Wysokość rocznego oprocentowania</label>
 						<div class="input-group"><input @bind="model.OTSPercentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
 					</div>
 					break;
 				case DebentureType.DOS:
-					SetDefaultPercentageValues();
+					SwitchDebentureTypeAction();
 					<h3>Podane obligacje od 1.06.2022r są wycofane z emisji.</h3>
 					<div class="form-group" style="width:25%">
 						<label>Wysokość rocznego oprocentowania</label>
@@ -65,7 +65,7 @@
 					</div>
 					break;
 				case DebentureType.TOZ:
-					SetDefaultPercentageValues();
+					SwitchDebentureTypeAction();
 					<div class="form-group" style="width:25%">
 						<label>Stałe oprocentowanie w 1 okresie</label>
 						<div class="input-group"><input @bind="model.TOZPercentage[0]" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
@@ -73,23 +73,33 @@
 					<PercentageTOZView model="model"></PercentageTOZView>
 					break;
 				case DebentureType.EDO:
-					SetDefaultPercentageValues();
+					SwitchDebentureTypeAction();
 					<h3>Juz wkrótce...</h3>
 					break;
 				case DebentureType.COI:
-					SetDefaultPercentageValues();
+					SwitchDebentureTypeAction();
 					<h3>Juz wkrótce...</h3>
 					break;
 				case DebentureType.DOR:
-					SetDefaultPercentageValues();
-					<h3>Juz wkrótce...</h3>
-					break;
-				case DebentureType.ROR:
-					SetDefaultPercentageValues();
+					SwitchDebentureTypeAction();
 					<section class="w-100 p-4 pb-4">
 						<label for="customRange3" class="form-label">Referencyjna stopa oprocentowania</label>
 						<div class="range" style="width:100%">
-							<input type="range" class="form-range" min="0" max="15" step="0.25" id="customRange3" @onchange="DynamicCalculate" @bind="model.RORPercentage" @bind:event="oninput" style="width:100%" />
+							<input type="range" class="form-range" min="0" max="15" step="0.25" id="customRange3" @onchange="CalculateDebentures" @bind="model.DORPercentage" @bind:event="oninput" style="width:100%" />
+						</div>
+
+
+						<div class="form-group" style="width:25%">
+							<div class="input-group"><input disabled="@true" @bind="model.DORPercentage" max="15" min="0" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+						</div>
+					</section>
+					break;
+				case DebentureType.ROR:
+					SwitchDebentureTypeAction();
+					<section class="w-100 p-4 pb-4">
+						<label for="customRange3" class="form-label">Referencyjna stopa oprocentowania</label>
+						<div class="range" style="width:100%">
+							<input type="range" class="form-range" min="0" max="15" step="0.25" id="customRange3" @onchange="CalculateDebentures" @bind="model.RORPercentage" @bind:event="oninput" style="width:100%" />
 						</div>
 
 
@@ -167,17 +177,20 @@
 	{
 		return DebentureService.GetInformationAboutDebenture(model.Type);
 	}
-	private void SetDefaultPercentageValues()
+	private void SwitchDebentureTypeAction()
 	{
 		model.DOSPercentage = model.Type != DebentureType.DOS ? DefaultValue.DOSPercentage : model.DOSPercentage;
 		model.OTSPercentage = model.Type != DebentureType.OTS ? DefaultValue.OTSPercentage : model.OTSPercentage;
 		model.TOZPercentage = model.Type != DebentureType.TOZ ? DefaultValue.TOZPercentage : model.TOZPercentage;
 		model.RORPercentage = model.Type != DebentureType.ROR ? DefaultValue.RORPercentage : model.RORPercentage;
-	}
+		model.DORPercentage = model.Type != DebentureType.DOR ? DefaultValue.DORPercentage : model.DORPercentage;
 
-	private async Task DynamicCalculate()
-	{
-		await CalculateDebentures();
+		if (debentureResult != null)
+		{
+			debentureResult.DebentureInfo.Clear();
+			debentureResult.DebentureData.DebentureColumns = null;
+			debentureResult.DebentureData.Head = null;
+		}
 	}
 
 }

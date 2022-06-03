@@ -1,20 +1,42 @@
 ﻿@page "/ppkcalculator"
 
+@using MyFinances.Models
+@using MyFinances.Data
+@using MyFinances.Helpers
+@using System.Threading
+
+@inject Data.PPKService PPKService
 
 <div class="card mx-auto mt-5" style="width: 65rem;">
-	<div class="card-header">
-		Kalkulator PPK
-	</div>
-	<div class="card-body">
+	<section class="w-100 p-4 pb-4">
+		<label for="customRange3" class="form-label">Twój procent</label>
+		<div class="range" style="width:100%">
+			<input type="range" class="form-range" min="0.5" max="4" step="0.5" id="customRange3" @onchange="CalculateDebentures" @bind="model.Percentage" @bind:event="oninput" style="width:100%" />
+		</div>
+		<div class="form-group" style="width:25%">
+			<div class="input-group"><input disabled="@true" @bind="model.Percentage" max="4" min="0.5" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+		</div>
+	</section>
 
-		<label for="percentageRange" class="form-label"> Wysokość wpłat własnych do PPK </label>
-		<input type="range" class="form-range" min="0.5" max="2" step="0.5" id="percentageRange" @bind="@actualNumber" @bind:event="oninput">
-		<p>@actualNumber</p>
-
-	</div>
+	<section class="w-100 p-4 pb-4">
+		<label for="customRange3" class="form-label">Procent pracodawcy</label>
+		<div class="range" style="width:100%">
+			<input type="range" class="form-range" min="1.5" max="4" step="0.5" id="customRange3" @onchange="CalculateDebentures" @bind="model.EmployerPercentage" @bind:event="oninput" style="width:100%" />
+		</div>
+		<div class="form-group" style="width:25%">
+			<div class="input-group"><input disabled="@true" @bind="model.EmployerPercentage" max="4" min="1.5" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+		</div>
+	</section>
 </div>
 
 
 @code {
-	private double actualNumber { get; set; } = 2;
+	private PPKModel model = new PPKModel();
+	private Data.PPK ppkResult;
+
+
+	private async Task CalculateDebentures()
+	{
+		ppkResult = await PPKService.GetPPKCalculatedAsync(model);
+	}
 }
