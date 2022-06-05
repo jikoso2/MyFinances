@@ -7,7 +7,7 @@
 
 
 
-<div class="card mx-auto mt-5" style="width: 65rem">
+<div class="card mx-auto mt-5">
 	<div class="card-header">
 		Kalkulator Obligacji
 	</div>
@@ -17,21 +17,18 @@
 			<DataAnnotationsValidator />
 			<ValidationSummary />
 
-			<div class="form-group">
-				<label style="margin-bottom:20px;margin-right:5px">TypObligacji:</label>
-				<InputSelect id="debentureType" @bind-Value="model.Type" style="height:30px;width:75px">
-					@foreach (var DebentureType in Enum.GetValues(typeof(DebentureType)))
-					{
-						<option value="@DebentureType">@DebentureType</option>
-					}
-				</InputSelect>
+			<label style="margin-bottom:20px;margin-right:5px">TypObligacji:</label>
+			<InputSelect id="debentureType" @bind-Value="model.Type" style="height:30px;width:75px">
+				@foreach (var DebentureType in Enum.GetValues(typeof(DebentureType)))
+				{
+					<option value="@DebentureType">@DebentureType</option>
+				}
+			</InputSelect>
 
-				<div class="form-check form-switch">
-					<InputCheckbox @bind-Value="model.BelkaTax" class="form-check-switch" style="height:25px;width:25px" />
-					<label class="form-check-label" style="position: absolute; margin-left: 7px"> Uwzględnienie podatku od zysków kapitałowych (19%)</label>
-				</div>
+			<div class="form-check-label">
+				<InputCheckbox @bind-Value="model.BelkaTax" class="form-check-label" id="checkbox" />
+				<label class="form-check-label" id="checkbox-label"> Uwzględnienie podatku od zysków kapitałowych (19%) </label>
 			</div>
-
 
 
 			<h5>Opis:</h5>
@@ -40,9 +37,9 @@
 				<label>@InformationAboutDebenture()</label>
 			</div>
 
-			<h5>Wprowadź informacje:</h5>
+			<p></p>
 
-			<div class="form-group" style="width:25%">
+			<div class="form-group" style="margin: 15px">
 				<label>Ilość obligacji</label>
 				<div class="input-group"><input @bind="model.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">sztuk</span></div></div>
 			</div>
@@ -51,7 +48,7 @@
 			{
 				case DebentureType.OTS:
 					SwitchDebentureTypeAction();
-					<div class="form-group" style="width:25%">
+					<div class="form-group">
 						<label>Wysokość rocznego oprocentowania</label>
 						<div class="input-group"><input @bind="model.OTSPercentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
 					</div>
@@ -59,14 +56,14 @@
 				case DebentureType.DOS:
 					SwitchDebentureTypeAction();
 					<h3>Podane obligacje od 1.06.2022r są wycofane z emisji.</h3>
-					<div class="form-group" style="width:25%">
+					<div class="form-group">
 						<label>Wysokość rocznego oprocentowania</label>
 						<div class="input-group"><input @bind="model.DOSPercentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
 					</div>
 					break;
 				case DebentureType.TOZ:
 					SwitchDebentureTypeAction();
-					<div class="form-group" style="width:25%">
+					<div class="form-group">
 						<label>Stałe oprocentowanie w 1 okresie</label>
 						<div class="input-group"><input @bind="model.TOZPercentage[0]" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
 					</div>
@@ -83,13 +80,13 @@
 				case DebentureType.DOR:
 					SwitchDebentureTypeAction();
 					<section class="w-100 p-4 pb-4">
-						<label for="customRange3" class="form-label">Referencyjna stopa oprocentowania</label>
-						<div class="range" style="width:100%">
-							<input type="range" class="form-range" min="0" max="15" step="0.25" id="customRange3" @onchange="CalculateDebentures" @bind="model.DORPercentage" @bind:event="oninput" style="width:100%" />
+						<label for="percentageRangeDOR" class="form-label">Referencyjna stopa oprocentowania</label>
+						<div class="range">
+							<input type="range" class="form-range" min="0" max="15" step="0.25" id="percentageRangeDOR" @onchange="CalculateDebentures" @bind="model.DORPercentage" @bind:event="oninput" />
 						</div>
 
 
-						<div class="form-group" style="width:25%">
+						<div class="form-group">
 							<div class="input-group"><input disabled="@true" @bind="model.DORPercentage" max="15" min="0" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
 						</div>
 					</section>
@@ -97,9 +94,9 @@
 				case DebentureType.ROR:
 					SwitchDebentureTypeAction();
 					<section class="w-100 p-4 pb-4">
-						<label for="customRange3" class="form-label">Referencyjna stopa oprocentowania</label>
-						<div class="range" style="width:100%">
-							<input type="range" class="form-range" min="0" max="15" step="0.25" id="customRange3" @onchange="CalculateDebentures" @bind="model.RORPercentage" @bind:event="oninput" style="width:100%" />
+						<label for="percentageRangeROR" class="form-label">Referencyjna stopa oprocentowania</label>
+						<div class="range">
+							<input type="range" class="form-range" min="0" max="15" step="0.25" id="percentageRangeROR" @onchange="CalculateDebentures" @bind="model.RORPercentage" @bind:event="oninput" />
 						</div>
 
 
@@ -112,8 +109,8 @@
 				default:
 					break;
 			}
-
-			<button class="btn btn-primary" type="submit">Oblicz</button>
+			<p></p>
+			<button class="btn btn-primary btn-center" type="submit">Oblicz</button>
 
 		</EditForm>
 	</div>
