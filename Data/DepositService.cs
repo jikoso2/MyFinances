@@ -66,7 +66,11 @@ namespace MyFinances.Data
 				new DepositColumn() { Rows = profitRows }
 			};
 
-			depositResult.NumberOfPeriods = periods.ToString();
+			depositResult.DepositInfo.Add(Tuple.Create("Kwota na lokacie", Helper.MoneyFormat(DepositModel.Amount)));
+			depositResult.DepositInfo.Add(Tuple.Create("Ilość Okresów rozliczeniowych", periods.ToString()));
+			//depositResult.DepositInfo.Add(Tuple.Create("Całkowita wartość odsetek", ));
+
+
 			return depositResult;
 		}
 	}
@@ -75,21 +79,16 @@ namespace MyFinances.Data
 	{
 		public Deposit(DepositModel depositModel)
 		{
-			this.Duration = depositModel.Duration;
-			this.PercentageNumber = depositModel.PercentageNumber;
-			this.Amount = depositModel.Amount;
-			this.TotalAmount = Helper.MoneyFormat(depositModel.Amount);
 			this.DepositData = new DepositResult();
 			this.DepositData.Head = new string[3] { "Okres", depositModel.Capitalization?"Kapitalizowane Odsetki":"Wypłata", "Zysk przy wypłacie" };
+			this.DepositInfo = new List<Tuple<string, string>>();
 		}
 
 		public int Duration { get; set; }
 		public double Amount { get; set; }
 		public double PercentageNumber { get; set; }
-		public string TotalAmount { get; set; }
-		public string NumberOfPeriods { get; set; }
-		public string TotalAdditionalPayment { get; set; }
 		public DepositResult DepositData { get; set; }
+		public List<Tuple<string, string>> DepositInfo { get; set; }
 	}
 
 	public class DepositResult

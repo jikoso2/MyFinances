@@ -23,6 +23,7 @@ namespace MyFinances.Helpers
 	}
 	public static class DefaultValue
 	{
+		public static int Amount = 1;
 		public static double OTSPercentage = 1.5;
 		public static double DOSPercentage = 3;
 		public static List<double> TOZPercentage = new List<double>() {3,2,4,3,2,4};

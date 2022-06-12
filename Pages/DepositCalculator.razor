@@ -67,20 +67,17 @@
 	{
 		<p>
 			<div class="card-footer">
-				<div class="row">
-					<div class="col">Kwota na lokacie</div>
-					<div class="col text-right">@calculatedDeposit.TotalAmount</div>
-				</div>
-				<div class="row">
-					<div class="col">Ilość Okresów rozliczeniowych</div>
-					<div class="col text-right">@calculatedDeposit.NumberOfPeriods</div>
-				</div>
-				<div class="row">
-					<div class="col">Całkowita wartość odsetek</div>
-					<div class="col text-right">@calculatedDeposit.TotalAdditionalPayment</div>
-				</div>
+				@foreach (var depositInfo in calculatedDeposit.DepositInfo)
+				{
+					<div class="row" id="rowinfoot">
+						<div class="col">@depositInfo.Item1</div>
+						<div class="col text-right">@depositInfo.Item2</div>
+					</div>
+				}
 			</div>
 		</p>
+
+
 		<table class="table table-bordered">
 			<thead>
 				<tr>

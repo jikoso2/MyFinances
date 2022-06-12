@@ -122,6 +122,18 @@ label {
 	width: 100%;
 }
 
-.form-range{
+.form-range {
 	width: 100%;
+}
+
+#rowinfoot {
+	border: 1px solid
+}
+
+#nextrowinfoot{
+	border-bottom: 0px;
+}
+
+#rowinfoot + #rowinfoot {
+	border-top: 0;
 }

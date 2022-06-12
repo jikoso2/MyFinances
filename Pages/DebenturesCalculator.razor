@@ -17,7 +17,7 @@
 			<DataAnnotationsValidator />
 			<ValidationSummary />
 
-			<label style="margin-bottom:20px;margin-right:5px">TypObligacji:</label>
+			<label style="margin-bottom:20px;margin-right:5px;margin-left:15px">TypObligacji:</label>
 			<InputSelect id="debentureType" @bind-Value="model.Type" style="height:30px;width:75px">
 				@foreach (var DebentureType in Enum.GetValues(typeof(DebentureType)))
 				{
@@ -25,17 +25,17 @@
 				}
 			</InputSelect>
 
-			<div class="form-check-label">
+			<div class="form-check-label" style="margin:15px">
 				<InputCheckbox @bind-Value="model.BelkaTax" class="form-check-label" id="checkbox" />
 				<label class="form-check-label" id="checkbox-label"> Uwzględnienie podatku od zysków kapitałowych (19%) </label>
 			</div>
 
+			@if (DebentureDialogOpen)
+			{
+				<DebentureInfoModal Title="@model.Type.ToString()" Text="@InformationAboutDebenture()" OnClose="@OnDebentureInfoClose"></DebentureInfoModal>
+			}
 
-			<h5>Opis:</h5>
-
-			<div class="form-group">
-				<label>@InformationAboutDebenture()</label>
-			</div>
+			<button class="btn btn-primary" style="margin:15px" @onclick="() => OpenDebentureInfoDialog()" data="@model"> Informacje dotyczące obligacji @model.Type.ToString()</button>
 
 			<p></p>
 
@@ -121,7 +121,7 @@
 			<div class="card-footer">
 				@foreach (var debentureInfo in debentureResult.DebentureInfo)
 				{
-					<div class="row">
+					<div class="row" id="rowinfoot">
 						<div class="col">@debentureInfo.Item1</div>
 						<div class="col text-right">@debentureInfo.Item2</div>
 					</div>
@@ -164,11 +164,22 @@
 @code {
 	private DebentureModel model = new DebentureModel();
 	private Data.Debenture debentureResult;
+	public bool DebentureDialogOpen { get; set; }
 
+	private void OnDebentureInfoClose(bool accepted)
+	{
+		DebentureDialogOpen = false;
+	}
+
+	private void OpenDebentureInfoDialog()
+	{
+		DebentureDialogOpen = true;
+	}
 
 	private async Task CalculateDebentures()
 	{
-		debentureResult = await DebentureService.GetDebentureAsync(model);
+		if (!DebentureDialogOpen)
+			debentureResult = await DebentureService.GetDebentureAsync(model);
 	}
 	private string InformationAboutDebenture()
 	{

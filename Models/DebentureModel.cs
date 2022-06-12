@@ -9,8 +9,8 @@ namespace MyFinances.Models
 	public class DebentureModel
 	{
 		[Required]
-		[Range(1, 10000, ErrorMessage = "Liczba zakupionych obligacji musi być całkowita i dodatnia")]
-		public int Amount { get; set; }
+		[Range(1, 100000, ErrorMessage = "Liczba zakupionych obligacji musi być całkowita i dodatnia")]
+		public int Amount { get; set; } = DefaultValue.Amount;
 
 		[Required]
 		public DebentureType Type { get; set; }

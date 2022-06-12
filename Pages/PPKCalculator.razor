@@ -16,18 +16,24 @@
 
 			<DataAnnotationsValidator />
 			<ValidationSummary />
+
+			<div class="form-group" style="margin: 15px">
+				<label>Wysokość wypłaty brutto</label>
+				<div class="input-group"><input @bind="model.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
+			</div>
+
 			<section class="w-100 p-4 pb-4">
-				<label for="percentageRange" class="form-label">Twój procent</label>
+				<label for="percentageRange" class="form-label">Procent wypłaty wpłacany przez przacownika</label>
 				<div class="range">
-					<input type="range" class="form-range" min="0.5" max="4" step="0.5" id="percentageRange" @onchange="CalculatePPK" @bind="model.Percentage" @bind:event="oninput" />
+					<input type="range" class="form-range" min="0.5" max="4" step="0.5" id="percentageRange" @onchange="CalculatePPK" @bind="model.EmployeePercentage" @bind:event="oninput" />
 				</div>
 				<div class="form-group">
-					<div class="input-group"><input disabled="@true" @bind="model.Percentage" max="4" min="0.5" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+					<div class="input-group"><input disabled="@true" @bind="model.EmployeePercentage" max="4" min="0.5" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
 				</div>
 			</section>
 
 			<section class="w-100 p-4 pb-4">
-				<label for="percentageEmployerRange" class="form-label">Procent pracodawcy</label>
+				<label for="percentageEmployerRange" class="form-label">Procent wypłaty wpłacany przez pracodawce</label>
 				<div class="range">
 					<input type="range" class="form-range" min="1.5" max="4" step="0.5" id="percentageEmployerRange" @onchange="CalculatePPK" @bind="model.EmployerPercentage" @bind:event="oninput" />
 				</div>
@@ -35,8 +41,27 @@
 					<div class="input-group"><input disabled="@true" @bind="model.EmployerPercentage" max="4" min="1.5" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
 				</div>
 			</section>
+
+			<button type="submit" class="btn btn-primary btn-center"> Oblicz </button>
+
 		</EditForm>
 	</div>
+
+	@if (ppkResult != null && ppkResult.PPKInfo != null)
+	{
+		<p>
+			<div class="card-footer">
+				@foreach (var ppkInfo in ppkResult.PPKInfo)
+				{
+					<div class="row" id="rowinfoot">
+						<div class="col">@ppkInfo.Item1</div>
+						<div class="col text-right">@ppkInfo.Item2</div>
+					</div>
+				}
+			</div>
+		</p>
+	}
+
 </div>
 
 
