@@ -8,7 +8,8 @@
 }
 
 .navbar-brand {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    margin-left:10px;
 }
 
 .oi {
@@ -21,7 +22,7 @@
 .nav-item {
     font-size: 0.9rem;
     padding-bottom: 0.5rem;
-    min-width:300px;
+    min-width:25px;
 }
 
     .nav-item:first-of-type {
