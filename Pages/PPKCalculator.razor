@@ -14,6 +14,7 @@
 		Kalkulator PPK
 	</div>
 	<div class="card-body">
+		@((MarkupString)InformationAboutPPK())
 		<EditForm Model="model" OnValidSubmit="CalculatePPK">
 
 			<DataAnnotationsValidator />
@@ -23,6 +24,17 @@
 				<label>Wysokość wypłaty brutto</label>
 				<div class="input-group"><input @bind="model.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
 			</div>
+
+			<div class="form-check-label" style="margin:15px">
+				<InputCheckbox @bind-Value="model.EarlyPayment" class="form-check-label" id="checkbox" />
+				<label class="form-check-label" id="checkbox-label"> Wypłata przed 60 rokiem życia </label>
+			</div>
+
+			<div class="form-group" style="margin: 15px">
+				<label>Długość oszczędzenia</label>
+				<div class="input-group"><input @bind="model.Duration" class="form-control"><div class="input-group-append"><span class="input-group-text">mies.</span></div></div>
+			</div>
+
 
 			<section class="w-100 p-4 pb-4">
 				<label for="percentageRange" class="form-label">Procent wypłaty wpłacany przez przacownika</label>
@@ -44,6 +56,15 @@
 				</div>
 			</section>
 
+			<section class="w-100 p-4 pb-4">
+				<label for="percentageRange" class="form-label">Szacowane roczne oprocentowanie funduszu</label>
+				<div class="range">
+					<input type="range" class="form-range" min="-10" max="10" step="0.1" id="percentageDepositRange" @onchange="CalculatePPK" @bind="model.DepositPercentage" @bind:event="oninput" />
+				</div>
+				<div class="form-group">
+					<div class="input-group"><input disabled="@true" @bind="model.DepositPercentage" max="10" min="-10" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+				</div>
+			</section>
 			<button type="submit" class="btn btn-primary btn-center"> Oblicz </button>
 
 		</EditForm>
@@ -75,5 +96,10 @@
 	private async Task CalculatePPK()
 	{
 		ppkResult = await PPKService.GetPPKCalculatedAsync(model);
+	}
+
+	private string InformationAboutPPK()
+	{
+		return PPKService.GetInformationAboutPPK();
 	}
 }

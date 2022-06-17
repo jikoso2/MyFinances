@@ -27,6 +27,12 @@ namespace MyFinances.Models
 		[DebentureModelValidation.TOZPercentage]
 		public List<double> TOZPercentage { get; set; } = DefaultValue.TOZPercentage;
 
+		[DebentureModelValidation.EDOPercentage]
+		public List<double> EDOPercentage { get; set; } = DefaultValue.EDOPercentage;
+
+		[DebentureModelValidation.COIPercentage]
+		public List<double> COIPercentage { get; set; } = DefaultValue.COIPercentage;
+
 		double rORPercentage = DefaultValue.RORPercentage;
 		[Range(0, 15)]
 		public double RORPercentage { get => rORPercentage; set => rORPercentage = value > 15.0 ? 15.0 : value; }
@@ -52,6 +58,32 @@ namespace MyFinances.Models
 					if (debentureModel.TOZPercentage[i] <= 0)
 						return new ValidationResult("Wskaźnik WIBOR 6M musi być dodatni", new[] { validationContext.MemberName });
 				}
+
+				return null;
+			}
+		}
+
+		internal class EDOPercentage : ValidationAttribute
+		{
+			protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+			{
+				var debentureModel = (DebentureModel)validationContext.ObjectInstance;
+
+				if (debentureModel.EDOPercentage[0] < 0)
+					return new ValidationResult("Oprocentowanie w pierwszym okresie musi być dodatnie", new[] { validationContext.MemberName });
+
+				return null;
+			}
+		}
+
+		internal class COIPercentage : ValidationAttribute
+		{
+			protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+			{
+				var debentureModel = (DebentureModel)validationContext.ObjectInstance;
+
+				if (debentureModel.COIPercentage[0] < 0)
+					return new ValidationResult("Oprocentowanie w pierwszym okresie musi być dodatnie", new[] { validationContext.MemberName });
 
 				return null;
 			}

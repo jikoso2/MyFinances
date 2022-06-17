@@ -24,20 +24,52 @@ namespace MyFinances.Data
 			var ppkResult = new PPK();
 
 			var employeePayment = Math.Round(PPKModel.Amount * PPKModel.EmployeePercentage / 100, 2);
+			var employeePaymentWithTax = Math.Round(employeePayment * 1.13, 2);
 			var employerPayment = Math.Round(PPKModel.Amount * PPKModel.EmployerPercentage / 100, 2);
-			var paycheckFromEmployee = employeePayment;
-			var paycheckFromEmployer = Math.Round(employerPayment * 0.7, 2);
-			var paycheckToZUS = employerPayment - paycheckFromEmployer;
-			var paycheckSum = paycheckFromEmployer + paycheckFromEmployee;
 
-			ppkResult.PPKInfo.Add(Tuple.Create("Wysokość wpłaty pracownika", Helper.MoneyFormat(employeePayment)));
-			ppkResult.PPKInfo.Add(Tuple.Create("Wysokość wpłaty pracodawcy", Helper.MoneyFormat(employerPayment)));
-			ppkResult.PPKInfo.Add(Tuple.Create("Wypłata części pracowniczej po zerwaniu", Helper.MoneyFormat(paycheckFromEmployee)));
-			ppkResult.PPKInfo.Add(Tuple.Create("Wypłata części pracodawcy po zerwaniu", Helper.MoneyFormat(paycheckFromEmployer)));
-			ppkResult.PPKInfo.Add(Tuple.Create("Wpłata części pracodawcy po zerwaniu do ZUS-u", Helper.MoneyFormat(paycheckToZUS)));
-			ppkResult.PPKInfo.Add(Tuple.Create("Sumaryczny zysk", Helper.MoneyFormat(paycheckSum)));
+			var interestSum = 0.0;
+			var finalAmount = 0.0;
+			var employerAmount = 0.0;
+
+			for (int i = 1; i <= PPKModel.Duration; i++)
+			{
+				var odsetki = Math.Round(finalAmount / 12 * PPKModel.DepositPercentage / 100, 2);
+				interestSum += odsetki;
+				employerAmount += employeePayment;
+				finalAmount += Math.Round(odsetki + employeePayment + employerPayment, 2);
+			}
+
+
+			ppkResult.PPKInfo.Add(Tuple.Create("Miesięczny koszt pracownika", Helper.MoneyFormat(employeePaymentWithTax)));
+			ppkResult.PPKInfo.Add(Tuple.Create("Miesięczna wysokość wpłaty pracownika", Helper.MoneyFormat(employeePayment)));
+			ppkResult.PPKInfo.Add(Tuple.Create("Miesięczna wysokość wpłaty pracodawcy", Helper.MoneyFormat(employerPayment)));
+
+			ppkResult.PPKInfo.Add(Tuple.Create("Ilość okresów", PPKModel.Duration.ToString()));
+			ppkResult.PPKInfo.Add(Tuple.Create("Zgromadzony kapitał", Helper.MoneyFormat(finalAmount)));
+			ppkResult.PPKInfo.Add(Tuple.Create("Wielkość odsetek w kapitale", Helper.MoneyFormat(interestSum)));
+
+			if (!PPKModel.EarlyPayment)
+			{
+				var taxFromOdsetki = 0.0;
+				if (interestSum > 0)
+					taxFromOdsetki = Math.Round(interestSum * 0.19, 2);
+
+				var amountToZUS = Math.Round(employeePayment * 0.3 * PPKModel.Duration, 2);
+				var amountEarlyPayment = Math.Round(finalAmount - amountToZUS - taxFromOdsetki, 2);
+				var totalProfit = amountEarlyPayment - (PPKModel.Duration * employeePaymentWithTax);
+
+				ppkResult.PPKInfo.Add(Tuple.Create("Podatek od zgromadzonych odsetek", Helper.MoneyFormat(taxFromOdsetki)));
+				ppkResult.PPKInfo.Add(Tuple.Create("Część odprowadzona do ZUSu", Helper.MoneyFormat(amountToZUS)));
+				ppkResult.PPKInfo.Add(Tuple.Create("Kwota Wypłaty", Helper.MoneyFormat(amountEarlyPayment)));
+				ppkResult.PPKInfo.Add(Tuple.Create("Zysk netto przy wcześniejszej wypłacie", Helper.MoneyFormat(totalProfit)));
+			}
 
 			return ppkResult;
+		}
+
+		public string GetInformationAboutPPK()
+		{
+			return HelperInformations.GetPPKInformation();
 		}
 	}
 	public class PPK

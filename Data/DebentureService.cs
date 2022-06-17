@@ -197,6 +197,49 @@ namespace MyFinances.Data
 
 		private void CalculateEDO(Debenture debentureResult)
 		{
+			var totalValue = new double[11];
+			Array.Fill(totalValue, DebentureModel.Amount * 100);
+			var interestRate = DebentureModel.EDOPercentage.Select(a => a / 100).ToList();
+
+			var interestProfit = new double[11];
+			var tax = new double[11];
+			var totalProfit = new double[11];
+			var totalProfitRes = new double[11];
+
+			for (int i = 0; i < 10; i++)
+			{
+				double profit = Math.Round(totalValue[i] * interestRate[i], 2);
+
+				if (i < 10)
+					totalValue[i + 1] = totalValue[i] + profit;
+
+				interestProfit[i] = profit;
+				totalProfit[i] = i != 0 ? totalProfit[i - 1] + profit : 0;
+
+				if (DebentureModel.BelkaTax) { }
+				//sam koniec dopiero
+
+				if (i > 0 && i < 11)
+					totalValue[i + 1] = profit + totalValue[i];
+
+			}
+
+			var yearRows = Enumerable.Range(0, 11).Select(a => a.ToString()).ToArray();
+			var interestRateRows = interestRate.Select(a => Helper.PercentFormat(a * 100)).ToArray();
+			var totalValueRows = totalValue.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var interestProfitRows = interestProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var totalProfitRows = totalProfitRes.Select(a => Helper.MoneyFormat(a)).ToArray();
+
+			debentureResult.DebentureData.DebentureColumns = new DebentureColumn[5]
+			{
+				new DebentureColumn() { Rows = yearRows },
+				new DebentureColumn() { Rows = totalValueRows },
+				new DebentureColumn() { Rows = interestRateRows },
+				new DebentureColumn() { Rows = interestProfitRows },
+				new DebentureColumn() { Rows = totalProfitRows }
+			};
+
+			debentureResult.DebentureInfo.Add(Tuple.Create("Całkowity zysk", totalProfitRows[totalProfitRows.Length - 1]));
 		}
 
 		private void CalculateRateIndexed(Debenture debentureResult)
@@ -260,7 +303,7 @@ namespace MyFinances.Data
 					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
 					break;
 				case DebentureType.EDO:
-					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
+					this.Head = new string[5] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Zysk przy wypłacie" };
 					break;
 				default:
 					break;

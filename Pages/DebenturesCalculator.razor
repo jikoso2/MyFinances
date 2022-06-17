@@ -53,6 +53,7 @@
 						<div class="input-group"><input @bind="model.OTSPercentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
 					</div>
 					break;
+
 				case DebentureType.DOS:
 					SwitchDebentureTypeAction();
 					<h3>Podane obligacje od 1.06.2022r są wycofane z emisji.</h3>
@@ -61,22 +62,22 @@
 						<div class="input-group"><input @bind="model.DOSPercentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
 					</div>
 					break;
+
 				case DebentureType.TOZ:
 					SwitchDebentureTypeAction();
-					<div class="form-group">
-						<label>Stałe oprocentowanie w 1 okresie</label>
-						<div class="input-group"><input @bind="model.TOZPercentage[0]" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
-					</div>
 					<PercentageTOZView model="model"></PercentageTOZView>
 					break;
+
 				case DebentureType.EDO:
 					SwitchDebentureTypeAction();
-					<h3>Juz wkrótce...</h3>
+					<PercentageEDOView model="model"></PercentageEDOView>
 					break;
+
 				case DebentureType.COI:
 					SwitchDebentureTypeAction();
-					<h3>Juz wkrótce...</h3>
+					<PercentageCOIView model="model"></PercentageCOIView>
 					break;
+
 				case DebentureType.DOR:
 					SwitchDebentureTypeAction();
 					<section class="w-100 p-4 pb-4">
