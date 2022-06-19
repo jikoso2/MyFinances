@@ -129,36 +129,31 @@
 				}
 			</div>
 		</p>
-	}
-
-	@if (debentureResult == null || debentureResult.DebentureData == null || debentureResult.DebentureData.DebentureColumns == null)
-	{
-	}
-	else
-	{
-		<table class="table table-bordered" style="align-content:center">
-			<thead>
-				<tr>
-					@foreach (var head in debentureResult.DebentureData.Head)
+		@if (debentureResult.DebentureData.DebentureColumns != null)
+		{
+			<table class="table table-bordered" style="align-content:center">
+				<thead>
+					<tr>
+						@foreach (var head in debentureResult.DebentureData.Head)
+						{
+							<th>@head</th>
+						}
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var column in debentureResult.DebentureData.DebentureColumns)
 					{
-						<th>@head</th>
-					}
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (var column in debentureResult.DebentureData.DebentureColumns)
-				{
-				<td>
-					@foreach (var row in column.Rows)
-					{
-					<tr>@row</tr>
-				}
+					<td>
+						@foreach (var row in column.Rows)
+						{
+						<tr>@row</tr>
+						}
 					</td>
-				}
+					}
 				</tbody>
-			</table>
-		}
-
+				</table>
+			}
+	}
 </div>
 
 
@@ -182,16 +177,20 @@
 		if (!DebentureDialogOpen)
 			debentureResult = await DebentureService.GetDebentureAsync(model);
 	}
+
 	private string InformationAboutDebenture()
 	{
 		return DebentureService.GetInformationAboutDebenture(model.Type);
 	}
+
 	private void SwitchDebentureTypeAction()
 	{
 		model.DOSPercentage = model.Type != DebentureType.DOS ? DefaultValue.DOSPercentage : model.DOSPercentage;
 		model.OTSPercentage = model.Type != DebentureType.OTS ? DefaultValue.OTSPercentage : model.OTSPercentage;
 		model.TOZPercentage = model.Type != DebentureType.TOZ ? DefaultValue.TOZPercentage : model.TOZPercentage;
 		model.RORPercentage = model.Type != DebentureType.ROR ? DefaultValue.RORPercentage : model.RORPercentage;
+		model.COIPercentage = model.Type != DebentureType.COI ? DefaultValue.COIPercentage : model.COIPercentage;
+		model.EDOPercentage = model.Type != DebentureType.EDO ? DefaultValue.EDOPercentage : model.EDOPercentage;
 		model.DORPercentage = model.Type != DebentureType.DOR ? DefaultValue.DORPercentage : model.DORPercentage;
 
 		if (debentureResult != null)

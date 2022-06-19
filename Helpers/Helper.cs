@@ -17,7 +17,7 @@ namespace MyFinances.Helpers
 
 		public static string PercentFormat(double valueNumber)
 		{
-			return valueNumber.ToString() + " %";
+			return Math.Round(valueNumber,5).ToString() + " %";
 		}
 
 	}

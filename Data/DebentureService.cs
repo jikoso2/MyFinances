@@ -93,57 +93,49 @@ namespace MyFinances.Data
 		{
 			var totalValue = new double[7];
 			Array.Fill(totalValue, DebentureModel.Amount * 100);
-			var interestRate = DebentureModel.TOZPercentage.Select(a => a / 100).ToList();
-			interestRate.Insert(0, 0);
+			var interestRate = DebentureModel.TOZPercentage.Select(a => Math.Round(a / 100, 5)).ToList();
+			interestRate.Add(0);
 			var interestProfit = new double[7];
-			var tax = new double[7];
 			var totalProfit = new double[7];
 			var totalProfitRes = new double[7];
 			double calculatedTax = 0;
 
 			for (int i = 0; i < 7; i++)
 			{
-				double profit = i >= 1 ? Math.Round(totalValue[i] * interestRate[i] / 2, 2) : 0;
+				double profit = i <= 6 ? Math.Round(totalValue[i] * interestRate[i] / 2, 2) : 0;
 
 				if (i < 6)
 					totalValue[i + 1] = totalValue[i] + profit;
 
 				interestProfit[i] = profit;
-				totalProfit[i] = i != 0 ? totalProfit[i - 1] + profit : 0;
+
+				if (i < 6)
+					totalProfit[i + 1] = i == 0 ? profit : totalProfit[i] + profit;
 
 				if (DebentureModel.BelkaTax)
+				{
 					calculatedTax = (Math.Ceiling(Math.Max(totalProfit[i] - 0.70, 0) * 19)) / 100;
+					if (i == 6)
+						calculatedTax = Math.Ceiling(totalProfit[i] * 19) / 100;
 
-				if (i == 6 && DebentureModel.BelkaTax)
-					calculatedTax = Math.Ceiling(totalProfit[i] * 19) / 100;
-
-				tax[i] = calculatedTax;
-
-				if (DebentureModel.BelkaTax)
-					totalProfitRes[i] = totalProfit[i] - calculatedTax;
-				else
-					totalProfitRes[i] = totalProfit[i];
-			}
-
-			for (int i = 1; i < 6; i++)
-			{
-				totalProfitRes[i] = totalProfitRes[i] - 0.7;
+				}
+				totalProfitRes[i] = totalProfit[i] - calculatedTax;
+				if (i < 6)
+					totalProfitRes[i] = totalProfitRes[i] - 0.7 > 0 ? totalProfitRes[i] - 0.7 : 0;
 			}
 
 			var interestRateRows = interestRate.Select(a => Helper.PercentFormat(a * 100)).ToArray();
 			var yearRows = Enumerable.Range(0, 7).Select(a => (Math.Round((double)a / 2, 1)).ToString()).ToArray();
 			var totalValueRows = totalValue.Select(a => Helper.MoneyFormat(a)).ToArray();
 			var interestProfitRows = interestProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
-			var taxRows = tax.Select(a => Helper.MoneyFormat(a)).ToArray();
 			var totalProfitRows = totalProfitRes.Select(a => Helper.MoneyFormat(a)).ToArray();
 
-			debentureResult.DebentureData.DebentureColumns = new DebentureColumn[6]
+			debentureResult.DebentureData.DebentureColumns = new DebentureColumn[5]
 			{
 				new DebentureColumn() { Rows = yearRows },
 				new DebentureColumn() { Rows = totalValueRows },
 				new DebentureColumn() { Rows = interestRateRows },
 				new DebentureColumn() { Rows = interestProfitRows },
-				new DebentureColumn() { Rows = taxRows },
 				new DebentureColumn() { Rows = totalProfitRows }
 			};
 
@@ -297,7 +289,7 @@ namespace MyFinances.Data
 					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
 					break;
 				case DebentureType.TOZ:
-					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
+					this.Head = new string[5] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Zysk netto przy wypłacie" };
 					break;
 				case DebentureType.COI:
 					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };

@@ -13,21 +13,21 @@ namespace MyFinances.Helpers
 			switch (type)
 			{
 				case DebentureType.OTS:
-					return "Trzymiesięczne obligacje ze stałym oprocentowaniem z kapitalizacją na koniec okresu rozliczeniowego";
+					return "Trzymiesięczne obligacje ze stałym oprocentowaniem z kapitalizacją na koniec okresu rozliczeniowego. <br/> Koszt wcześniejszego wykupu: 0 gr, został uwzględniony w obliczeniach.";
 				case DebentureType.DOS:
-					return "Dwuletnie obligacje ze stałym oprocentowaniem z roczną kapitalizacją odsetek";
+					return "Dwuletnie obligacje ze stałym oprocentowaniem z roczną kapitalizacją odsetek.";
 				case DebentureType.TOZ:
-					return "Trzyletnie obligacje ze zmiennym oprocentowaniem z pół roczną kapitalizacją odsetek";
+					return "Trzyletnie obligacje ze zmiennym oprocentowaniem z pół roczną kapitalizacją odsetek. <br/> Koszt wcześniejszego wykupu: 70 gr, został uwzględniony w obliczeniach.";
 				case DebentureType.COI:
-					return "Czteroletnie obligacje ze zmiennym oprocentowaniem z co roczną wypłatą odsetek";
+					return "Czteroletnie obligacje ze zmiennym oprocentowaniem z co roczną wypłatą odsetek. <br/> Koszt wcześniejszego wykupu: 70 gr.";
 				case DebentureType.EDO:
-					return "Dziesięcioletnie obligacje ze zmiennym oprocentowaniem z co roczną kapitalizacją odsetek";
+					return "Dziesięcioletnie obligacje ze zmiennym oprocentowaniem z co roczną kapitalizacją odsetek <br/> Koszt wcześniejszego wykupu: 2 zł, został uwzględniony w obliczeniach.";
 				case DebentureType.ROR:
-					return "Roczne obligacje ze zmiennym oprocentowaniem indeksowanym wskaźnikiem stopy referencyjnej. Odsetki wypłacane są co miesiąc.";
+					return "Roczne obligacje ze zmiennym oprocentowaniem indeksowanym wskaźnikiem stopy referencyjnej. Odsetki wypłacane są co miesiąc. <br/> Koszt wcześniejszego wykupu: 50 gr.";
 				case DebentureType.DOR:
-					return "Dwuletnie obligacje ze zmiennym oprocentowaniem indeksowanym wskaźnikiem stopy referencyjnej z dodatkiem 0.25 punkta procentowego";
+					return "Dwuletnie obligacje ze zmiennym oprocentowaniem indeksowanym wskaźnikiem stopy referencyjnej z dodatkiem 0.25 punkta procentowego. <br/> Koszt wcześniejszego wykupu: 70 gr.";
 				default:
-					return "Podstawowe Informację dotyczące typu obligacji";
+					return "Podstawowe Informację dotyczące typu obligacji.";
 			}
 		}
 
