@@ -1,0 +1,32 @@
+﻿@if (IsLoading)
+{
+    if (LoadingTemplate != null)
+    {
+        @LoadingTemplate
+    }
+    else
+    {
+        <div class="row justify-content-center">
+            <div class="spinner-border" style="margin:20px;height:60px;width:60px"></div>
+            <span style="min-height: 100px; display: inline-flex;align-items: center;">@LoadingText</span>
+        </div>
+    }
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public string LoadingText { get; set; } = "Loading...";
+
+    [Parameter]
+    public RenderFragment LoadingTemplate { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

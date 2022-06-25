@@ -48,7 +48,7 @@ namespace MyFinances.Data
 			ppkResult.PPKInfo.Add(Tuple.Create("Zgromadzony kapitał", Helper.MoneyFormat(finalAmount)));
 			ppkResult.PPKInfo.Add(Tuple.Create("Wielkość odsetek w kapitale", Helper.MoneyFormat(interestSum)));
 
-			if (!PPKModel.EarlyPayment)
+			if (PPKModel.EarlyPayment)
 			{
 				var taxFromOdsetki = 0.0;
 				if (interestSum > 0)
