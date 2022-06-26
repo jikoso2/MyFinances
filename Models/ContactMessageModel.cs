@@ -8,10 +8,11 @@ namespace MyFinances.Models
 {
 	public class ContactMessageModel
 	{
+		[Required(ErrorMessage = "Wprowadź treść wiadomości")]
 		public string EmailMessage { get; set; }
 
-		[Required]
-		[EmailAddress]
+		[Required(ErrorMessage = "Wprowadź adres e-mail")]
+		[EmailAddress(ErrorMessage = "Wprowadź poprawny adres e-mail")]
 		public string Email { get; set; }
 	}
 }
