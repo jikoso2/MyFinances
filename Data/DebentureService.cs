@@ -148,6 +148,57 @@ namespace MyFinances.Data
 
 		private void CalculateCOI(Debenture debentureResult)
 		{
+			var totalValue = new double[5];
+			Array.Fill(totalValue, DebentureModel.Amount * 100);
+			var interestRate = DebentureModel.COIPercentage.Select(a => Math.Round(a / 100, 5)).ToList();
+			interestRate.Add(0);
+			var interestProfit = new double[5];
+			var totalProfit = new double[5];
+			var totalProfitRes = new double[5];
+			var interestSum = new double[5];
+
+			double calculatedTax = 0;
+
+
+			for (int i = 0; i < 5; i++)
+			{
+				double profit = i <= 4 ? Math.Round(totalValue[i] * interestRate[i], 2) : 0;
+
+				interestProfit[i] = profit;
+
+				if (i < 4)
+					totalProfit[i + 1] = i == 0 ? profit : totalProfit[i] + profit;
+
+				if (DebentureModel.BelkaTax)
+				{
+					calculatedTax = (Math.Ceiling(Math.Max(totalProfit[i] - 0.70, 0) * 19)) / 100;
+					if (i == 4)
+						calculatedTax = Math.Ceiling(totalProfit[i] * 19) / 100;
+				}
+
+				totalProfitRes[i] = totalProfit[i] - calculatedTax;
+				if (i < 4)
+					totalProfitRes[i] = totalProfitRes[i] - 0.7 > 0 ? totalProfitRes[i] - 0.7 : 0;
+			}
+
+			var interestRateRows = interestRate.Select(a => Helper.PercentFormat(a * 100)).ToArray();
+			var yearRows = Enumerable.Range(0, 5).Select(a => a.ToString()).ToArray();
+			var totalValueRows = totalValue.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var interestProfitRows = interestProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var totalProfitRows = totalProfitRes.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var interestSumRows = totalProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
+
+			debentureResult.DebentureData.DebentureColumns = new DebentureColumn[6]
+			{
+				new DebentureColumn() { Rows = yearRows },
+				new DebentureColumn() { Rows = totalValueRows },
+				new DebentureColumn() { Rows = interestRateRows },
+				new DebentureColumn() { Rows = interestProfitRows },
+				new DebentureColumn() { Rows = interestSumRows},
+				new DebentureColumn() { Rows = totalProfitRows }
+			};
+
+			debentureResult.DebentureInfo.Add(Tuple.Create("Całkowity zysk", totalProfitRows[4]));
 		}
 
 		private void CalculateOTS(Debenture debentureResult)
@@ -305,7 +356,7 @@ namespace MyFinances.Data
 					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Suma odsetek", "Zysk netto przy wypłacie" };
 					break;
 				case DebentureType.COI:
-					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
+					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Suma odsetek", "Zysk netto przy wypłacie" };
 					break;
 				case DebentureType.EDO:
 					this.Head = new string[5] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Zysk przy wypłacie" };
