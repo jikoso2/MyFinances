@@ -136,7 +136,7 @@
 					<tr>
 						@foreach (var head in debentureResult.DebentureData.Head)
 						{
-							<th>@head</th>
+							<th>@head.Head  @if (@head.ToolTip != null){<Tooltip Text="@head.ToolTip"></Tooltip>} </th>
 						}
 					</tr>
 				</thead>

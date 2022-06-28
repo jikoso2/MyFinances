@@ -347,26 +347,71 @@ namespace MyFinances.Data
 			switch (type)
 			{
 				case DebentureType.OTS:
-					this.Head = new string[6] { "Miesiąc", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
+					this.Head = new DebentureHead[6]
+					{
+						new DebentureHead() { Head = "Miesiąc", ToolTip = "Czas od wykupienia danej obligacji w miesiącach" },
+						new DebentureHead() { Head = "Całkowita wartość" },
+						new DebentureHead() { Head = "Oprocentowanie" },
+						new DebentureHead() { Head = "Odsetki" },
+						new DebentureHead() { Head = "Podatek" },
+						new DebentureHead() { Head = "Zysk netto" }
+					};
 					break;
 				case DebentureType.DOS:
-					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Podatek", "Zysk netto" };
+					this.Head = new DebentureHead[6]
+					{
+						new DebentureHead() { Head = "Rok", ToolTip = "Czas od wykupienia danej obligacji w latach" },
+						new DebentureHead() { Head = "Całkowita wartość" },
+						new DebentureHead() { Head = "Oprocentowanie" },
+						new DebentureHead() { Head = "Odsetki" },
+						new DebentureHead() { Head = "Podatek" },
+						new DebentureHead() { Head = "Zysk netto" }
+					};
 					break;
 				case DebentureType.TOZ:
-					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Suma odsetek", "Zysk netto przy wypłacie" };
+					this.Head = new DebentureHead[6]
+					{
+						new DebentureHead() { Head = "Rok", ToolTip = "Czas od wykupienia danej obligacji w latach" },
+						new DebentureHead() { Head = "Całkowita wartość" },
+						new DebentureHead() { Head = "Oprocentowanie" },
+						new DebentureHead() { Head = "Odsetki" },
+						new DebentureHead() { Head = "Suma odsetek" },
+						new DebentureHead() { Head = "Zysk netto" }
+					};
 					break;
 				case DebentureType.COI:
-					this.Head = new string[6] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Suma odsetek", "Zysk netto przy wypłacie" };
+					this.Head = new DebentureHead[6]
+					{
+						new DebentureHead() { Head = "Rok", ToolTip = "Czas od wykupienia danej obligacji w latach" },
+						new DebentureHead() { Head = "Całkowita wartość" },
+						new DebentureHead() { Head = "Oprocentowanie" },
+						new DebentureHead() { Head = "Odsetki" },
+						new DebentureHead() { Head = "Suma odsetek" },
+						new DebentureHead() { Head = "Zysk netto" }
+					};
 					break;
 				case DebentureType.EDO:
-					this.Head = new string[5] { "Rok", "Całkowita wartość", "Oprocentowanie", "Odsetki", "Zysk przy wypłacie" };
+					this.Head = new DebentureHead[5]
+					{
+						new DebentureHead() { Head = "Rok", ToolTip = "Czas od wykupienia danej obligacji w latach" },
+						new DebentureHead() { Head = "Całkowita wartość" },
+						new DebentureHead() { Head = "Oprocentowanie" },
+						new DebentureHead() { Head = "Odsetki" },
+						new DebentureHead() { Head = "Zysk netto", ToolTip = "Jest to zysk netto jaki możemy uzyskać przy wcześniejszym zerwaniu obligacji, z uwzględnieniem kosztów wcześniejszego wykupu"}
+					};
 					break;
 				default:
 					break;
 			}
 		}
-		public string[] Head { get; set; }
+		public DebentureHead[] Head { get; set; }
 		public DebentureColumn[] DebentureColumns { get; set; }
+	}
+
+	public class DebentureHead
+	{
+		public string ToolTip { get; set; }
+		public string Head { get; set; }
 	}
 
 	public class DebentureColumn

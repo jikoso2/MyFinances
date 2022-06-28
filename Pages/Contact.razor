@@ -15,6 +15,7 @@
 
                 <DataAnnotationsValidator />
                 <ValidationSummary />
+
                 <div class="form-group" style="margin: 15px">
                     <label>Email</label>
                     <div class="input-group"><input @bind="model.Email" class="form-control"></div>
@@ -24,14 +25,15 @@
                     <label>Treść Wiadomości</label>
                     <textarea @bind="model.EmailMessage" class="form-control" style="height:200px;width:500px;max-width:500px" placeholder="Wpisz swoją wiadomość"></textarea>
                 </div>
+
                 <button class="btn btn-primary btn-center" style="min-width:250px">Wyślij wiadomość E-Mail</button>
+
             </EditForm>
 
             @if (SendMailInfoOpen)
             {
                 <EmailInfoModal ServiceResponse="@Message" OnClose="@OnSendMailInfoClose"></EmailInfoModal>
             }
-
 
         </div>
     </LoadingModal>
