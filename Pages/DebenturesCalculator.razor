@@ -8,197 +8,217 @@
 
 
 <div class="card mx-auto mt-5">
-	<div class="card-header">
-		Kalkulator Obligacji
-	</div>
-	<div class="card-body">
-		<EditForm Model="@model" OnValidSubmit="CalculateDebentures">
+    <div class="card-header">
+        Kalkulator Obligacji
+    </div>
+    <div class="card-body">
+        <EditForm Model="@model" OnValidSubmit="CalculateDebentures">
 
-			<DataAnnotationsValidator />
-			<ValidationSummary />
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-			<label style="margin-bottom:20px;margin-right:5px;margin-left:15px">TypObligacji:</label>
-			<InputSelect id="debentureType" @bind-Value="model.Type" style="height:30px;width:75px">
-				@foreach (var DebentureType in Enum.GetValues(typeof(DebentureType)))
-				{
-					<option value="@DebentureType">@DebentureType</option>
-				}
-			</InputSelect>
+            <label style="margin-bottom:20px;margin-right:5px;margin-left:15px">TypObligacji:</label>
+            <InputSelect id="debentureType" @bind-Value="model.Type" style="height:30px;width:75px">
+                @foreach (var DebentureType in Enum.GetValues(typeof(DebentureType)))
+                {
+                    <option value="@DebentureType">@DebentureType</option>
+                }
+            </InputSelect>
 
-			<div class="form-check-label" style="margin:15px">
-				<InputCheckbox @bind-Value="model.BelkaTax" class="form-check-label" id="checkbox" />
-				<label class="form-check-label" id="checkbox-label"> Uwzględnienie podatku od zysków kapitałowych (19%) </label>
-			</div>
+            <div class="form-check-label" style="margin:15px">
+                <InputCheckbox @bind-Value="model.BelkaTax" class="form-check-label" id="checkbox" />
+                <label class="form-check-label" id="checkbox-label"> Uwzględnienie podatku od zysków kapitałowych (19%) </label>
+            </div>
 
-			@if (DebentureDialogOpen)
-			{
-				<DebentureInfoModal Title="@model.Type.ToString()" Text="@InformationAboutDebenture()" OnClose="@OnDebentureInfoClose"></DebentureInfoModal>
-			}
+            @if (DebentureDialogOpen)
+            {
+                <DebentureInfoModal Title="@model.Type.ToString()" Text="@InformationAboutDebenture()" OnClose="@OnDebentureInfoClose"></DebentureInfoModal>
+            }
 
-			<button class="btn btn-primary" style="margin:15px" @onclick="() => OpenDebentureInfoDialog()" data="@model"> Informacje dotyczące obligacji @model.Type.ToString()</button>
+            <button class="btn btn-primary" style="margin:15px" @onclick="() => OpenDebentureInfoDialog()" data="@model"> Informacje dotyczące obligacji @model.Type.ToString()</button>
 
-			<p></p>
+            <p></p>
 
-			<div class="form-group" style="margin: 15px">
-				<label>Ilość obligacji</label>
-				<div class="input-group"><input @bind="model.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">sztuk</span></div></div>
-			</div>
+            <div class="form-group" style="margin: 15px">
+                <label>Ilość obligacji</label>
+                <div class="input-group"><input @bind="model.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">sztuk</span></div></div>
+            </div>
 
-			@switch (model.Type)
-			{
-				case DebentureType.OTS:
-					SwitchDebentureTypeAction();
-					<div class="form-group">
-						<label>Wysokość rocznego oprocentowania</label>
-						<div class="input-group"><input @bind="model.OTSPercentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
-					</div>
-					break;
+            @switch (model.Type)
+            {
+                case DebentureType.OTS:
+                    SwitchDebentureTypeAction();
+                    <div class="form-group">
+                        <label>Wysokość rocznego oprocentowania</label>
+                        <div class="input-group"><input @bind="model.OTSPercentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                    </div>
+                    break;
 
-				case DebentureType.DOS:
-					SwitchDebentureTypeAction();
-					<h3>Podane obligacje od 1.06.2022r są wycofane z emisji.</h3>
-					<div class="form-group">
-						<label>Wysokość rocznego oprocentowania</label>
-						<div class="input-group"><input @bind="model.DOSPercentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
-					</div>
-					break;
+                case DebentureType.DOS:
+                    SwitchDebentureTypeAction();
+                    <h3>Dane obligacje od 1.06.2022r są wycofane z emisji.</h3>
+                    <div class="form-group">
+                        <label>Wysokość rocznego oprocentowania</label>
+                        <div class="input-group"><input @bind="model.DOSPercentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                    </div>
+                    break;
 
-				case DebentureType.TOZ:
-					SwitchDebentureTypeAction();
-					<PercentageTOZView model="model"></PercentageTOZView>
-					break;
+                case DebentureType.TOZ:
+                    SwitchDebentureTypeAction();
+                    <h3>Dane obligacje od 1.08.2022r są wycofane z emisji.</h3>
+                    <PercentageTOZView model="model"></PercentageTOZView>
+                    break;
 
-				case DebentureType.EDO:
-					SwitchDebentureTypeAction();
-					<PercentageEDOView model="model"></PercentageEDOView>
-					break;
+                case DebentureType.EDO:
+                    SwitchDebentureTypeAction();
+                    <PercentageEDOView model="model"></PercentageEDOView>
+                    break;
 
-				case DebentureType.COI:
-					SwitchDebentureTypeAction();
-					<PercentageCOIView model="model"></PercentageCOIView>
-					break;
+                case DebentureType.COI:
+                    SwitchDebentureTypeAction();
+                    <PercentageCOIView model="model"></PercentageCOIView>
+                    break;
 
-				case DebentureType.DOR:
-					SwitchDebentureTypeAction();
-					<section class="w-100 p-4 pb-4">
-						<label for="percentageRangeDOR" class="form-label">Referencyjna stopa oprocentowania</label>
-						<div class="range">
-							<input type="range" class="form-range" min="0" max="15" step="0.25" id="percentageRangeDOR" @onchange="CalculateDebentures" @bind="model.DORPercentage" @bind:event="oninput" />
-						</div>
-
-
-						<div class="form-group">
-							<div class="input-group"><input disabled="@true" @bind="model.DORPercentage" max="15" min="0" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
-						</div>
-					</section>
-					break;
-				case DebentureType.ROR:
-					SwitchDebentureTypeAction();
-					<section class="w-100 p-4 pb-4">
-						<label for="percentageRangeROR" class="form-label">Referencyjna stopa oprocentowania</label>
-						<div class="range">
-							<input type="range" class="form-range" min="0" max="15" step="0.25" id="percentageRangeROR" @onchange="CalculateDebentures" @bind="model.RORPercentage" @bind:event="oninput" />
-						</div>
+                case DebentureType.DOR:
+                    SwitchDebentureTypeAction();
+                    <section class="w-100 p-4 pb-4">
+                        <label for="percentageRangeDOR" class="form-label">Referencyjna stopa oprocentowania</label>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0" max="15" step="0.25" id="percentageRangeDOR" @onchange="CalculateDebentures" @bind="model.DORPercentage" @bind:event="oninput" />
+                        </div>
 
 
-						<div class="form-group" style="width:25%">
-							<div class="input-group"><input disabled="@true" @bind="model.RORPercentage" max="15" min="0" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
-						</div>
-					</section>
+                        <div class="form-group">
+                            <div class="input-group"><input disabled="@true" @bind="model.DORPercentage" max="15" min="0" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                        </div>
+                    </section>
+                    break;
 
-					break;
-				default:
-					break;
-			}
-			<p></p>
-			<button class="btn btn-primary btn-center" type="submit">Oblicz</button>
+                case DebentureType.ROR:
+                    SwitchDebentureTypeAction();
+                    <section class="w-100 p-4 pb-4">
+                        <label for="percentageRangeROR" class="form-label">Referencyjna stopa oprocentowania</label>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0" max="15" step="0.25" id="percentageRangeROR" @onchange="CalculateDebentures" @bind="model.RORPercentage" @bind:event="oninput" />
+                        </div>
 
-		</EditForm>
-	</div>
+                        <div class="form-group" style="width:25%">
+                            <div class="input-group"><input disabled="@true" @bind="model.RORPercentage" max="15" min="0" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                        </div>
+                    </section>
+                    break;
 
-	@if (debentureResult != null && debentureResult.DebentureInfo != null)
-	{
-		<p>
-			<div class="card-footer">
-				@foreach (var debentureInfo in debentureResult.DebentureInfo)
-				{
-					<div class="row" id="rowinfoot">
-						<div class="col-8">@debentureInfo.Item1</div>
-						<div class="col-4 text-right">@debentureInfo.Item2</div>
-					</div>
-				}
-			</div>
-		</p>
-		@if (debentureResult.DebentureData.DebentureColumns != null)
-		{
-			<table class="table table-bordered" style="align-content:center">
-				<thead>
-					<tr>
-						@foreach (var head in debentureResult.DebentureData.Head)
-						{
-							<th>@head.Head  @if (@head.ToolTip != null){<Tooltip Text="@head.ToolTip"></Tooltip>} </th>
-						}
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var column in debentureResult.DebentureData.DebentureColumns)
-					{
-					<td>
-						@foreach (var row in column.Rows)
-						{
-						<tr>@row</tr>
-						}
-					</td>
-					}
-				</tbody>
-				</table>
-			}
-	}
+                case DebentureType.TOS:
+                    SwitchDebentureTypeAction();
+                    <section class="w-100 p-4 pb-4">
+                        <label for="percentageRangeTOS" class="form-label">Oprocentowanie</label>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0" max="15" step="0.25" id="percentageRangeTOS" @onchange="CalculateDebentures" @bind="model.TOSPercentage" @bind:event="oninput" />
+                        </div>
+
+                        <div class="form-group" style="width:25%">
+                            <div class="input-group"><input disabled="@true" @bind="model.TOSPercentage" max="15" min="0" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                        </div>
+                    </section>
+                    break;
+
+                default:
+                    break;
+            }
+            <p></p>
+            <button class="btn btn-primary btn-center" type="submit">Oblicz</button>
+
+        </EditForm>
+    </div>
+
+    @if (debentureResult != null && debentureResult.DebentureInfo != null)
+    {
+        <p>
+            <div class="card-footer">
+                @foreach (var debentureInfo in debentureResult.DebentureInfo)
+                {
+                    <div class="row" id="rowinfoot">
+                        <div class="col-8">@debentureInfo.Item1</div>
+                        <div class="col-4 text-right">@debentureInfo.Item2</div>
+                    </div>
+                }
+            </div>
+        </p>
+        @if (debentureResult.DebentureData.DebentureColumns != null)
+        {
+            <table class="table table-bordered" style="align-content:center">
+                <thead>
+                    <tr>
+                        @foreach (var head in debentureResult.DebentureData.Head)
+                        {
+                            <th>
+                                @head.Head  @if (@head.ToolTip != null)
+                                {
+                                    <Tooltip Text="@head.ToolTip"></Tooltip>
+                                }
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var column in debentureResult.DebentureData.DebentureColumns)
+                    {
+                    <td>
+                            @foreach (var row in column.Rows)
+                            {
+                        <tr>@row</tr>
+                            }
+                    </td>
+                    }
+                </tbody>
+            </table>
+        }
+    }
 </div>
 
 
 @code {
-	private DebentureModel model = new DebentureModel();
-	private Data.Debenture debentureResult;
-	public bool DebentureDialogOpen { get; set; }
+    private DebentureModel model = new DebentureModel();
+    private Data.Debenture debentureResult;
+    public bool DebentureDialogOpen { get; set; }
 
-	private void OnDebentureInfoClose(bool accepted)
-	{
-		DebentureDialogOpen = false;
-	}
+    private void OnDebentureInfoClose(bool accepted)
+    {
+        DebentureDialogOpen = false;
+    }
 
-	private void OpenDebentureInfoDialog()
-	{
-		DebentureDialogOpen = true;
-	}
+    private void OpenDebentureInfoDialog()
+    {
+        DebentureDialogOpen = true;
+    }
 
-	private async Task CalculateDebentures()
-	{
-		if (!DebentureDialogOpen)
-			debentureResult = await DebentureService.GetDebentureAsync(model);
-	}
+    private async Task CalculateDebentures()
+    {
+        if (!DebentureDialogOpen)
+            debentureResult = await DebentureService.GetDebentureAsync(model);
+    }
 
-	private string InformationAboutDebenture()
-	{
-		return DebentureService.GetInformationAboutDebenture(model.Type);
-	}
+    private string InformationAboutDebenture()
+    {
+        return DebentureService.GetInformationAboutDebenture(model.Type);
+    }
 
-	private void SwitchDebentureTypeAction()
-	{
-		model.DOSPercentage = model.Type != DebentureType.DOS ? DefaultValue.DOSPercentage : model.DOSPercentage;
-		model.OTSPercentage = model.Type != DebentureType.OTS ? DefaultValue.OTSPercentage : model.OTSPercentage;
-		model.TOZPercentage = model.Type != DebentureType.TOZ ? DefaultValue.TOZPercentage : model.TOZPercentage;
-		model.RORPercentage = model.Type != DebentureType.ROR ? DefaultValue.RORPercentage : model.RORPercentage;
-		model.COIPercentage = model.Type != DebentureType.COI ? DefaultValue.COIPercentage : model.COIPercentage;
-		model.EDOPercentage = model.Type != DebentureType.EDO ? DefaultValue.EDOPercentage : model.EDOPercentage;
-		model.DORPercentage = model.Type != DebentureType.DOR ? DefaultValue.DORPercentage : model.DORPercentage;
+    private void SwitchDebentureTypeAction()
+    {
+        model.DOSPercentage = model.Type != DebentureType.DOS ? DefaultValue.DOSPercentage : model.DOSPercentage;
+        model.OTSPercentage = model.Type != DebentureType.OTS ? DefaultValue.OTSPercentage : model.OTSPercentage;
+        model.TOZPercentage = model.Type != DebentureType.TOZ ? DefaultValue.TOZPercentage : model.TOZPercentage;
+        model.RORPercentage = model.Type != DebentureType.ROR ? DefaultValue.RORPercentage : model.RORPercentage;
+        model.COIPercentage = model.Type != DebentureType.COI ? DefaultValue.COIPercentage : model.COIPercentage;
+        model.EDOPercentage = model.Type != DebentureType.EDO ? DefaultValue.EDOPercentage : model.EDOPercentage;
+        model.DORPercentage = model.Type != DebentureType.DOR ? DefaultValue.DORPercentage : model.DORPercentage;
 
-		if (debentureResult != null)
-		{
-			debentureResult.DebentureInfo.Clear();
-			debentureResult.DebentureData.DebentureColumns = null;
-			debentureResult.DebentureData.Head = null;
-		}
-	}
+        if (debentureResult != null)
+        {
+            debentureResult.DebentureInfo.Clear();
+            debentureResult.DebentureData.DebentureColumns = null;
+            debentureResult.DebentureData.Head = null;
+        }
+    }
 
 }

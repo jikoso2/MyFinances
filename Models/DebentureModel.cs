@@ -40,6 +40,10 @@ namespace MyFinances.Models
 		double dORPercentage = DefaultValue.DORPercentage;
 		[Range(0, 15)]
 		public double DORPercentage { get => dORPercentage; set => dORPercentage = value > 15.0 ? 15.0 : value; }
+
+		double tOSPercentage = DefaultValue.TOSPercentage;
+		[Range(0, 15)]
+		public double TOSPercentage { get => tOSPercentage; set => tOSPercentage = value > 15.0 ? 15.0 : value; }
 	}
 
 	internal class DebentureModelValidation
@@ -98,6 +102,7 @@ namespace MyFinances.Models
 		COI,
 		EDO,
 		ROR,
-		DOR
+		DOR,
+		TOS
 	}
 }
