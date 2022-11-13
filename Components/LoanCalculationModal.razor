@@ -1,0 +1,73 @@
+﻿@using MyFinances.Data.DataBase
+@inject Data.UserAccountService userAccountService
+
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edytor kalkulacji kredytowej</h4>
+                <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="LoanCalculation" OnValidSubmit="UpdateLoanCalculation">
+                    <div class="modal-body">
+                        <table class="table">
+                            <tr>
+                                <td>Kwota Kredytu</td>
+                                <td><input type="text" placeholder="Wpisz oprocentowanie" @bind="LoanCalculation.amount" /></td>
+                            </tr>
+                            <tr>
+                                <td>Oprocentowanie</td>
+                                <td><input type="text" placeholder="Wpisz oprocentowanie" @bind="LoanCalculation.percentage" /></td>
+                            </tr>
+                            <tr>
+                                <td>Długość trwania</td>
+                                <td><input type="text" placeholder="Wpisz oprocentowanie" @bind="LoanCalculation.duration" /></td>
+                            </tr>
+                        </table>
+                    </div>
+                </EditForm>
+            </div>
+            @if (LoanCalculation.iid > 0)
+            {
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" @onclick="@UpdateLoanCalculation">Edytuj</button>
+                </div>
+            }
+            else
+            {
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" @onclick="@InsertLoanCalculation">Dodaj</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public LoanCalculation LoanCalculation { get; set; }
+
+    [Parameter]
+    public string fullUserName { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    private Task ModalCancel()
+    {
+        return OnClose.InvokeAsync(false);
+    }
+
+    public Task InsertLoanCalculation()
+    {
+        userAccountService.InsertLoanCalculation(LoanCalculation, fullUserName);
+        return OnClose.InvokeAsync(false);
+    }
+
+    public Task UpdateLoanCalculation()
+    {
+        userAccountService.UpdateLoanCalculation(LoanCalculation);
+        return OnClose.InvokeAsync(false);
+    }
+}

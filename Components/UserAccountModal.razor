@@ -1,0 +1,69 @@
+﻿@using MyFinances.Data.DataBase
+@inject Data.UserAccountService userAccountService
+
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edycja Użytkownika</h4>
+                <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="UserAccount" OnValidSubmit="UpdateUserAccount">
+                    <div class="modal-body">
+                        <table class="table">
+                            <tr>
+                                <td>E-mail</td>
+                                <td><input type="text" placeholder="E-mail" @bind="UserAccount.email" /></td>
+                            </tr>
+                            <tr>
+                                <td>Pełna Nazwa</td>
+                                <td><input type="text" placeholder="Fullname" @bind="UserAccount.fullname" /></td>
+                            </tr>
+                            <tr>
+                                <td>Nazwa Użytkownika</td>
+                                <td><input type="text" placeholder="Username" @bind="UserAccount.username" disabled=true /></td>
+                            </tr>
+                            <tr>
+                                <td>Hasło</td>
+                                <td><input type="text" placeholder="Password" @bind="UserAccount.password" /></td>
+                            </tr>
+                        </table>
+                    </div>
+                </EditForm>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary" @onclick="@UpdateUserAccount">Edytuj</button>
+                <button type="button" class="btn btn-danger" @onclick="@DeleteUserAccount">Usuń</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public UserAccount UserAccount { get; set; }
+
+    [Parameter]
+    public UserAccount Admin { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    private Task ModalCancel()
+    {
+        return OnClose.InvokeAsync(false);
+    }
+
+    public Task UpdateUserAccount()
+    {
+        userAccountService.UpdateUserAccount(UserAccount, Admin);
+        return OnClose.InvokeAsync(false);
+    }
+
+    public Task DeleteUserAccount()
+    {
+        userAccountService.DeleteUserAccount(UserAccount, Admin);
+        return OnClose.InvokeAsync(false);
+    }
+}

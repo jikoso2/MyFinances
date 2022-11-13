@@ -22,7 +22,7 @@ namespace MyFinances.Models
 		public double DOSPercentage { get; set; } = DefaultValue.DOSPercentage;
 
 		[Required]
-		public bool BelkaTax { get; set; }
+		public bool BelkaTax { get; set; } = true;
 
 		[DebentureModelValidation.TOZPercentage]
 		public List<double> TOZPercentage { get; set; } = DefaultValue.TOZPercentage;

@@ -1,0 +1,40 @@
+﻿@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navManager
+@using MyFinances.Data.Auth
+
+
+<AuthorizeView>
+    <Authorized>
+        <a>Cześć, @context.User.Identity?.Name!</a>
+        <form>
+            <button type="submit" class="nav-link btn btn-link" @onclick="AccManagement">Zarządzaj</button>
+        </form>
+        <form>
+            <button type="submit" class="nav-link btn btn-link" @onclick="Logout">Wylogowanie</button>
+        </form>
+    </Authorized>
+    <NotAuthorized>
+        <a href="auth/login">Zaloguj się</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="admin">
+    <Authorized>
+        <a href="auth/register">Nowe Konto</a>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    private void AccManagement()
+    {
+        navManager.NavigateTo("/auth/accountmanagement", true);
+    }
+
+    private async Task Logout()
+    {
+        var customAuthStateProvider = (StateProvider)authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(null);
+        await Task.Delay(1000); //at the slow free azure host, app need some time
+        navManager.NavigateTo("/", true);
+    }
+}

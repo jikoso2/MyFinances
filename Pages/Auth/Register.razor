@@ -1,0 +1,103 @@
+﻿@using MyFinances.Models
+@using MyFinances.Data
+@using MyFinances.Helpers
+@using MyFinances.Data.DataBase
+@using System.Threading
+@using Microsoft.AspNetCore.Components.Web
+
+@page "/auth/register"
+
+@inject Data.UserAccountService userAccountService;
+
+<AuthorizeView Roles="admin" Context="another_context">
+    <Authorized>
+
+        <div class="card-header">
+            Utwórz nowe konto
+        </div>
+
+        <div class="card-body">
+
+            @if (isOpenAfterRegisterModal)
+            {
+                <InfoModal OnClose="ChangeStateAfterRegisterModal" Text="@resumeAfterRegisterUserAccount" Title="Zakładanie nowego konta"></InfoModal>
+            }
+
+            <EditForm Model="model" OnValidSubmit="CreateAccount">
+
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="row justify-content-center">
+                    <div class="row">
+
+                        <div class="col">
+                            <div class="form-group">
+                                <label>Login</label>
+                                <div class="input-group"><input @bind="model.username" class="form-control" style="min-width: 75px"></div>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="form-group">
+                                <label>Hasło</label>
+                                <div class="input-group"><input @bind="model.password" class="form-control" style="min-width: 75px"></div>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="form-group">
+                                <label>Imie i Nazwisko</label>
+                                <div class="input-group"><input @bind="model.fullname" class="form-control" style="min-width: 75px"></div>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="form-group">
+                                <label>Adres E-mail</label>
+                                <div class="input-group"><input @bind="model.email" class="form-control" style="min-width: 75px"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-center" style="width:100px"> Utwórz konto </button>
+
+            </EditForm>
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+        <span class="text-nowrap">
+            Nowe konto może zostać utworzone tylko przed administratora. Skontaktuj się poprzez
+            <a href="/contact"> formularz </a>
+            na mojej stronie.
+        </span>
+    </NotAuthorized>
+
+</AuthorizeView>
+
+@code
+{
+    UserAccount model = new UserAccount();
+    bool isOpenAfterRegisterModal = false;
+    private void ChangeStateAfterRegisterModal() => isOpenAfterRegisterModal = !isOpenAfterRegisterModal;
+    string resumeAfterRegisterUserAccount;
+
+    private async Task CreateAccount()
+    {
+        var createAccountResult = await userAccountService.InsertUserAccount(model);
+
+        if (createAccountResult)
+        {
+            resumeAfterRegisterUserAccount = $"Poprawnie stworzyłeś konto. <br> Login: {model.username} <br> Hasło: {model.password} ";
+        }
+        else
+        {
+            resumeAfterRegisterUserAccount = "Nie udało się stworzyć konta";
+        }
+
+        ChangeStateAfterRegisterModal();
+    }
+}

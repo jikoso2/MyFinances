@@ -1,0 +1,97 @@
+﻿@page "/users"
+
+@using MyFinances.Data.DataBase
+@using MyFinances.Data
+
+@inherits OwningComponentBase<UserAccountService>
+@inject AuthenticationStateProvider authStateProvider;
+
+<AuthorizeView Roles="admin">
+    <Authorized>
+
+        @if (isOpenUserAccountEditor)
+        {
+            <UserAccountModal UserAccount="mainUserAccount" Admin="admin" OnClose="OnUserAccountModalClose"></UserAccountModal>
+        }
+
+        <h3>Użytkownicy</h3>
+
+        <div class="table-responsive" style="max-height:1500px">
+            <table class="table table-bordered " style="align-content:center">
+
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Username</th>
+                        <th>Password</th>
+                        <th>Email</th>
+                        <th>Full Name</th>
+                        <th>Last Login</th>
+                        <th>Modified</th>
+                        <th>ModifiedBy</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var user in userAccounts)
+                    {
+                        <tr>
+                            <td>@user.id</td>
+                            <td>@user.username</td>
+                            <td>@user.password</td>
+                            <td>@user.email</td>
+                            <td>@user.fullname</td>
+                            <td>@user.last_login</td>
+                            <td>@user.modified</td>
+                            <td>@user.modified_by</td>
+                            @if (user.role != "admin")
+                            {
+                                <td><button class="btn btn-primary" type="submit" @onclick="(()=>GetUserAccount(user))">Edytuj</button></td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+        Kolego zbłądziłeś, nie masz dostępu.
+    </NotAuthorized>
+
+</AuthorizeView>
+
+@code {
+
+    public IList<UserAccount> userAccounts;
+
+    bool isOpenUserAccountEditor = false;
+    private UserAccount mainUserAccount;
+    private UserAccount admin;
+    private void ChangeStateUserAccountEditModal() => isOpenUserAccountEditor = !isOpenUserAccountEditor;
+
+    protected override void OnInitialized()
+    {
+        userAccounts = Service.GetUserAccounts();
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        admin = await Service.GetUserAccountByUsername(authState.User.Identity.Name);
+    }
+
+    void GetUserAccount(UserAccount user)
+    {
+        mainUserAccount = user;
+        isOpenUserAccountEditor = true;
+    }
+
+    private void OnUserAccountModalClose(bool accepted)
+    {
+        OnInitializedAsync().GetAwaiter();
+        isOpenUserAccountEditor = false;
+    }
+
+}

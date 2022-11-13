@@ -6,111 +6,116 @@
 
 
 <div class="card mx-auto mt-5">
-	<div class="card-header">
-		Kalkulator Lokaty
-	</div>
-	<div class="card-body">
-		<EditForm Model="@model" OnValidSubmit="CalculateDeposit">
 
-			<DataAnnotationsValidator />
-			<ValidationSummary />
+    <div class="card-header">
+        Kalkulator Lokaty
+    </div>
 
-			<div class="form-check-label">
-				<InputCheckbox @bind-Value="model.Capitalization" class="form-check-label" id="checkbox" />
-				<label class="form-check-label" id="checkbox-label"> Kapitalizacja </label>
-			</div>
-			<div class="form-check-label">
-				<InputCheckbox @bind-Value="model.BelkaTax" class="form-check-label" id="checkbox" />
-				<label class="form-check-label" id="checkbox-label"> Podatek 19% </label>
-			</div>
+    <div class="card-body">
+        <EditForm Model="@model" OnValidSubmit="CalculateDeposit">
 
-			<div class="row justify-content-center">
-				<div class="row">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-					<div class="col">
-						<div class="form-group">
-							<label>Kwota ulokowana na lokacie</label>
-							<div class="input-group"><input @bind="model.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
-						</div>
-					</div>
+            <div class="form-check-label">
+                <InputCheckbox @bind-Value="model.Capitalization" class="form-check-label" id="checkbox" />
+                <label class="form-check-label" id="checkbox-label"> Kapitalizacja </label>
+            </div>
 
-					<div class="col">
-						<div class="form-group">
-							<label>Czas trwania lokaty</label>
-							<div class="input-group"><input @bind="model.Duration" class="form-control"><div class="input-group-append"><span class="input-group-text">dni</span></div></div>
-						</div>
-					</div>
+            <div class="form-check-label">
+                <InputCheckbox @bind-Value="model.BelkaTax" class="form-check-label" id="checkbox" />
+                <label class="form-check-label" id="checkbox-label"> Podatek 19% </label>
+            </div>
 
-					<div class="col">
-						<div class="form-group">
-							<label>Roczne oprocentowanie</label>
-							<div class="input-group"><input @bind="model.Percentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
-						</div>
-					</div>
-					<div class="col">
-						<div class="form-group">
-							<label>Okres kapitalizacji</label>
-							<div class="input-group"><input @bind="model.Period" class="form-control"><div class="input-group-append"><span class="input-group-text">dni</span></div></div>
-						</div>
-					</div>
-				</div>
-			</div>
+            <div class="row justify-content-center">
+                <div class="row justify-content-center">
 
-			<p></p>
-			<button type="submit" class="btn btn-primary btn-center">Oblicz</button>
-		</EditForm>
-	</div>
-	@if (calculatedDeposit == null || calculatedDeposit.DepositData == null)
-	{
-	}
-	else
-	{
-		<p>
-			<div class="card-footer">
-				@foreach (var depositInfo in calculatedDeposit.DepositInfo)
-				{
-					<div class="row" id="rowinfoot">
-						<div class="col-8">@depositInfo.Item1</div>
-						<div class="col-4 text-right">@depositInfo.Item2</div>
-					</div>
-				}
-			</div>
-		</p>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Kwota ulokowana na lokacie</label>
+                            <div class="input-group"><input @bind="model.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
+                        </div>
+                    </div>
 
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Czas trwania lokaty</label>
+                            <div class="input-group"><input @bind="model.Duration" class="form-control"><div class="input-group-append"><span class="input-group-text">dni</span></div></div>
+                        </div>
+                    </div>
 
-		<table class="table table-bordered">
-			<thead>
-				<tr>
-					@foreach (var head in calculatedDeposit.DepositData.Head)
-					{
-						<th>@head</th>
-					}
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (var column in calculatedDeposit.DepositData.DepositColumn)
-				{
-				<td>
-					@foreach (var row in column.Rows)
-					{
-					<tr>@row</tr>
-				}
-					</td>
-				}
-				</tbody>
-			</table>
-		}
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Roczne oprocentowanie</label>
+                            <div class="input-group"><input @bind="model.Percentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Okres kapitalizacji</label>
+                            <div class="input-group"><input @bind="model.Period" class="form-control"><div class="input-group-append"><span class="input-group-text">dni</span></div></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <p></p>
+            <button type="submit" class="btn btn-primary btn-center">Oblicz</button>
+
+        </EditForm>
+    </div>
+
+    @if (calculatedDeposit != null && calculatedDeposit.DepositData != null)
+    {
+        <p>
+            <div class="card-footer">
+                @foreach (var depositInfo in calculatedDeposit.DepositInfo)
+                {
+                    <div class="row" id="rowinfoot">
+                        <div class="col-8">@depositInfo.Item1</div>
+                        <div class="col-4 text-right">@depositInfo.Item2</div>
+                    </div>
+                }
+            </div>
+        </p>
+
+        <div class="table-responsive" style="max-height:300px">
+            <table class="table table-bordered " style="align-content:center">
+
+                <thead>
+                    <tr>
+                        @foreach (var head in calculatedDeposit.DepositData.Head)
+                        {
+                            <th>@head</th>
+                        }
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var column in calculatedDeposit.DepositData.DepositColumn)
+                    {
+                    <td>
+                        @foreach (var row in column.Rows)
+                        {
+                            <tr>@row</tr>
+                        }
+                    </td>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    }
 </div>
 
 
 
 
 @code {
-	private DepositModel model = new DepositModel();
-	private Data.Deposit calculatedDeposit;
+    private DepositModel model = new DepositModel();
+    private Data.Deposit calculatedDeposit;
 
-	private async Task CalculateDeposit()
-	{
-		calculatedDeposit = await DepositService.GetDepositAsync(model);
-	}
+    private async Task CalculateDeposit() => calculatedDeposit = await DepositService.GetDepositAsync(model);
 }

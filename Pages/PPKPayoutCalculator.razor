@@ -10,24 +10,40 @@
 
 
 <div class="card mx-auto mt-5">
+
     <div class="card-header">
         Kalkulator PPK
     </div>
+
     <div class="card-body">
+
+        <p>Wybierz sposób w jaki chcesz wprowadzić wpłacone kwoty.</p>
+
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            @foreach (var optionName in toggleGroup.Options)
+            {
+                <label class="btn btn-secondary @toggleGroup.GetActive(optionName)" style="width:215px;color:white">
+                    <input type="radio" name="options" autocomplete="off"
+                       checked="@(toggleGroup.SelectedOption == optionName)"
+                       @onchange="()=>toggleGroup.SelectedOption = optionName" /> @optionName
+                </label>
+            }
+        </div>
+        <p></p>
+
+        @if (dialogOpen)
+        {
+            <InfoModal Title="Wprowadzanie informacji dotyczących PPK" Text="@HelperInformations.GetPPKPayoutInformation()" OnClose="@OnInfoClose" Width="1200px"></InfoModal>
+        }
+
+        <button class="btn btn-primary" style="margin:15px" @onclick="() => OpenInfoDialog()" data="@model"> Informacje dotyczące obliczania wypłat </button>
+
         <EditForm Model="model" OnValidSubmit="CalculatePPK">
 
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            Wybierz sposób w jaki chcesz wprowadzić wpłacone kwoty.
-            <InputSelect id="payoutType" @bind-Value="model.PayoutType" style="height:30px;width:75px">
-                @foreach (var PayoutType in Enum.GetValues(typeof(PayoutType)))
-                {
-                    <option value="@PayoutType">@PayoutType</option>
-                }
-            </InputSelect>
-
-            @switch (model.PayoutType)
+            @switch (toggleGroup.SelectedOption)
             {
                 case PayoutType.Całość:
                     <div class="form-group" style="margin: 15px">
@@ -55,13 +71,14 @@
                 <label>Kwota wpłacona przez państwo</label>
                 <div class="input-group"><input @bind="model.CountryAmount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
             </div>
+
             <div class="form-group" style="margin: 15px">
                 <label>Procent zwrotu</label>
                 <div class="input-group"><input @bind="model.Percentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
             </div>
 
             <div class="form-check-label" style="margin:15px">
-                <InputCheckbox @bind-Value="model.EarlyPayment" class="form-check-label" id="checkbox" disabled/>
+                <InputCheckbox @bind-Value="model.EarlyPayment" class="form-check-label" id="checkbox" disabled />
                 <label class="form-check-label" id="checkbox-label"> Wypłata przed 60 rokiem życia </label>
             </div>
 
@@ -90,11 +107,21 @@
 
 @code {
     private PPKPayoutModel model = new PPKPayoutModel();
-    private Data.PPKPayout ppkResult;
+    private PPKPayout ppkResult;
+    private bool dialogOpen;
 
+    private void OnInfoClose(bool accepted) => dialogOpen = false;
+    private void OpenInfoDialog() => dialogOpen = true;
 
     private async Task CalculatePPK()
     {
+        model.PayoutType = toggleGroup.SelectedOption;
         ppkResult = await PPKPayoutService.GetPPKPayoutCalculatedAsync(model);
     }
+
+    Helpers.TogglePayoutType toggleGroup = new Helpers.TogglePayoutType()
+        {
+            SelectedOption = PayoutType.Całość,
+            Options = new PayoutType[] { PayoutType.Całość, PayoutType.Cześciami }
+        };
 }

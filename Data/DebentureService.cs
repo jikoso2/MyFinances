@@ -329,12 +329,68 @@ namespace MyFinances.Data
 
 		private void CalculateTOS(Debenture debentureResult)
 		{
-			var totalValue = DebentureModel.Amount * 100;
-			var percentage = DebentureModel.TOSPercentage;
-			var percentageCompound = ((Math.Pow((1 + percentage/100),3) - 1) * 100) / 3;
+			var percentage = DebentureModel.TOSPercentage / 100;
+			var percentageCompound = Math.Round(((Math.Pow((1 + percentage), 3) - 1)) / 3, 4);
 
-			debentureResult.DebentureInfo.Add(Tuple.Create("Koszt obligacji", Helper.MoneyFormat(totalValue)));
-			debentureResult.DebentureInfo.Add(Tuple.Create("Wysokość rocznego procentu składanego (długosc: 3 lata, kapitalizacja: roczna)", Helper.PercentFormat(percentageCompound)));
+			var totalValue = new double[4];
+			Array.Fill(totalValue, DebentureModel.Amount * 100);
+			var interestRate = DebentureModel.TOSPercentage / 100;
+			var interestRates = new double[4];
+			Array.Fill(interestRates, DebentureModel.TOSPercentage / 100);
+			var interestProfit = new double[4];
+			var totalProfit = new double[4];
+			var totalProfitRes = new double[4];
+			var interestSum = new double[4];
+
+			double calculatedTax = 0;
+
+			for (int i = 0; i < 4; i++)
+			{
+				double profit = i <= 3 ? Math.Round(totalValue[i] * interestRate, 2) : 0;
+
+				if (i < 3)
+					interestProfit[i] = profit;
+				else
+					interestProfit[i] = 0;
+
+				if (i < 3)
+					totalProfit[i + 1] = i == 0 ? profit : totalProfit[i] + profit;
+
+				if (DebentureModel.BelkaTax)
+				{
+					calculatedTax = (Math.Ceiling(Math.Max(totalProfit[i] - 0.70, 0) * 19)) / 100;
+					if (i == 3)
+						calculatedTax = Math.Ceiling(totalProfit[i] * 19) / 100;
+
+				}
+				totalProfitRes[i] = totalProfit[i] - calculatedTax;
+				if (i < 3)
+					totalProfitRes[i] = totalProfitRes[i] - 0.7 > 0 ? totalProfitRes[i] - 0.7 : 0;
+
+				if (i > 0)
+					totalValue[i] = totalValue[i - 1] + profit;
+			}
+
+			var yearRows = Enumerable.Range(0, 4).Select(a => (Math.Round((double)a, 1)).ToString()).ToArray();
+			var totalValueRows = totalValue.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var totalRateRows = interestRates.Select(a => Helper.PercentFormat(a)).ToArray();
+			var interestProfitRows = interestProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var totalProfitRows = totalProfitRes.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var interestSumRows = totalProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
+
+			debentureResult.DebentureData.DebentureColumns = new DebentureColumn[6]
+			{
+				new DebentureColumn() { Rows = yearRows },
+				new DebentureColumn() { Rows = totalValueRows },
+				new DebentureColumn() { Rows = totalRateRows },
+				new DebentureColumn() { Rows = interestProfitRows },
+				new DebentureColumn() { Rows = interestSumRows},
+				new DebentureColumn() { Rows = totalProfitRows }
+			};
+
+			debentureResult.DebentureInfo.Add(Tuple.Create("Koszt obligacji", Helper.MoneyFormat(totalValue[0])));
+			debentureResult.DebentureInfo.Add(Tuple.Create("Całkowity zysk", totalProfitRows[3]));
+			debentureResult.DebentureInfo.Add(Tuple.Create("Wysokość rocznego procentu składanego (długosc: 3 lata, kapitalizacja: roczna)", Helper.PercentFormat(percentageCompound * 100)));
 		}
 
 		public string GetInformationAboutDebenture(DebentureType type)
@@ -363,7 +419,7 @@ namespace MyFinances.Data
 					this.Head = new DebentureHead[6]
 					{
 						new DebentureHead() { Head = "Miesiąc", ToolTip = "Czas od wykupienia danej obligacji w miesiącach" },
-						new DebentureHead() { Head = "Całkowita wartość" },
+						new DebentureHead() { Head = "Całkowita wartość", ToolTip = "Wartość obligacji na początku danego okresu" },
 						new DebentureHead() { Head = "Oprocentowanie" },
 						new DebentureHead() { Head = "Odsetki" },
 						new DebentureHead() { Head = "Podatek" },
@@ -374,7 +430,7 @@ namespace MyFinances.Data
 					this.Head = new DebentureHead[6]
 					{
 						new DebentureHead() { Head = "Rok", ToolTip = "Czas od wykupienia danej obligacji w latach" },
-						new DebentureHead() { Head = "Całkowita wartość" },
+						new DebentureHead() { Head = "Całkowita wartość", ToolTip = "Wartość obligacji na początku danego okresu" },
 						new DebentureHead() { Head = "Oprocentowanie" },
 						new DebentureHead() { Head = "Odsetki" },
 						new DebentureHead() { Head = "Podatek" },
@@ -385,7 +441,7 @@ namespace MyFinances.Data
 					this.Head = new DebentureHead[6]
 					{
 						new DebentureHead() { Head = "Rok", ToolTip = "Czas od wykupienia danej obligacji w latach" },
-						new DebentureHead() { Head = "Całkowita wartość" },
+						new DebentureHead() { Head = "Całkowita wartość", ToolTip = "Wartość obligacji na początku danego okresu" },
 						new DebentureHead() { Head = "Oprocentowanie" },
 						new DebentureHead() { Head = "Odsetki" },
 						new DebentureHead() { Head = "Suma odsetek" },
@@ -396,31 +452,32 @@ namespace MyFinances.Data
 					this.Head = new DebentureHead[6]
 					{
 						new DebentureHead() { Head = "Rok", ToolTip = "Czas od wykupienia danej obligacji w latach" },
-						new DebentureHead() { Head = "Całkowita wartość" },
+						new DebentureHead() { Head = "Całkowita wartość", ToolTip = "Wartość obligacji na początku danego okresu" },
 						new DebentureHead() { Head = "Oprocentowanie" },
 						new DebentureHead() { Head = "Odsetki" },
 						new DebentureHead() { Head = "Suma odsetek" },
-						new DebentureHead() { Head = "Zysk netto" }
+						new DebentureHead() { Head = "Zysk netto", ToolTip = "Zysk przy wypłacie pod koniec danego okresu. (Z uwzględnieniem kosztów wykupu obligacji)" }
 					};
 					break;
 				case DebentureType.EDO:
 					this.Head = new DebentureHead[5]
 					{
 						new DebentureHead() { Head = "Rok", ToolTip = "Czas od wykupienia danej obligacji w latach" },
-						new DebentureHead() { Head = "Całkowita wartość" },
+						new DebentureHead() { Head = "Całkowita wartość", ToolTip = "Wartość obligacji na początku danego okresu" },
 						new DebentureHead() { Head = "Oprocentowanie" },
-						new DebentureHead() { Head = "Odsetki" },
-						new DebentureHead() { Head = "Zysk netto", ToolTip = "Jest to zysk netto jaki możemy uzyskać przy wcześniejszym zerwaniu obligacji, z uwzględnieniem kosztów wcześniejszego wykupu"}
+						new DebentureHead() { Head = "Odsetki", ToolTip = "Naliczone odestki w danym okresie" },
+						new DebentureHead() { Head = "Zysk netto", ToolTip = "Zysk przy wypłacie pod koniec danego okresu. (Z uwzględnieniem kosztów wykupu obligacji)"}
 					};
 					break;
 				case DebentureType.TOS:
-					this.Head = new DebentureHead[5]
+					this.Head = new DebentureHead[6]
 					{
 						new DebentureHead() { Head = "Rok", ToolTip = "Czas od wykupienia danej obligacji w latach" },
-						new DebentureHead() { Head = "Całkowita wartość" },
+						new DebentureHead() { Head = "Całkowita wartość", ToolTip = "Wartość obligacji na początku danego okresu" },
 						new DebentureHead() { Head = "Oprocentowanie" },
-						new DebentureHead() { Head = "Odsetki" },
-						new DebentureHead() { Head = "Zysk netto", ToolTip = "Jest to zysk netto jaki możemy uzyskać przy wcześniejszym zerwaniu obligacji, z uwzględnieniem kosztów wcześniejszego wykupu"}
+						new DebentureHead() { Head = "Odsetki", ToolTip = "Naliczone odestki w danym okresie" },
+						new DebentureHead() { Head = "Suma odsetek" },
+						new DebentureHead() { Head = "Zysk netto", ToolTip = "Zysk przy wypłacie pod koniec danego okresu. (Z uwzględnieniem kosztów wykupu obligacji)" }
 					};
 					break;
 				default:

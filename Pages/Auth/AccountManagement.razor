@@ -1,0 +1,82 @@
+﻿@using MyFinances.Models
+@using MyFinances.Data
+@using MyFinances.Helpers
+@using MyFinances.Data.DataBase
+@using System.Threading
+@using Microsoft.AspNetCore.Components.Web
+@using MyFinances.Data.Auth
+
+@page "/auth/accountmanagement"
+
+@inject Data.UserAccountService userAccountService;
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager navManager;
+
+<div class="card-header">
+    Zmiana hasła
+</div>
+
+@if (isOpenFailAuthModal)
+{
+    <InfoModal OnClose="ChangeStateModifyAccountModal" Text="@resumeInfoAboutLogin" Title="Modyfikacja konta"></InfoModal>
+}
+
+<div class="card-body">
+    <EditForm Model="model" OnValidSubmit="ApproveModification">
+
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="row justify-content-center">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>Nowe hasło</label>
+                        <div class="input-group"><input @bind="model.password" class="form-control" style="min-width: 75px"></div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Adres e-mail</label>
+                        <div class="input-group"><input @bind="model.email" class="form-control" style="min-width: 75px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-center" style="width:100px"> Zatwierdź zmiany </button>
+    </EditForm>
+</div>
+
+@code
+{
+    UserAccount model = new UserAccount();
+    UserAccount user = new UserAccount();
+
+    string resumeInfoAboutLogin;
+    bool isOpenFailAuthModal = false;
+    private void ChangeStateModifyAccountModal() => isOpenFailAuthModal = !isOpenFailAuthModal;
+
+    private async Task ApproveModification()
+    {
+        model.username = user.username;
+
+        var result = await userAccountService.UpdateUserAccount(model);
+        var userDB = await userAccountService.GetUserAccountByUsername(user.username);
+        model.email = userDB.email;
+
+        if (result.Count() > 0)
+            resumeInfoAboutLogin = $"Pomyślnie zmienione: {string.Join(",", result)}";
+        else
+            resumeInfoAboutLogin = $"Nie dokonano żadnych zmian";
+
+        ChangeStateModifyAccountModal();
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        user = await userAccountService.GetUserAccountByUsername(authState.User.Identity.Name);
+        model.email = user.email;
+    }
+}

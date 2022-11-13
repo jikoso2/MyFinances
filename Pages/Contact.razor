@@ -7,9 +7,11 @@
 
 <div class="card mx-auto mt-5">
     <LoadingModal IsLoading="isProcessing" LoadingText="Wysyłanie wiadomości E-Mail">
+
         <div class="card-header">
             Formularz kontaktowy
         </div>
+
         <div class="card-body">
             <EditForm Model="model" OnValidSubmit="SendMail">
 
@@ -23,16 +25,16 @@
 
                 <div class="form-group" style="margin: 15px">
                     <label>Treść Wiadomości</label>
-                    <textarea @bind="model.EmailMessage" class="form-control" style="height:200px;width:500px;max-width:500px" placeholder="Wpisz swoją wiadomość"></textarea>
+                    <textarea @bind="model.EmailMessage" class="form-control" style="min-height:200px;width:100%;max-width:500px" placeholder="Wpisz swoją wiadomość"></textarea>
                 </div>
 
                 <button class="btn btn-primary btn-center" style="min-width:250px">Wyślij wiadomość E-Mail</button>
 
             </EditForm>
 
-            @if (SendMailInfoOpen)
+            @if (sendMailInfoOpen)
             {
-                <EmailInfoModal ServiceResponse="@Message" OnClose="@OnSendMailInfoClose"></EmailInfoModal>
+                <EmailInfoModal ServiceResponse="@message" OnClose="@OnSendMailInfoClose"></EmailInfoModal>
             }
 
         </div>
@@ -40,20 +42,14 @@
 </div>
 
 @code {
-    private ContactResponse Message { get; set; }
+    private ContactResponse message { get; set; }
     private ContactMessageModel model = new ContactMessageModel();
     private bool isProcessing;
-    private bool SendMailInfoOpen = false;
+    private bool sendMailInfoOpen = false;
 
-    private void OnSendMailInfoClose(bool accepted)
-    {
-        SendMailInfoOpen = false;
-    }
+    private void OnSendMailInfoClose(bool accepted) => sendMailInfoOpen = false;
 
-    private void OpenDebentureInfoDialog()
-    {
-        SendMailInfoOpen = true;
-    }
+    private void OpenDebentureInfoDialog() => sendMailInfoOpen = true;
 
     private async Task SendMail()
     {
@@ -61,7 +57,7 @@
         try
         {
             await Task.Delay(1000);
-            Message = await MailService.SendMail(model);
+            message = await MailService.SendMail(model);
         }
         finally
         {

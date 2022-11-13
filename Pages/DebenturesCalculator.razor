@@ -32,7 +32,7 @@
 
             @if (DebentureDialogOpen)
             {
-                <DebentureInfoModal Title="@model.Type.ToString()" Text="@InformationAboutDebenture()" OnClose="@OnDebentureInfoClose"></DebentureInfoModal>
+                <InfoModal Title="@("Obligacje " + model.Type.ToString())" Text="@InformationAboutDebenture()" OnClose="@OnDebentureInfoClose"></InfoModal>
             }
 
             <button class="btn btn-primary" style="margin:15px" @onclick="() => OpenDebentureInfoDialog()" data="@model"> Informacje dotyczące obligacji @model.Type.ToString()</button>
@@ -130,7 +130,6 @@
 
         </EditForm>
     </div>
-
     @if (debentureResult != null && debentureResult.DebentureInfo != null)
     {
         <p>
@@ -146,32 +145,34 @@
         </p>
         @if (debentureResult.DebentureData.DebentureColumns != null)
         {
-            <table class="table table-bordered" style="align-content:center">
-                <thead>
-                    <tr>
-                        @foreach (var head in debentureResult.DebentureData.Head)
-                        {
-                            <th>
-                                @head.Head  @if (@head.ToolTip != null)
-                                {
-                                    <Tooltip Text="@head.ToolTip"></Tooltip>
-                                }
-                            </th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var column in debentureResult.DebentureData.DebentureColumns)
-                    {
-                    <td>
-                            @foreach (var row in column.Rows)
+            <div class="table-responsive" style="max-height:300px">
+                <table class="table table-bordered " style="align-content:center">
+                    <thead>
+                        <tr>
+                            @foreach (var head in debentureResult.DebentureData.Head)
                             {
-                        <tr>@row</tr>
+                                <th>
+                                    @head.Head  @if (@head.ToolTip != null)
+                                    {
+                                        <Tooltip Text="@head.ToolTip"></Tooltip>
+                                    }
+                                </th>
                             }
-                    </td>
-                    }
-                </tbody>
-            </table>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var column in debentureResult.DebentureData.DebentureColumns)
+                        {
+                        <td>
+                                @foreach (var row in column.Rows)
+                                {
+                            <tr>@row</tr>
+                                }
+                        </td>
+                        }
+                    </tbody>
+                </table>
+            </div>
         }
     }
 </div>

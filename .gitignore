@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 # MailService
 MailService.cs
+
+#AppSettings (DB and other)
+appsettings.json

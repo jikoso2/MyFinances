@@ -3,6 +3,18 @@
 
 <h1>Cześć!</h1>
 
-Nazywam się Jarek i stworzyłem prostą aplikację do łatwych kalkulacji finansowych dla siebie i znajomych.
+Nazywam się Jarek i stworzyłem prostą aplikację do łatwych kalkulacji finansowych dla siebie i znajomych.<br><br>
+Należy pamiętać że wszystkie obliczenia są orientacyjne. Sposób w jaki wyznaczane są wysokości podatków mogą się w każdej chwili zmienić. Narzędzia opublikowane na tej stronie służą wyłącznie na potrzeby prywatne i nie można ich wykorzystywać komercyjnie. Wartości wyliczone przez kalkulatory mogą nieco odbiegać od rzeczywistych kwot jakie uzyskamy w banku lub urzędzie skarbowym.
 
 <SurveyPrompt Title="Chcesz się ze mną skontaktować ?" />
+
+@code{
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private async Task DisplayGreetingAlert()
+    {
+        var authState = await authenticationState;
+        var message = $"hello {authState.User.Identity.Name}";
+    }
+}

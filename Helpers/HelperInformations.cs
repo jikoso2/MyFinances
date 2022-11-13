@@ -38,5 +38,16 @@ namespace MyFinances.Helpers
 				$"Pracownik co miesiąc przeznacza na PPK 2 % swojego wynagrodzenia. Może także zadeklarować finansowanie wpłaty dodatkowej – w wysokości do 2 % wynagrodzenia(łącznie maksymalnie 4 %).<br/>" +
 				$"Pracownik może zdecydować o wypłacie środków przed 60 rokiem życia, wtedy musi opłacić należny podatek od wypracowanego zysku, a także 30% wpłat pracodawcy przekazać do ZUSu";
 		}
+
+		public static string GetPPKPayoutInformation()
+        {
+			return $"Obliczenia odbywają się przy założeniu wpłat 2% pracownik, 1,5% pracodawca. <br/><br/>" +
+				$"Kwota zgromadzona na PPK - suma zgromadzonych pieniędzy (ich aktualna wartość na koncie). <br/>" +
+				$"Kwota wpłacona przez państwo - Dokładna kwota wpłacona jako bonus za prowadzenie PPK - niezależnie od wartości funszów</br>" +
+				$"Procent zwrotu - procent wyliczony przez obsługującego PPK - wartość ta może być ujemna</br>" +
+				$"</br>" +
+				$"Kwota wpłacona przez pracodawce - dokładna kwota wpłacona przez pracodawce bez uwzględnienia oprocentowania zwrotu</br>" +
+				$"Kwota wpłacona przez pracownika - dokładna kwota wpłacona przez pracownika bez uwzględnienia oprocentowania zwrotu</br>";
+		}
 	}
 }

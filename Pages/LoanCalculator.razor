@@ -3,463 +3,552 @@
 @using MyFinances.Models
 @using MyFinances.Data
 @using MyFinances.Helpers
+@using MyFinances.Data.DataBase
+@using MyFinances.Data.Auth
 @using System.Threading
 
+@inject Data.UserAccountService userAccountService
+@inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager NavigationManager
 @inject Data.LoanService LoanService
 @inject IJSRuntime jsRunTime
 
 
 <div class="card mx-auto mt-5">
-	<div class="card-header">
-		Kalkulator Kredytu
-	</div>
-	<div class="card-body">
-		<EditForm Model="model" OnValidSubmit="CalculateLoan">
+    <div class="card-header">
+        Kalkulator Kredytu
+    </div>
+    <div class="card-body">
+        <AuthorizeView>
+            <Authorized>
+                @if (isOpenLoanCalculationEditor)
+                {
+                    <LoanCalculationModal LoanCalculation="mainLoanCalculation" fullUserName="@context.User.Identity.Name" OnClose="OnLoanCalculationModalClose"></LoanCalculationModal>
+                }
+                @if (loanCalculations != null)
+                {
+                    <h6>Zapisane kalulacje</h6>
+                    <div class="table-responsive" style="max-height:300px">
+                        <table class="table table-bordered " style="align-content:center">
+                            <thead>
+                                <tr>
+                                    <th>Kwota kredytu</th>
+                                    <th>Oprocentowanie</th>
+                                    <th>Czas Trwania</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var loanCalculation in loanCalculations)
+                                {
+                                    <tr>
+                                        <td>@loanCalculation.amount</td>
+                                        <td>@loanCalculation.percentage</td>
+                                        <td>@loanCalculation.duration</td>
+                                        <td style="width:100px"><button class="btn btn-primary" style="width:100%;max-width:100px" type="submit" @onclick="(()=>GetLoanCalculation(loanCalculation))">Edytuj</button></td>
+                                        <td style="width:100px"><button class="btn btn-danger" style="width:100%;max-width:100px" type="submit" @onclick="(()=>DeleteLoanCalculation(loanCalculation))">Usuń</button></td>
+                                        <td style="width:100px"><button class="btn btn-success" style="width:100%;max-width:100px" type="submit" @onclick="(()=>LoadLoanCalculation(loanCalculation))">Załaduj</button></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                <p></p>
+                <button class="btn btn-primary btn-center" style="width:180px" type="submit" @onclick="(()=>GetLoanCalculation(new LoanCalculation()))">
+                    Dodaj kalkulacje
+                </button>
+                <p></p>
+            </Authorized>
+        </AuthorizeView>
+        <EditForm Model="model" OnValidSubmit="CalculateLoan">
 
-			<DataAnnotationsValidator />
-			<ValidationSummary />
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-			<div class="row justify-content-center">
-				<div class="row">
-					<div class="col">
-						<div class="form-group">
-							<label>Kwota Kredytu</label>
-							<div class="input-group"><input @bind="model.Amount" class="form-control" style="min-width: 75px"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
-						</div>
-					</div>
-					<div class="col">
-						<div class="form-group">
-							<label>Czas trwania</label>
-							<div class="input-group"><input @bind="model.Duration" class="form-control" style="min-width: 75px"><div class="input-group-append"><span class="input-group-text">mies.</span></div></div>
-						</div>
-					</div>
-					<div class="col">
-						<div class="form-group">
-							<label>Oprocentowanie</label>
-							<div class="input-group"><input @bind="model.Percentage" class="form-control" style="min-width:75px"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="form-check-label">
-				<InputCheckbox @bind-Value="isExcessPayment" class="form-check-label" id="checkbox" />
-				<label class="form-check-label" id="checkbox-label"> Nadpłaty kredytu </label>
-			</div>
-			<div class="form-check-label">
-				<InputCheckbox @bind-Value="isVariableInterest" class="form-check-label" id="checkbox" />
-				<label class="form-check-label" id="checkbox-label"> Zmienne oprocentowanie </label>
-			</div>
-			<div class="form-check-label">
-				<InputCheckbox @bind-Value="isPeriodicExcessPayment" class="form-check-label" id="checkbox" />
-				<label class="form-check-label" id="checkbox-label"> Cykliczne nadpłaty kredytu </label>
-			</div>
-			<button type="submit" class="btn btn-primary btn-center"> Oblicz </button>
-		</EditForm>
-	</div>
+            <div class="row justify-content-center">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Kwota Kredytu</label>
+                            <div class="input-group"><input @bind="model.Amount" class="form-control" style="min-width: 75px"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Czas trwania</label>
+                            <div class="input-group"><input @bind="model.Duration" class="form-control" style="min-width: 75px"><div class="input-group-append"><span class="input-group-text">mies.</span></div></div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Oprocentowanie</label>
+                            <div class="input-group"><input @bind="model.Percentage" class="form-control" style="min-width:75px"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-check-label">
+                <InputCheckbox @bind-Value="isExcessPayment" class="form-check-label" id="checkbox" />
+                <label class="form-check-label" id="checkbox-label"> Nadpłaty kredytu </label>
+            </div>
+            <div class="form-check-label">
+                <InputCheckbox @bind-Value="isVariableInterest" class="form-check-label" id="checkbox" />
+                <label class="form-check-label" id="checkbox-label"> Zmienne oprocentowanie </label>
+            </div>
+            <div class="form-check-label">
+                <InputCheckbox @bind-Value="isPeriodicExcessPayment" class="form-check-label" id="checkbox" />
+                <label class="form-check-label" id="checkbox-label"> Cykliczne nadpłaty kredytu </label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-center"> Oblicz </button>
+        </EditForm>
+    </div>
 
-	@if (isExcessPayment)
-	{
+    @if (isExcessPayment)
+    {
 
-		<div class="card-footer">
-			Nadpłaty
-			<p align="right" style="margin-bottom:0px">
-				@if (isExcessVisible)
-				{
-					<button class="btn btn-outline-secondary btn-sm" @onclick="ChangeShowExcess">Ukryj</button>
-				}
-				else
-				{
-					<button class="btn btn-outline-primary btn-sm" @onclick="ChangeShowExcess">Pokaż</button>
-				}
-			</p>
-		</div>
+        <div class="card-footer">
+            Nadpłaty
+            <p align="right" style="margin-bottom:0px">
+                @if (isExcessVisible)
+                {
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="ChangeShowExcess">Ukryj</button>
+                }
+                else
+                {
+                    <button class="btn btn-outline-primary btn-sm" @onclick="ChangeShowExcess">Pokaż</button>
+                }
+            </p>
+        </div>
 
-		@if (isExcessVisible)
-		{
-			@if (excessPayments.Count > 0)
-			{
-				<div class="card-body" style="padding:12px;align-content:center">
-					<div class="row justify-content-center">
-						<table style="width:300px" class="table table-bordered">
-							<thead>
-								<tr>
-									<th>
-										Miesiąc
-									</th>
-									<th>
-										Nadpłata
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								@foreach (var column in excessPayments)
-								{
-									<tr>
-										<th style="font-weight:normal"> @column.Month </th>
-										<th style="font-weight:normal"> @Helper.MoneyFormat(column.Amount) </th>
-									</tr>
-								}
-							</tbody>
-						</table>
-					</div>
+        @if (isExcessVisible)
+        {
+            @if (excessPayments.Count > 0)
+            {
+                <div class="card-body" style="padding:12px;align-content:center">
+                    <div class="row justify-content-center">
+                        <table style="width:300px" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Miesiąc
+                                    </th>
+                                    <th>
+                                        Nadpłata
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var column in excessPayments)
+                                {
+                                    <tr>
+                                        <th style="font-weight:normal"> @column.Month </th>
+                                        <th style="font-weight:normal"> @Helper.MoneyFormat(column.Amount) </th>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
 
-					<p align="right" style="margin-bottom:0px">
-						<button class="btn btn-warning btn-sm" @onclick="ClearExcessPayments">Wyczyść</button>
-					</p>
+                    <p align="right" style="margin-bottom:0px">
+                        <button class="btn btn-warning btn-sm" @onclick="ClearExcessPayments">Wyczyść</button>
+                    </p>
 
-				</div>
-			}
+                </div>
+            }
 
-			<div class="card-footer">
-				<EditForm Model="@excessPaymentModel" OnValidSubmit="AddExcessPayment">
-					<div class="row justify-content-center">
+            <div class="card-footer">
+                <EditForm Model="@excessPaymentModel" OnValidSubmit="AddExcessPayment">
+                    <div class="row justify-content-center">
 
-						<div class="form-group" style="margin: 15px">
-							<label>Miesiąc</label>
-							<div class="input-group"><input @bind="excessPaymentModel.Month" class="form-control"><div class="input-group-append"><span class="input-group-text">mies.</span></div></div>
-						</div>
+                        <div class="form-group" style="margin: 15px">
+                            <label>Miesiąc</label>
+                            <div class="input-group"><input @bind="excessPaymentModel.Month" class="form-control"><div class="input-group-append"><span class="input-group-text">mies.</span></div></div>
+                        </div>
 
-						<div class="form-group" style="margin: 15px">
-							<label>Kwota nadpłaty</label>
-							<div class="input-group"><input @bind="excessPaymentModel.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
-						</div>
-					</div>
-					<DataAnnotationsValidator />
-					<ValidationSummary />
-					<button class="btn btn-primary btn-center" style="width:170px" type="submit" @onclick="ChangeLoanDurationInOtherModels">Dodaj nadpłate</button>
-				</EditForm>
-			</div>
-		}
-	}
+                        <div class="form-group" style="margin: 15px">
+                            <label>Kwota nadpłaty</label>
+                            <div class="input-group"><input @bind="excessPaymentModel.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
+                        </div>
+                    </div>
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <button class="btn btn-primary btn-center" style="width:170px" type="submit" @onclick="ChangeLoanDurationInOtherModels">Dodaj nadpłate</button>
+                </EditForm>
+            </div>
+        }
+    }
 
-	@if (isVariableInterest)
-	{
-		<div class="card-footer">
-			Zmienne Oprocentowanie
-			<p align="right" style="margin-bottom:0px">
-				@if (isVariableInterestVisible)
-				{
-					<button class="btn btn-outline-secondary btn-sm" @onclick="ChangeShowVariableInterest">Ukryj</button>
-				}
-				else
-				{
-					<button class="btn btn-outline-primary btn-sm" @onclick="ChangeShowVariableInterest">Pokaż</button>
-				}
-			</p>
+    @if (isVariableInterest)
+    {
+        <div class="card-footer">
+            Zmienne Oprocentowanie
+            <p align="right" style="margin-bottom:0px">
+                @if (isVariableInterestVisible)
+                {
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="ChangeShowVariableInterest">Ukryj</button>
+                }
+                else
+                {
+                    <button class="btn btn-outline-primary btn-sm" @onclick="ChangeShowVariableInterest">Pokaż</button>
+                }
+            </p>
 
-		</div>
-		@if (isVariableInterestVisible)
-		{
-			@if (variableInterest.Count > 0)
-			{
-				<div class="card-body" style="padding:12px;align-content:center">
-					<div class="row justify-content-center">
-						<table style="width:300px" class="table table-bordered">
-							<thead>
-								<tr>
-									<th>
-										Miesiąc
-									</th>
-									<th>
-										Nowe Oprocentowanie
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								@foreach (var column in variableInterest)
-								{
-									<tr>
-										<th style="font-weight:normal"> @column.Key </th>
-										<th style="font-weight:normal"> @Helper.PercentFormat(column.Value)</th>
-									</tr>
-								}
-							</tbody>
-						</table>
-					</div>
+        </div>
+        @if (isVariableInterestVisible)
+        {
+            @if (variableInterest.Count > 0)
+            {
+                <div class="card-body" style="padding:12px;align-content:center">
+                    <div class="row justify-content-center">
+                        <table style="width:300px" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Miesiąc
+                                    </th>
+                                    <th>
+                                        Nowe Oprocentowanie
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var column in variableInterest)
+                                {
+                                    <tr>
+                                        <th style="font-weight:normal"> @column.Key </th>
+                                        <th style="font-weight:normal"> @Helper.PercentFormat(column.Value)</th>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
 
-					<p align="right" style="margin-bottom:0px">
-						<button class="btn btn-warning btn-sm" @onclick="ClearVariableInterest">Wyczyść</button>
-					</p>
+                    <p align="right" style="margin-bottom:0px">
+                        <button class="btn btn-warning btn-sm" @onclick="ClearVariableInterest">Wyczyść</button>
+                    </p>
 
-				</div>
-			}
+                </div>
+            }
 
-			<div class="card-footer">
-				<EditForm Model="variableInterestModel" OnValidSubmit="AddVariableInterest">
-					<div class="row justify-content-center">
+            <div class="card-footer">
+                <EditForm Model="variableInterestModel" OnValidSubmit="AddVariableInterest">
+                    <div class="row justify-content-center">
 
-						<div class="form-group" style="margin: 15px">
-							<label>Miesiąc</label>
-							<div class="input-group"><input @bind="variableInterestModel.Month" class="form-control"><div class="input-group-append"><span class="input-group-text">mies.</span></div></div>
-						</div>
+                        <div class="form-group" style="margin: 15px">
+                            <label>Miesiąc</label>
+                            <div class="input-group"><input @bind="variableInterestModel.Month" class="form-control"><div class="input-group-append"><span class="input-group-text">mies.</span></div></div>
+                        </div>
 
-						<div class="form-group" style="margin: 15px">
-							<label>Nowe Oprocentowanie</label>
-							<div class="input-group"><input @bind="variableInterestModel.Percentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
-						</div>
+                        <div class="form-group" style="margin: 15px">
+                            <label>Nowe Oprocentowanie</label>
+                            <div class="input-group"><input @bind="variableInterestModel.Percentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                        </div>
 
-					</div>
-					<DataAnnotationsValidator />
-					<ValidationSummary />
+                    </div>
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
 
-					<button class="btn btn-primary btn-center" style="width:auto" @onclick="ChangeLoanDurationInOtherModels">Dodaj zmiane oprocentowania</button>
-				</EditForm>
-			</div>
-		}
-	}
+                    <button class="btn btn-primary btn-center" style="width:auto" @onclick="ChangeLoanDurationInOtherModels">Dodaj zmiane oprocentowania</button>
+                </EditForm>
+            </div>
+        }
+    }
 
-	@if (isPeriodicExcessPayment)
-	{
-		<div class="card-footer">
-			Cykliczne wpłaty
-			<p align="right" style="margin-bottom:0px">
-				@if (isPeriodicExcessPaymentVisible)
-				{
-					<button class="btn btn-outline-secondary btn-sm" @onclick="ChangeShowPeriodicVariableInterest">Ukryj</button>
-				}
-				else
-				{
-					<button class="btn btn-outline-primary btn-sm" @onclick="ChangeShowPeriodicVariableInterest">Pokaż</button>
-				}
-			</p>
-		</div>
-		@if (isPeriodicExcessPaymentVisible)
-		{
-			@if (periodicExcessPayments.Count > 0)
-			{
-				<div class="card-body" style="padding:12px;align-content:center">
-					<div class="row justify-content-center">
-						<table style="width:300px" class="table table-bordered">
-							<thead>
-								<tr>
-									<th>
-										Początek
-									</th>
-									<th>
-										Koniec
-									</th>
-									<th>
-										Nadpłaty
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								@foreach (var column in periodicExcessPayments)
-								{
-									<tr>
-										<th style="font-weight:normal"> @column.StartMonth </th>
-										<th style="font-weight:normal"> @column.EndMonth </th>
-										<th style="font-weight:normal"> @Helper.MoneyFormat(column.Amount)</th>
-									</tr>
-								}
-							</tbody>
-						</table>
-					</div>
+    @if (isPeriodicExcessPayment)
+    {
+        <div class="card-footer">
+            Cykliczne wpłaty
+            <p align="right" style="margin-bottom:0px">
+                @if (isPeriodicExcessPaymentVisible)
+                {
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="ChangeShowPeriodicVariableInterest">Ukryj</button>
+                }
+                else
+                {
+                    <button class="btn btn-outline-primary btn-sm" @onclick="ChangeShowPeriodicVariableInterest">Pokaż</button>
+                }
+            </p>
+        </div>
+        @if (isPeriodicExcessPaymentVisible)
+        {
+            @if (periodicExcessPayments.Count > 0)
+            {
+                <div class="card-body" style="padding:12px;align-content:center">
+                    <div class="row justify-content-center">
+                        <table style="width:300px" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Początek
+                                    </th>
+                                    <th>
+                                        Koniec
+                                    </th>
+                                    <th>
+                                        Nadpłaty
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var column in periodicExcessPayments)
+                                {
+                                    <tr>
+                                        <th style="font-weight:normal"> @column.StartMonth </th>
+                                        <th style="font-weight:normal"> @column.EndMonth </th>
+                                        <th style="font-weight:normal"> @Helper.MoneyFormat(column.Amount)</th>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
 
-					<p align="right" style="margin-bottom:0px">
-						<button class="btn btn-warning btn-sm" @onclick="ClearPeriodicExcessPayments">Wyczyść</button>
-					</p>
+                    <p align="right" style="margin-bottom:0px">
+                        <button class="btn btn-warning btn-sm" @onclick="ClearPeriodicExcessPayments">Wyczyść</button>
+                    </p>
 
-				</div>
-			}
+                </div>
+            }
 
-			<div class="card-footer">
-				<EditForm Model="periodicExcessPaymentModel" OnValidSubmit="AddPeriodicExcessPayment">
-					<div class="row justify-content-center">
+            <div class="card-footer">
+                <EditForm Model="periodicExcessPaymentModel" OnValidSubmit="AddPeriodicExcessPayment">
+                    <div class="row justify-content-center">
 
-						<div class="form-group" style="margin: 15px">
-							<label>Początek nadpłacania</label>
-							<div class="input-group"><input @bind="periodicExcessPaymentModel.StartMonth" class="form-control"><div class="input-group-append"><span class="input-group-text">mies.</span></div></div>
-						</div>
+                        <div class="form-group" style="margin: 15px">
+                            <label>Początek nadpłacania</label>
+                            <div class="input-group"><input @bind="periodicExcessPaymentModel.StartMonth" class="form-control"><div class="input-group-append"><span class="input-group-text">mies.</span></div></div>
+                        </div>
 
-						<div class="form-group" style="margin: 15px">
-							<label>Koniec nadpłacania</label>
-							<div class="input-group"><input @bind="periodicExcessPaymentModel.EndMonth" class="form-control"><div class="input-group-append"><span class="input-group-text">mies.</span></div></div>
-						</div>
+                        <div class="form-group" style="margin: 15px">
+                            <label>Koniec nadpłacania</label>
+                            <div class="input-group"><input @bind="periodicExcessPaymentModel.EndMonth" class="form-control"><div class="input-group-append"><span class="input-group-text">mies.</span></div></div>
+                        </div>
 
-						<div class="form-group" style="margin: 15px">
-							<label>Wysokość nadpłat</label>
-							<div class="input-group"><input @bind="periodicExcessPaymentModel.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
-						</div>
+                        <div class="form-group" style="margin: 15px">
+                            <label>Wysokość nadpłat</label>
+                            <div class="input-group"><input @bind="periodicExcessPaymentModel.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
+                        </div>
 
-					</div>
-					<DataAnnotationsValidator />
-					<ValidationSummary />
+                    </div>
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
 
-					<button class="btn btn-primary btn-center" style="width:auto" @onclick="ChangeLoanDurationInOtherModels">Dodaj cykliczną płatność</button>
-				</EditForm>
-			</div>
-		}
-	}
+                    <button class="btn btn-primary btn-center" style="width:auto" @onclick="ChangeLoanDurationInOtherModels">Dodaj cykliczną płatność</button>
+                </EditForm>
+            </div>
+        }
+    }
 
-	<div class="card-footer"><div id="chartdiv" hidden="@isHidePieChart"></div></div>
+    <div class="card-footer"><div id="chartdiv" hidden="@isHidePieChart"></div></div>
 
-	@if (loanCalculateResult == null || loanCalculateResult.LoanData == null) { }
-	else
-	{
-		<p>
-			<div class="card-footer">
-				@for (int i = 0; i < loanCalculateResult.LoanInfo.Count(); i++)
-				{
-					<div class="row" id="rowinfoot">
-						<div class="col-8">@loanCalculateResult.LoanInfo[i].Item1</div>
-						<div class="col-4 text-right">@loanCalculateResult.LoanInfo[i].Item2</div>
-					</div>
-				}
-			</div>
-		</p>
-		<table class="table table-bordered" style="align-content:center">
-			<thead>
-				<tr>
-					@foreach (var head in loanCalculateResult.LoanData.Head)
-					{
-						<th>@head</th>
-					}
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (var column in loanCalculateResult.LoanData.LoanColumns)
-				{
-				<td>
-					@foreach (var row in column.Rows)
-					{
-					<tr>@row</tr>
-				}
-					</td>
-				}
-				</tbody>
-			</table>
-		}
+    @if (loanCalculateResult == null || loanCalculateResult.LoanData == null) { }
+    else
+    {
+        <p>
+            <div class="card-footer">
+                @for (int i = 0; i < loanCalculateResult.LoanInfo.Count(); i++)
+                {
+                    <div class="row" id="rowinfoot">
+                        <div class="col-8">@loanCalculateResult.LoanInfo[i].Item1</div>
+                        <div class="col-4 text-right" style="white-space:nowrap">@loanCalculateResult.LoanInfo[i].Item2</div>
+                    </div>
+                }
+            </div>
+        </p>
+        <div class="table-responsive" style="max-height:300px">
+            <table class="table table-bordered " style="align-content:center">
+                <thead>
+                    <tr>
+                        @foreach (var head in loanCalculateResult.LoanData.Head)
+                        {
+                            <th>@head</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var column in loanCalculateResult.LoanData.LoanColumns)
+                    {
+                    <td>
+                            @foreach (var row in column.Rows)
+                            {
+                        <tr>@row</tr>
+                            }
+                    </td>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>
 
 
 @code {
-	private LoanModel model = new();
-	private Data.Loan loanCalculateResult;
+    private LoanModel model = new();
+    private Data.Loan loanCalculateResult;
+    private List<LoanCalculation> loanCalculations;
+    private LoanCalculation mainLoanCalculation;
 
-	bool isHidePieChart = true;
-	bool isLoaded = false;
+    bool isHidePieChart = true;
+    bool isLoaded = false;
 
-	bool isExcessPayment = false;
-	bool isVariableInterest = false;
-	bool isPeriodicExcessPayment = false;
+    bool isExcessPayment = false;
+    bool isVariableInterest = false;
+    bool isPeriodicExcessPayment = false;
 
-	bool isExcessVisible = true;
-	bool isVariableInterestVisible = true;
-	bool isPeriodicExcessPaymentVisible = true;
-
-
-	private void ChangeShowExcess() => isExcessVisible = !isExcessVisible;
-	private void ChangeShowVariableInterest() => isVariableInterestVisible = !isVariableInterestVisible;
-	private void ChangeShowPeriodicVariableInterest() => isPeriodicExcessPaymentVisible = !isPeriodicExcessPaymentVisible;
-
-	private async Task CalculateLoan()
-	{
-		isLoaded = true;
-		if (isExcessPayment)
-			model.ExcessPayments = excessPayments;
-		else
-			model.ExcessPayments = new List<ExcessPayment>();
-
-		if (isVariableInterest)
-			model.VariableInterest = variableInterest;
-		else
-			model.VariableInterest = new Dictionary<int, double>();
-
-		if (isPeriodicExcessPayment)
-			model.PeriodicExcessPayments = periodicExcessPayments;
-		else
-			model.PeriodicExcessPayments = new List<PeriodicExcessPaymentModel>();
-
-		loanCalculateResult = await LoanService.GetCalculatedLoanAsync(model);
-		await jsRunTime.InvokeVoidAsync("CreatePieChart", model.Amount, loanCalculateResult.TotalAdditionalPaymentToPieChart);
-		isHidePieChart = false;
-	}
+    bool isExcessVisible = true;
+    bool isVariableInterestVisible = true;
+    bool isPeriodicExcessPaymentVisible = true;
+    bool isOpenLoanCalculationEditor = false;
 
 
-	private List<ExcessPayment> excessPayments = new();
-	private Dictionary<int, double> variableInterest = new();
-	private List<PeriodicExcessPaymentModel> periodicExcessPayments = new();
+    private void ChangeShowExcess() => isExcessVisible = !isExcessVisible;
+    private void ChangeShowVariableInterest() => isVariableInterestVisible = !isVariableInterestVisible;
+    private void ChangeShowPeriodicVariableInterest() => isPeriodicExcessPaymentVisible = !isPeriodicExcessPaymentVisible;
+    private void ChangeLoanCalculationEditModal() => isOpenLoanCalculationEditor = !isOpenLoanCalculationEditor;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private async Task CalculateLoan()
+    {
+        isLoaded = true;
+        if (isExcessPayment)
+            model.ExcessPayments = excessPayments;
+        else
+            model.ExcessPayments = new List<ExcessPayment>();
+
+        if (isVariableInterest)
+            model.VariableInterest = variableInterest;
+        else
+            model.VariableInterest = new Dictionary<int, double>();
+
+        if (isPeriodicExcessPayment)
+            model.PeriodicExcessPayments = periodicExcessPayments;
+        else
+            model.PeriodicExcessPayments = new List<PeriodicExcessPaymentModel>();
+
+        loanCalculateResult = await LoanService.GetCalculatedLoanAsync(model);
+        await jsRunTime.InvokeVoidAsync("CreatePieChart", model.Amount, loanCalculateResult.TotalAdditionalPaymentToPieChart);
+        isHidePieChart = false;
+    }
 
 
-	private ExcessPaymentModel excessPaymentModel = new();
-	private VariableInterestModel variableInterestModel = new();
-	private PeriodicExcessPaymentModel periodicExcessPaymentModel = new();
+    private List<ExcessPayment> excessPayments = new();
+    private Dictionary<int, double> variableInterest = new();
+    private List<PeriodicExcessPaymentModel> periodicExcessPayments = new();
 
 
-	private void ChangeLoanDurationInOtherModels() { excessPaymentModel.LoanDuration = model.Duration; variableInterestModel.LoanDuration = model.Duration; periodicExcessPaymentModel.LoanDuration = model.Duration; }
+    private ExcessPaymentModel excessPaymentModel = new();
+    private VariableInterestModel variableInterestModel = new();
+    private PeriodicExcessPaymentModel periodicExcessPaymentModel = new();
 
 
-	private void AddExcessPayment()
-	{
-		if (excessPaymentModel.Month > 0 && excessPaymentModel.Amount > 0)
-		{
-			int index = excessPayments.FindIndex(f => f.Month == excessPaymentModel.Month);
-
-			if (index >= 0)
-				excessPayments[index] = new ExcessPayment { Month = excessPaymentModel.Month, Amount = excessPaymentModel.Amount };
-			else
-				excessPayments.Add(new ExcessPayment { Month = excessPaymentModel.Month, Amount = excessPaymentModel.Amount });
-		}
-		excessPayments = excessPayments.OrderBy(o => o.Month).ToList();
-		if (model.MinDuration < excessPayments.Last().Month)
-			model.MinDuration = excessPayments.Last().Month;
-	}
+    private void ChangeLoanDurationInOtherModels() { excessPaymentModel.LoanDuration = model.Duration; variableInterestModel.LoanDuration = model.Duration; periodicExcessPaymentModel.LoanDuration = model.Duration; }
 
 
-	private void AddVariableInterest()
-	{
-		if (variableInterestModel.Month > 0 && variableInterestModel.Percentage > 0 && variableInterestModel.Percentage < 30)
-		{
-			if (variableInterest.ContainsKey(variableInterestModel.Month))
-				variableInterest[variableInterestModel.Month] = variableInterestModel.Percentage;
-			else
-				variableInterest.Add(variableInterestModel.Month, variableInterestModel.Percentage);
-		}
-		variableInterest = variableInterest.OrderBy(o => o.Key).ToDictionary(a => a.Key, b => b.Value);
-		if (model.MinDuration < variableInterest.Last().Key)
-			model.MinDuration = variableInterest.Last().Key;
-	}
+    private void AddExcessPayment()
+    {
+        if (excessPaymentModel.Month > 0 && excessPaymentModel.Amount > 0)
+        {
+            int index = excessPayments.FindIndex(f => f.Month == excessPaymentModel.Month);
 
-	private void AddPeriodicExcessPayment()
-	{
-		periodicExcessPayments.Add(new PeriodicExcessPaymentModel(periodicExcessPaymentModel));
-		periodicExcessPayments.OrderBy(o => o.EndMonth).ToList();
-		if (model.MinDuration < periodicExcessPayments.Last().EndMonth)
-			model.MinDuration = periodicExcessPayments.Last().EndMonth;
-	}
+            if (index >= 0)
+                excessPayments[index] = new ExcessPayment { Month = excessPaymentModel.Month, Amount = excessPaymentModel.Amount };
+            else
+                excessPayments.Add(new ExcessPayment { Month = excessPaymentModel.Month, Amount = excessPaymentModel.Amount });
+        }
+        excessPayments = excessPayments.OrderBy(o => o.Month).ToList();
+        if (model.MinDuration < excessPayments.Last().Month)
+            model.MinDuration = excessPayments.Last().Month;
+    }
 
-	private void ClearExcessPayments()
-	{
-		if (excessPayments.Last().Month == model.MinDuration)
-		{
-			if (periodicExcessPayments.Count > 0)
-			{
-				model.MinDuration = periodicExcessPayments.Last().EndMonth;
-			}
-			else
-				model.MinDuration = 0;
-		}
-		excessPayments.Clear();
-	}
 
-	private void ClearPeriodicExcessPayments()
-	{
-		if (periodicExcessPayments.Last().EndMonth == model.MinDuration)
-		{
-			if (excessPayments.Count > 0)
-			{
-				model.MinDuration = excessPayments.Last().Month;
-			}
-			else
-				model.MinDuration = 0;
-		}
-		periodicExcessPayments.Clear();
-	}
+    private void AddVariableInterest()
+    {
+        if (variableInterestModel.Month > 0 && variableInterestModel.Percentage > 0 && variableInterestModel.Percentage < 30)
+        {
+            if (variableInterest.ContainsKey(variableInterestModel.Month))
+                variableInterest[variableInterestModel.Month] = variableInterestModel.Percentage;
+            else
+                variableInterest.Add(variableInterestModel.Month, variableInterestModel.Percentage);
+        }
+        variableInterest = variableInterest.OrderBy(o => o.Key).ToDictionary(a => a.Key, b => b.Value);
+        if (model.MinDuration < variableInterest.Last().Key)
+            model.MinDuration = variableInterest.Last().Key;
+    }
 
-	private void ClearVariableInterest()
-	{
-		variableInterest.Clear();
-	}
+    private void AddPeriodicExcessPayment()
+    {
+        periodicExcessPayments.Add(new PeriodicExcessPaymentModel(periodicExcessPaymentModel));
+        periodicExcessPayments.OrderBy(o => o.EndMonth).ToList();
+        if (model.MinDuration < periodicExcessPayments.Last().EndMonth)
+            model.MinDuration = periodicExcessPayments.Last().EndMonth;
+    }
+
+    private void ClearExcessPayments()
+    {
+        if (excessPayments.Last().Month == model.MinDuration)
+        {
+            if (periodicExcessPayments.Count > 0)
+            {
+                model.MinDuration = periodicExcessPayments.Last().EndMonth;
+            }
+            else
+                model.MinDuration = 0;
+        }
+        excessPayments.Clear();
+    }
+
+    private void ClearPeriodicExcessPayments()
+    {
+        if (periodicExcessPayments.Last().EndMonth == model.MinDuration)
+        {
+            if (excessPayments.Count > 0)
+            {
+                model.MinDuration = excessPayments.Last().Month;
+            }
+            else
+                model.MinDuration = 0;
+        }
+        periodicExcessPayments.Clear();
+    }
+
+    private void ClearVariableInterest()
+    {
+        variableInterest.Clear();
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var customAuthStateProvider = (StateProvider)authStateProvider;
+        var authstate = await authStateProvider.GetAuthenticationStateAsync();
+        loanCalculations = userAccountService.GetLoanCalculations(authstate.User.Identity.Name);
+    }
+
+    void GetLoanCalculation(LoanCalculation loanCalculation)
+    {
+        mainLoanCalculation = loanCalculation;
+        if (loanCalculation.iid == 0)
+        {
+            loanCalculations.Add(loanCalculation);
+        }
+        isOpenLoanCalculationEditor = true;
+    }
+
+    void DeleteLoanCalculation(LoanCalculation loanCalculation)
+    {
+        userAccountService.DeleteLoanCalculation(loanCalculation);
+        loanCalculations.Remove(loanCalculation);
+    }
+
+    void LoadLoanCalculation(LoanCalculation loanCalculation)
+    {
+        model.Amount = loanCalculation.amount;
+        model.Percentage = loanCalculation.percentage;
+        model.Duration = loanCalculation.duration;
+    }
+
+    private void OnLoanCalculationModalClose(bool accepted)
+    {
+        OnInitializedAsync().GetAwaiter();
+        isOpenLoanCalculationEditor = false;
+    }
 }

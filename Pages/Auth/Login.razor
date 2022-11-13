@@ -1,0 +1,74 @@
+﻿@using MyFinances.Models
+@using MyFinances.Data
+@using MyFinances.Helpers
+@using MyFinances.Data.DataBase
+@using System.Threading
+@using Microsoft.AspNetCore.Components.Web
+@using MyFinances.Data.Auth
+
+@page "/auth/login"
+
+@inject Data.UserAccountService userAccountService;
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager navManager;
+
+<div class="card-header">
+    Logowanie
+</div>
+
+@if (isOpenFailAuthModal)
+{
+    <InfoModal OnClose="ChangeStateFailAuthModal" Text="@informationAboutLogin" Title="Nieudane Logowanie"></InfoModal>
+}
+
+<div class="card-body">
+    <EditForm Model="model" OnValidSubmit="Authenticate">
+
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="row justify-content-center">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>Login</label>
+                        <div class="input-group"><input @bind="model.username" class="form-control" style="min-width: 75px"></div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Hasło</label>
+                        <div class="input-group"><input @bind="model.password" class="form-control" style="min-width: 75px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-center" style="width:100px"> Zaloguj </button>
+    </EditForm>
+</div>
+
+@code
+{
+    UserAccount model = new UserAccount();
+    bool isOpenFailAuthModal = false;
+    private void ChangeStateFailAuthModal() => isOpenFailAuthModal = !isOpenFailAuthModal;
+    string informationAboutLogin;
+
+    private async Task Authenticate()
+    {
+        try
+        {
+            var user = await userAccountService.GetUserAccountByUserAndPassword(model.username, model.password);
+            var stateProvider = (StateProvider)authStateProvider;
+            await stateProvider.UpdateAuthenticationState(new UserSession { UserName = user.username, Role = user.role });
+            navManager.NavigateTo("/", true);
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message == "Invalid username or password")
+                informationAboutLogin = "Błędna nazwa użytkownika lub hasło";
+            ChangeStateFailAuthModal();
+        }
+    }
+}

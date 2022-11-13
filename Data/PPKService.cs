@@ -24,8 +24,8 @@ namespace MyFinances.Data
 			var ppkResult = new PPK();
 
 			var employeePayment = Math.Round(PPKModel.Amount * PPKModel.EmployeePercentage / 100, 2);
-			var employeePaymentWithTax = Math.Round(employeePayment * 1.13, 2);
 			var employerPayment = Math.Round(PPKModel.Amount * PPKModel.EmployerPercentage / 100, 2);
+			var employeePaymentWithTax = Math.Round(employerPayment * 1.17, 2);
 
 			var interestSum = 0.0;
 			var finalAmount = 0.0;
@@ -54,7 +54,7 @@ namespace MyFinances.Data
 				if (interestSum > 0)
 					taxFromOdsetki = Math.Round(interestSum * 0.19, 2);
 
-				var amountToZUS = Math.Round(employeePayment * 0.3 * PPKModel.Duration, 2);
+				var amountToZUS = Math.Round(employerPayment * 0.3 * PPKModel.Duration, 2);
 				var amountEarlyPayment = Math.Round(finalAmount - amountToZUS - taxFromOdsetki, 2);
 				var totalProfit = amountEarlyPayment - (PPKModel.Duration * employeePaymentWithTax);
 
