@@ -41,7 +41,7 @@
                         <div class="col">
                             <div class="form-group">
                                 <label>Hasło</label>
-                                <div class="input-group"><input @bind="model.password" class="form-control" style="min-width: 75px"></div>
+                                <div class="input-group"><input type="@TxtType" @bind="model.password" class="form-control" style="min-width: 75px"><div class="input-group-append"><span class='input-group-text'><span class='oi oi-dial' @onclick="ShowPassword"></span></span></div></div>
                             </div>
                         </div>
 
@@ -84,6 +84,8 @@
     bool isOpenAfterRegisterModal = false;
     private void ChangeStateAfterRegisterModal() => isOpenAfterRegisterModal = !isOpenAfterRegisterModal;
     string resumeAfterRegisterUserAccount;
+    string TxtType = "password";
+
 
     private async Task CreateAccount()
     {
@@ -99,5 +101,13 @@
         }
 
         ChangeStateAfterRegisterModal();
+    }
+
+    public void ShowPassword()
+    {
+        if (this.TxtType == "password")
+            this.TxtType = "text";
+        else
+            this.TxtType = "password";
     }
 }

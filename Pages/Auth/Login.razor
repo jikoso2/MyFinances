@@ -38,7 +38,7 @@
                 <div class="col">
                     <div class="form-group">
                         <label>Hasło</label>
-                        <div class="input-group"><input @bind="model.password" class="form-control" style="min-width: 75px"></div>
+                        <div class="input-group"><input type="@TxtType" @bind="model.password" class="form-control" style="min-width: 75px"><div class="input-group-append"><span class='input-group-text'><span class='oi oi-dial' @onclick="ShowPassword"></span></span></div></div>
                     </div>
                 </div>
             </div>
@@ -54,14 +54,16 @@
     bool isOpenFailAuthModal = false;
     private void ChangeStateFailAuthModal() => isOpenFailAuthModal = !isOpenFailAuthModal;
     string informationAboutLogin;
+    string TxtType = "password";
+
 
     private async Task Authenticate()
     {
         try
         {
-            var user = await userAccountService.GetUserAccountByUserAndPassword(model.username, model.password);
+            var user = await userAccountService.GetUserAccountByUsernameAndPassword(model.username, model.password);
             var stateProvider = (StateProvider)authStateProvider;
-            await stateProvider.UpdateAuthenticationState(new UserSession { UserName = user.username, Role = user.role });
+            await stateProvider.UpdateAuthenticationState(new UserSession { UserName = user.username, Role = user.role, Id = user.id.ToString() });
             navManager.NavigateTo("/", true);
         }
         catch (Exception ex)
@@ -70,5 +72,13 @@
                 informationAboutLogin = "Błędna nazwa użytkownika lub hasło";
             ChangeStateFailAuthModal();
         }
+    }
+
+    public void ShowPassword()
+    {
+        if (this.TxtType == "password")
+            this.TxtType = "text";
+        else
+            this.TxtType = "password";
     }
 }

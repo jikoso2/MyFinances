@@ -34,6 +34,16 @@ namespace MyFinances.Data
 			return _userAccountList;
 		}
 
+		public Task<UserAccount> GetUserAccount(Guid id)
+		{
+			var user = _userAccountList.Where(a => a.id == id).FirstOrDefault();
+
+			if (user != null)
+				return Task.FromResult(user);
+			else
+				throw new Exception($"User id: {id} doesn't exist");
+		}
+
 		public Task<UserAccount> GetUserAccountByUsername(string username)
 		{
 			var user = _userAccountList.Where(a => a.username == username).FirstOrDefault();
@@ -44,14 +54,21 @@ namespace MyFinances.Data
 				throw new Exception($"Username: {username} doesn't exist");
 		}
 
-		public Task<UserAccount> GetUserAccountByUserAndPassword(string userName, string password)
+		public bool isUsernameExist(string username)
+		{
+			var user = _userAccountList.Where(a => a.username == username).FirstOrDefault();
+
+			return user != null ? true : false;
+		}
+
+		public Task<UserAccount> GetUserAccountByUsernameAndPassword(string userName, string password)
 		{
 			var user = _userAccountList.Where(a => a.username == userName && a.password == password).FirstOrDefault();
 
 			if (user != null)
 			{
-				user.last_login = DateTime.Now;
-				_dbcontext.SaveChangesAsync();
+				user.last_login = DateTime.UtcNow;
+				_dbcontext.SaveChanges();
 				return Task.FromResult(user);
 			}
 			else
@@ -103,7 +120,13 @@ namespace MyFinances.Data
 				}
 				else
 				{
-					userDB = _userAccountList.FirstOrDefault(a => a.username == user.username);
+					userDB = GetUserAccount(user.id).Result;
+
+					if (!Equals(userDB.username, user.username) && user.username != null)
+					{
+						userDB.username = user.username;
+						result.Add("Nazwa użytkownika");
+					}
 
 					if (!Equals(userDB.email, user.email) && user.email != null)
 					{
@@ -129,6 +152,7 @@ namespace MyFinances.Data
 			}
 			catch (Exception)
 			{
+				RefreshUserAccounts();
 				result.Clear();
 				return Task.FromResult(result);
 			}

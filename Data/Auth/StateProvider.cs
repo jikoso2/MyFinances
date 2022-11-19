@@ -28,7 +28,7 @@ namespace MyFinances.Data.Auth
 				if (userSession == null)
 					return await Task.FromResult(new AuthenticationState(_anonymous));
 
-				var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(ClaimTypes.Name, userSession.UserName), new Claim(ClaimTypes.Role, userSession.Role) }, "CustomAuth"));
+				var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(ClaimTypes.Name, userSession.UserName), new Claim(ClaimTypes.Role, userSession.Role), new Claim(ClaimTypes.NameIdentifier, userSession.Id) }, "CustomAuth"));
 				return await Task.FromResult(new AuthenticationState(claimsPrincipal));
 			}
 			catch (Exception)
@@ -45,7 +45,7 @@ namespace MyFinances.Data.Auth
 			if(userSession != null)
 			{
 				await _sessionStorage.SetAsync("UserSession", userSession);
-				claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(ClaimTypes.Name, userSession.UserName), new Claim(ClaimTypes.Role, userSession.Role) }, "CustomAuth"));
+				claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(ClaimTypes.Name, userSession.UserName), new Claim(ClaimTypes.Role, userSession.Role), new Claim(ClaimTypes.Sid, userSession.Id) }, "CustomAuth"));
 			}
 			else
 			{

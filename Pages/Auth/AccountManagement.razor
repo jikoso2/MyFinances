@@ -5,8 +5,10 @@
 @using System.Threading
 @using Microsoft.AspNetCore.Components.Web
 @using MyFinances.Data.Auth
+@using System.Security.Claims
 
-@page "/auth/accountmanagement"
+@page "/accountmanagement"
+@attribute [Authorize]
 
 @inject Data.UserAccountService userAccountService;
 @inject AuthenticationStateProvider authStateProvider;
@@ -31,8 +33,14 @@
             <div class="row">
                 <div class="col">
                     <div class="form-group">
+                        <label>Nazwa użytkownika</label>
+                        <div class="input-group"><input @bind="model.username" class="form-control" style="min-width: 75px"></div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
                         <label>Nowe hasło</label>
-                        <div class="input-group"><input @bind="model.password" class="form-control" style="min-width: 75px"></div>
+                        <div class="input-group"><input type="@TxtType" @bind="model.password" class="form-control" style="min-width: 75px"><div class="input-group-append"><span class='input-group-text'><span class='oi oi-dial' @onclick="ShowPassword"></span></span></div></div>
                     </div>
                 </div>
                 <div class="col">
@@ -47,11 +55,19 @@
         <button type="submit" class="btn btn-primary btn-center" style="width:100px"> Zatwierdź zmiany </button>
     </EditForm>
 </div>
-
+<AuthorizeView>
+    <Authorizing>
+        <h1>Sprawdzanie zalogowanego użytkownika.</h1>
+    </Authorizing>
+    <NotAuthorized>
+        <h1>Nie jesteś zalogowany.</h1>
+    </NotAuthorized>
+</AuthorizeView>
 @code
 {
     UserAccount model = new UserAccount();
     UserAccount user = new UserAccount();
+    string TxtType = "password";
 
     string resumeInfoAboutLogin;
     bool isOpenFailAuthModal = false;
@@ -59,11 +75,19 @@
 
     private async Task ApproveModification()
     {
-        model.username = user.username;
+        model.id = user.id;
+
+        if (model.username != user.username && userAccountService.isUsernameExist(model.username))
+        {
+            resumeInfoAboutLogin = $"Istnieje już użytkownik o nazwie {model.username}";
+            ChangeStateModifyAccountModal();
+            return;
+        }
 
         var result = await userAccountService.UpdateUserAccount(model);
-        var userDB = await userAccountService.GetUserAccountByUsername(user.username);
+        var userDB = await userAccountService.GetUserAccount(user.id);
         model.email = userDB.email;
+        model.username = user.username;
 
         if (result.Count() > 0)
             resumeInfoAboutLogin = $"Pomyślnie zmienione: {string.Join(",", result)}";
@@ -76,7 +100,18 @@
     protected async override Task OnInitializedAsync()
     {
         var authState = await authStateProvider.GetAuthenticationStateAsync();
-        user = await userAccountService.GetUserAccountByUsername(authState.User.Identity.Name);
+        var userId = authState.User.Identities.FirstOrDefault().Claims.FirstOrDefault(a => a.Type == System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+
+        user = await userAccountService.GetUserAccount(new Guid(userId));
         model.email = user.email;
+        model.username = user.username;
+    }
+
+    public void ShowPassword()
+    {
+        if (this.TxtType == "password")
+            this.TxtType = "text";
+        else
+            this.TxtType = "password";
     }
 }

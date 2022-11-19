@@ -79,7 +79,8 @@
     protected async override Task OnInitializedAsync()
     {
         var authState = await authStateProvider.GetAuthenticationStateAsync();
-        admin = await Service.GetUserAccountByUsername(authState.User.Identity.Name);
+        if(Service.isUsernameExist(authState.User.Identity.Name))
+            admin = await Service.GetUserAccountByUsername(authState.User.Identity.Name);
     }
 
     void GetUserAccount(UserAccount user)
