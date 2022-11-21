@@ -49,6 +49,9 @@
     public LoanCalculation LoanCalculation { get; set; }
 
     [Parameter]
+    public List<LoanCalculation> LoanCalculations { get; set; }
+
+    [Parameter]
     public string fullUserName { get; set; }
 
     [Parameter]
@@ -62,6 +65,7 @@
     public Task InsertLoanCalculation()
     {
         userAccountService.InsertLoanCalculation(LoanCalculation, fullUserName);
+        LoanCalculations.Add(LoanCalculation);
         return OnClose.InvokeAsync(false);
     }
 

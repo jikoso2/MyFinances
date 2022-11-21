@@ -23,7 +23,7 @@
             <Authorized>
                 @if (isOpenLoanCalculationEditor)
                 {
-                    <LoanCalculationModal LoanCalculation="mainLoanCalculation" fullUserName="@context.User.Identity.Name" OnClose="OnLoanCalculationModalClose"></LoanCalculationModal>
+                    <LoanCalculationModal LoanCalculation="mainLoanCalculation" LoanCalculations="loanCalculations" fullUserName="@context.User.Identity.Name" OnClose="OnLoanCalculationModalClose"></LoanCalculationModal>
                 }
                 @if (loanCalculations != null)
                 {
@@ -526,10 +526,6 @@
     void GetLoanCalculation(LoanCalculation loanCalculation)
     {
         mainLoanCalculation = loanCalculation;
-        if (loanCalculation.iid == 0)
-        {
-            loanCalculations.Add(loanCalculation);
-        }
         isOpenLoanCalculationEditor = true;
     }
 
