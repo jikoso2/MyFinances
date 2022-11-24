@@ -23,40 +23,50 @@
             <Authorized>
                 @if (isOpenLoanCalculationEditor)
                 {
-                    <LoanCalculationModal LoanCalculation="mainLoanCalculation" LoanCalculations="loanCalculations" fullUserName="@context.User.Identity.Name" OnClose="OnLoanCalculationModalClose"></LoanCalculationModal>
+                    <LoanCalculationModal LoanCalculation="currentLoanCalculation" LoanCalculations="loanCalculations" fullUserName="@context.User.Identity.Name" OnClose="OnLoanCalculationModalClose"></LoanCalculationModal>
                 }
-                @if (loanCalculations != null)
-                {
-                    <h6>Zapisane kalulacje</h6>
-                    <div class="table-responsive" style="max-height:300px">
-                        <table class="table table-bordered " style="align-content:center">
-                            <thead>
-                                <tr>
-                                    <th>Kwota kredytu</th>
-                                    <th>Oprocentowanie</th>
-                                    <th>Czas Trwania</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var loanCalculation in loanCalculations)
-                                {
-                                    <tr>
-                                        <td>@loanCalculation.amount</td>
-                                        <td>@loanCalculation.percentage</td>
-                                        <td>@loanCalculation.duration</td>
-                                        <td style="width:100px"><button class="btn btn-primary" style="width:100%;max-width:100px" type="submit" @onclick="(()=>GetLoanCalculation(loanCalculation))">Edytuj</button></td>
-                                        <td style="width:100px"><button class="btn btn-danger" style="width:100%;max-width:100px" type="submit" @onclick="(()=>DeleteLoanCalculation(loanCalculation))">Usuń</button></td>
-                                        <td style="width:100px"><button class="btn btn-success" style="width:100%;max-width:100px" type="submit" @onclick="(()=>LoadLoanCalculation(loanCalculation))">Załaduj</button></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                <div class="card mx-auto mt-5">
+                    <div class="card-header">
+                        Zapisane kalkulacje kredytowe
                     </div>
-                }
-                <p></p>
-                <button class="btn btn-primary btn-center" style="width:180px" type="submit" @onclick="(()=>GetLoanCalculation(new LoanCalculation()))">
-                    Dodaj kalkulacje
-                </button>
+                    @if (loanCalculations != null && loanCalculations.Count > 0)
+                    {
+                        <div class="card-body">
+                            <div class="table-responsive" style="max-height:300px">
+                                <table class="table table-bordered " style="align-content:center">
+                                    <thead>
+                                        <tr>
+                                            <th>Kwota kredytu</th>
+                                            <th>Oprocentowanie</th>
+                                            <th>Czas Trwania</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var loanCalculation in loanCalculations)
+                                        {
+                                            <tr>
+                                                <td>@loanCalculation.amount</td>
+                                                <td>@loanCalculation.percentage</td>
+                                                <td>@loanCalculation.duration</td>
+                                                <td style="width:100px"><button class="btn btn-primary" style="width:100%;max-width:100px" type="submit" @onclick="(()=>GetLoanCalculation(loanCalculation))">Edytuj</button></td>
+                                                <td style="width:100px"><button class="btn btn-danger" style="width:100%;max-width:100px" type="submit" @onclick="(()=>DeleteLoanCalculation(loanCalculation))">Usuń</button></td>
+                                                <td style="width:100px"><button class="btn btn-success" style="width:100%;max-width:100px" type="submit" @onclick="(()=>LoadLoanCalculation(loanCalculation))">Załaduj</button></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <p></p>
+                    }
+                    <button class="btn btn-primary btn-center" style="width:180px" type="submit" @onclick="(()=>GetLoanCalculation(new LoanCalculation()))">
+                        Dodaj kalkulacje
+                    </button>
+                    <p></p>
+                </div>
                 <p></p>
             </Authorized>
         </AuthorizeView>
@@ -385,7 +395,7 @@
     private LoanModel model = new();
     private Data.Loan loanCalculateResult;
     private List<LoanCalculation> loanCalculations;
-    private LoanCalculation mainLoanCalculation;
+    private LoanCalculation currentLoanCalculation;
 
     bool isHidePieChart = true;
     bool isLoaded = false;
@@ -399,13 +409,29 @@
     bool isPeriodicExcessPaymentVisible = true;
     bool isOpenLoanCalculationEditor = false;
 
-
     private void ChangeShowExcess() => isExcessVisible = !isExcessVisible;
     private void ChangeShowVariableInterest() => isVariableInterestVisible = !isVariableInterestVisible;
     private void ChangeShowPeriodicVariableInterest() => isPeriodicExcessPaymentVisible = !isPeriodicExcessPaymentVisible;
     private void ChangeLoanCalculationEditModal() => isOpenLoanCalculationEditor = !isOpenLoanCalculationEditor;
+
+    private List<ExcessPayment> excessPayments = new();
+    private Dictionary<int, double> variableInterest = new();
+    private List<PeriodicExcessPaymentModel> periodicExcessPayments = new();
+
+    private ExcessPaymentModel excessPaymentModel = new();
+    private VariableInterestModel variableInterestModel = new();
+    private PeriodicExcessPaymentModel periodicExcessPaymentModel = new();
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        var customAuthStateProvider = (StateProvider)authStateProvider;
+        var authstate = await authStateProvider.GetAuthenticationStateAsync();
+        loanCalculations = userAccountService.GetLoanCalculations(authstate.User.Identity.Name);
+    }
 
     private async Task CalculateLoan()
     {
@@ -430,19 +456,7 @@
         isHidePieChart = false;
     }
 
-
-    private List<ExcessPayment> excessPayments = new();
-    private Dictionary<int, double> variableInterest = new();
-    private List<PeriodicExcessPaymentModel> periodicExcessPayments = new();
-
-
-    private ExcessPaymentModel excessPaymentModel = new();
-    private VariableInterestModel variableInterestModel = new();
-    private PeriodicExcessPaymentModel periodicExcessPaymentModel = new();
-
-
     private void ChangeLoanDurationInOtherModels() { excessPaymentModel.LoanDuration = model.Duration; variableInterestModel.LoanDuration = model.Duration; periodicExcessPaymentModel.LoanDuration = model.Duration; }
-
 
     private void AddExcessPayment()
     {
@@ -511,21 +525,11 @@
         periodicExcessPayments.Clear();
     }
 
-    private void ClearVariableInterest()
-    {
-        variableInterest.Clear();
-    }
-
-    protected async override Task OnInitializedAsync()
-    {
-        var customAuthStateProvider = (StateProvider)authStateProvider;
-        var authstate = await authStateProvider.GetAuthenticationStateAsync();
-        loanCalculations = userAccountService.GetLoanCalculations(authstate.User.Identity.Name);
-    }
+    private void ClearVariableInterest() => variableInterest.Clear();
 
     void GetLoanCalculation(LoanCalculation loanCalculation)
     {
-        mainLoanCalculation = loanCalculation;
+        currentLoanCalculation = loanCalculation;
         isOpenLoanCalculationEditor = true;
     }
 

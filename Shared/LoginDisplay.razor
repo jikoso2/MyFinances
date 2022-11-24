@@ -7,7 +7,9 @@
     <Authorized>
         <a>Cześć, @context.User.Identity?.Name!</a>
         <form>
-            <button type="submit" class="nav-link btn btn-link" @onclick="AccManagement">Zarządzaj</button>
+            <NavLink class="nav-link" href="accountmanagement">
+                <span aria-hidden="true"></span> Zarządzanie kontem
+            </NavLink>
         </form>
         <form>
             <button type="submit" class="nav-link btn btn-link" @onclick="Logout">Wylogowanie</button>
@@ -30,11 +32,16 @@
         navManager.NavigateTo("/accountmanagement", true);
     }
 
+    private void LogIn()
+    {
+        navManager.NavigateTo("/auth/login", true);
+    }
+
     private async Task Logout()
     {
         var customAuthStateProvider = (StateProvider)authStateProvider;
         await customAuthStateProvider.UpdateAuthenticationState(null);
-        await Task.Delay(1000); //at the slow free azure host, app need some time
+        //await Task.Delay(1000); //at the slow free azure host, app need some time
         navManager.NavigateTo("/", true);
     }
 }
