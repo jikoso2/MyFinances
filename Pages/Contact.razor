@@ -4,6 +4,8 @@
 @using MyFinances.Models
 @using MyFinances.Data
 @inject Data.MailService MailService
+@inject Data.UserAccountService userAccountService
+@inject AuthenticationStateProvider authStateProvider;
 
 <div class="card mx-auto mt-5">
     <LoadingModal IsLoading="isProcessing" LoadingText="Wysyłanie wiadomości E-Mail">
@@ -64,5 +66,17 @@
             isProcessing = false;
         }
         OpenDebentureInfoDialog();
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identities.FirstOrDefault().Claims.Count() > 0)
+        {
+            var userId = authState.User.Identities.FirstOrDefault().Claims.FirstOrDefault(a => a.Type == System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+
+            var user = await userAccountService.GetUserAccount(new Guid(userId));
+            model.Email = user.email;
+        }
     }
 }

@@ -17,17 +17,20 @@
 
     <div class="card-body">
 
-        <p>Wybierz sposób w jaki chcesz wprowadzić wpłacone kwoty.</p>
-
-        <div class="btn-group btn-group-toggle" data-toggle="buttons">
-            @foreach (var optionName in toggleGroup.Options)
-            {
-                <label class="btn btn-secondary @toggleGroup.GetActive(optionName)" style="width:215px;color:white">
-                    <input type="radio" name="options" autocomplete="off"
-                       checked="@(toggleGroup.SelectedOption == optionName)"
-                       @onchange="()=>toggleGroup.SelectedOption = optionName" /> @optionName
-                </label>
-            }
+        <div class="card mx-auto" style="margin-top:20px">
+            <div class="card-header">
+                Sposób wprowadzania wpłaconych kwot
+            </div>
+            <div class="btn-group btn-group-toggle" data-toggle="buttons" style="display:flex;margin:20px">
+                @foreach (var optionName in toggleGroup.Options)
+                {
+                    <label class="btn btn-secondary @toggleGroup.GetActive(optionName)" style="color:white">
+                        <input type="radio" name="options" autocomplete="off"
+                           checked="@(toggleGroup.SelectedOption == optionName)"
+                           @onchange="()=>toggleGroup.SelectedOption = optionName" /> @optionName
+                    </label>
+                }
+            </div>
         </div>
         <p></p>
 
