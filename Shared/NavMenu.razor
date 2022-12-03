@@ -1,4 +1,6 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
+﻿@*<div class="top-row pl-4 navbar" style="background-image:url(Images/gownabelka.png); background-position:center;background-size:auto; background-repeat:no-repeat">
+*@
+<div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">Moje finanse</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
@@ -46,7 +48,15 @@
             <Authorized>
                 <li class="nav-item px-3">
                     <NavLink class="nav-link" href="users">
-                        <span class="oi oi-envelope-closed" aria-hidden="true"></span> Użytkownicy (Admin)
+                        <span class="oi oi-people" aria-hidden="true"></span> Użytkownicy (Admin)
+                    </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                    @*<NavLink class="nav-link" href="configuration">
+                        <img src="Images/control_options_configuration_slider_settings_icon_230584.png" style="height:16px;width:16px;margin-right:16px;" /><span aria-hidden="true"></span> Konfiguracje (Admin)
+                    </NavLink>*@
+                    <NavLink class="nav-link" href="configuration">
+                        <span class="oi oi-cog" aria-hidden="true"></span> Konfiguracje (Admin)
                     </NavLink>
                 </li>
             </Authorized>

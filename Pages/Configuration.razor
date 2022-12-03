@@ -1,0 +1,85 @@
+﻿@page "/configuration"
+
+@using MyFinances.Data.DataBase
+@using MyFinances.Data
+
+@inherits OwningComponentBase<UserAccountService>
+@inject AuthenticationStateProvider authStateProvider;
+
+<AuthorizeView Roles="admin">
+    <Authorized>
+
+        @if (isOpenConfigurationEditor)
+        {
+            <ConfigurationModal Configuration="currentConfiguration" OnClose="OnConfigurationModalClose" Configurations="configurations"></ConfigurationModal>
+        }
+
+        <h3>Konfiguracje</h3>
+
+        <div class="table-responsive" style="max-height:1500px">
+            <table class="table table-bordered " style="align-content:center">
+
+                <thead>
+                    <tr>
+                        <th>IId</th>
+                        <th>Name</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var configuration in configurations)
+                    {
+                        <tr>
+                            <td>@configuration.iid</td>
+                            <td>@configuration.name</td>
+                            <td>@configuration.value</td>
+                            <td style="width:100px"><button class="btn btn-primary" style="width:100%;max-width:100px" type="submit" @onclick="(()=>GetConfiguration(configuration))">Edytuj</button></td>
+                            <td style="width:100px"><button class="btn btn-danger" style="width:100%;max-width:100px" type="submit" @onclick="(()=>DeleteConfiguration(configuration))">Usuń</button></td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+        <button class="btn btn-primary btn-center" style="width:180px" type="submit" @onclick="(()=>GetConfiguration(new Data.DataBase.Configuration()))">
+            Dodaj konfiguracje
+        </button>
+    </Authorized>
+
+    <NotAuthorized>
+        Kolego zbłądziłeś, nie masz dostępu.
+    </NotAuthorized>
+
+</AuthorizeView>
+
+@code {
+
+    public List<Data.DataBase.Configuration> configurations;
+    public Data.DataBase.Configuration currentConfiguration;
+
+    bool isOpenConfigurationEditor = false;
+    private void ChangeStateConfigurationEditModal() => isOpenConfigurationEditor = !isOpenConfigurationEditor;
+
+    protected override void OnInitialized()
+    {
+        configurations = Service.GetConfiguration();
+    }
+
+    private void OnConfigurationModalClose(bool accepted)
+    {
+        isOpenConfigurationEditor = false;
+    }
+
+    void GetConfiguration(Data.DataBase.Configuration configuration)
+    {
+        currentConfiguration = configuration;
+        isOpenConfigurationEditor = true;
+    }
+
+    void DeleteConfiguration(Data.DataBase.Configuration configuration)
+    {
+        Service.DeleteConfiguration(configuration);
+        configurations.Remove(configuration);
+    }
+}

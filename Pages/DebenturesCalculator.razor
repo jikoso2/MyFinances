@@ -84,7 +84,7 @@
                     <section class="w-100 p-4 pb-4">
                         <label for="percentageRangeDOR" class="form-label">Referencyjna stopa oprocentowania</label>
                         <div class="range">
-                            <input type="range" class="form-range" min="0" max="15" step="0.25" id="percentageRangeDOR" @onchange="CalculateDebentures" @bind="model.DORPercentage" @bind:event="oninput" />
+                            <input type="range" class="form-range" min="0" max="15" step="0.05" id="percentageRangeDOR" @onchange="CalculateDebentures" @bind="model.DORPercentage" @bind:event="oninput" />
                         </div>
 
 
@@ -99,7 +99,7 @@
                     <section class="w-100 p-4 pb-4">
                         <label for="percentageRangeROR" class="form-label">Referencyjna stopa oprocentowania</label>
                         <div class="range">
-                            <input type="range" class="form-range" min="0" max="15" step="0.25" id="percentageRangeROR" @onchange="CalculateDebentures" @bind="model.RORPercentage" @bind:event="oninput" />
+                            <input type="range" class="form-range" min="0" max="15" step="0.05" id="percentageRangeROR" @onchange="CalculateDebentures" @bind="model.RORPercentage" @bind:event="oninput" />
                         </div>
 
                         <div class="form-group" style="width:25%">

@@ -1,0 +1,87 @@
+﻿@using MyFinances.Data.DataBase
+@inject Data.UserAccountService userAccountService
+
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edycja Konfiguracji</h4>
+                <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+            </div>
+            <div class="modal-body">
+                @if (Configuration.iid > 0)
+                {
+                    <EditForm Model="Configuration" OnValidSubmit="UpdateConfiguration">
+                        <div class="modal-body">
+                            <table class="table">
+                                <tr>
+                                    <td>Nazwa</td>
+                                    <td><input type="text" placeholder="E-mail" @bind="Configuration.name" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Wartość</td>
+                                    <td><input type="text" placeholder="Fullname" @bind="Configuration.value" /></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-primary" @onclick="@UpdateConfiguration">Edytuj</button>
+                        </div>
+                    </EditForm>
+                }
+                else
+                {
+                    <EditForm Model="Configuration" OnValidSubmit="InsertConfiguration">
+                        <div class="modal-body">
+                            <table class="table">
+                                <tr>
+                                    <td>Nazwa</td>
+                                    <td><input type="text" placeholder="E-mail" @bind="Configuration.name" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Wartość</td>
+                                    <td><input type="text" placeholder="Fullname" @bind="Configuration.value" /></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-primary" @onclick="@InsertConfiguration">Dodaj konfiguracje</button>
+                        </div>
+                    </EditForm>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public Configuration Configuration
+    {
+        get; set;
+    }
+
+    [Parameter]
+    public List<Configuration> Configurations { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    private Task ModalCancel()
+    {
+        return OnClose.InvokeAsync(false);
+    }
+
+    public Task InsertConfiguration()
+    {
+        userAccountService.InsertConfiguration(Configuration);
+        return OnClose.InvokeAsync(false);
+    }
+
+    public Task UpdateConfiguration()
+    {
+        userAccountService.UpdateConfiguration(Configuration);
+        return OnClose.InvokeAsync(false);
+    }
+}

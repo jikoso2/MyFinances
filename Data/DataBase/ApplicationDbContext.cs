@@ -12,5 +12,7 @@ namespace MyFinances.Data.DataBase
 		public DbSet<UserAccount> user { get; set; }
 
 		public DbSet<LoanCalculation> loan_calculation { get; set; }
+
+		public DbSet<Configuration> configuration { get; set; }
 	}
 }

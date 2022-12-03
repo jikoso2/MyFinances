@@ -10,6 +10,7 @@ namespace MyFinances.Data
 	{
 		private List<UserAccount> _userAccountList;
 		private List<LoanCalculation> _loanCalculationsList;
+		private List<Configuration> _configuration;
 		protected readonly ApplicationDbContext _dbcontext;
 
 		public UserAccountService(ApplicationDbContext dbcontext)
@@ -17,6 +18,7 @@ namespace MyFinances.Data
 			_dbcontext = dbcontext;
 			RefreshUserAccounts();
 			RefreshLoanCalculations();
+			RefreshConfiguration();
 		}
 
 		public void RefreshUserAccounts()
@@ -29,9 +31,20 @@ namespace MyFinances.Data
 			_loanCalculationsList = _dbcontext.loan_calculation.ToList();
 		}
 
+		public void RefreshConfiguration()
+		{
+			_configuration = _dbcontext.configuration.ToList();
+			LoadConfiguration();
+		}
+
 		public List<UserAccount> GetUserAccounts()
 		{
 			return _userAccountList;
+		}
+
+		public List<Configuration> GetConfiguration()
+		{
+			return _configuration;
 		}
 
 		public Task<UserAccount> GetUserAccount(Guid id)
@@ -212,7 +225,7 @@ namespace MyFinances.Data
 			return true;
 		}
 
-		public bool DeleteLoanCalculations(List<LoanCalculation> loanCalculations)
+		private bool DeleteLoanCalculations(List<LoanCalculation> loanCalculations)
 		{
 			bool result = false;
 
@@ -224,6 +237,113 @@ namespace MyFinances.Data
 			if (result)
 				RefreshLoanCalculations();
 			return result;
+		}
+
+		public void LoadConfiguration()
+		{
+			if (_configuration.FirstOrDefault(a => a.name.Equals("Amount")) != null)
+			{
+				if (int.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Amount")).value, out int val))
+					Helpers.DefaultValue.Amount = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("OTSPercentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("OTSPercentage")).value, out double val))
+					Helpers.DefaultValue.OTSPercentage = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("DOSPercentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("DOSPercentage")).value, out double val))
+					Helpers.DefaultValue.DOSPercentage = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("TOSPercentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("TOSPercentage")).value, out double val))
+					Helpers.DefaultValue.TOSPercentage = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("RORPercentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("RORPercentage")).value, out double val))
+					Helpers.DefaultValue.RORPercentage = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("DORPercentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("DORPercentage")).value, out double val))
+					Helpers.DefaultValue.DORPercentage = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("EDOAdditionalPercentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("EDOAdditionalPercentage")).value, out double val))
+					Helpers.DefaultValue.EDOAdditionalPercentage = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("TOZPercentage")) != null)
+			{
+				var val = _configuration.FirstOrDefault(a => a.name.Equals("TOZPercentage")).value;
+				var TOZPercentage = new List<double>();
+				foreach (var item in val.Split(','))
+				{
+					if (double.TryParse(item, out double result))
+						TOZPercentage.Add(result);
+				}
+
+				if (TOZPercentage.Count == 6)
+					Helpers.DefaultValue.TOZPercentage = val.Split(',').Select(a => double.Parse(a)).ToList();
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("EDOPercentage")) != null)
+			{
+				var val = _configuration.FirstOrDefault(a => a.name.Equals("EDOPercentage")).value;
+				var EDOPercentage = new List<double>();
+				foreach (var item in val.Split(','))
+				{
+					if (double.TryParse(item, out double result))
+						EDOPercentage.Add(result);
+				}
+
+				if (EDOPercentage.Count == 10)
+					Helpers.DefaultValue.EDOPercentage = val.Split(',').Select(a => double.Parse(a)).ToList();
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("COIPercentage")) != null)
+			{
+				var val = _configuration.FirstOrDefault(a => a.name.Equals("COIPercentage")).value;
+				var COIPercentage = new List<double>();
+				foreach (var item in val.Split(','))
+				{
+					if (double.TryParse(item, out double result))
+						COIPercentage.Add(result);
+				}
+
+				if (COIPercentage.Count == 4)
+					Helpers.DefaultValue.COIPercentage = val.Split(',').Select(a => double.Parse(a)).ToList();
+			}
+		}
+
+		public void InsertConfiguration(Configuration configuration)
+		{
+			_dbcontext.configuration.Add(configuration);
+			_dbcontext.SaveChanges();
+			RefreshConfiguration();
+		}
+
+		public void DeleteConfiguration(Configuration configuration)
+		{
+			_dbcontext.configuration.Remove(configuration);
+			_dbcontext.SaveChanges();
+			RefreshConfiguration();
+		}
+
+		public bool UpdateConfiguration(Configuration configuration)
+		{
+			var configurationUpdate = _dbcontext.configuration.FirstOrDefault(a => a.iid == configuration.iid);
+			if (configurationUpdate != null)
+			{
+				configurationUpdate.name = configuration.name;
+				configurationUpdate.value = configuration.value;
+				_dbcontext.SaveChanges();
+				RefreshConfiguration();
+
+				return true;
+			}
+			return false;
 		}
 	}
 }

@@ -30,6 +30,9 @@ namespace MyFinances.Models
 		[DebentureModelValidation.EDOPercentage]
 		public List<double> EDOPercentage { get; set; } = DefaultValue.EDOPercentage;
 
+		[Range(0, 2.5, ErrorMessage = "Dodatkowe oprocentowanie nie może być mniejsze od zera lub większe od 2.5")]
+		public double EDOAdditionalPercentage { get; set; } = DefaultValue.EDOAdditionalPercentage;
+
 		[DebentureModelValidation.COIPercentage]
 		public List<double> COIPercentage { get; set; } = DefaultValue.COIPercentage;
 

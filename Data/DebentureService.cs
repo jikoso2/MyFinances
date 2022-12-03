@@ -260,6 +260,9 @@ namespace MyFinances.Data
 
 			for (int i = 0; i < 11; i++)
 			{
+				if(i >= 1 && i < 10)
+					interestRate[i] = interestRate[i] <= 0 ? DebentureModel.EDOAdditionalPercentage/100 : DebentureModel.EDOAdditionalPercentage/100 + interestRate[i];
+
 				double profit = i <= 10 ? Math.Round(totalValue[i] * interestRate[i], 2) : 0;
 
 				if (i < 10)
@@ -304,7 +307,7 @@ namespace MyFinances.Data
 		private void CalculateRateIndexed(Debenture debentureResult)
 		{
 			var totalValue = DebentureModel.Amount * 100;
-			var percentage = DebentureModel.Type == DebentureType.DOR ? DebentureModel.DORPercentage + 0.25 : DebentureModel.RORPercentage;
+			var percentage = DebentureModel.Type == DebentureType.DOR ? DebentureModel.DORPercentage : DebentureModel.RORPercentage;
 			var monthlyProfitPerDebenture = Math.Round(percentage / 12, 2);
 			var monthlyTaxPerDebenture = (Math.Ceiling(monthlyProfitPerDebenture * 19)) / 100 < 0.01 ? 0 : (Math.Ceiling(monthlyProfitPerDebenture * 19)) / 100;
 			var monthlyProfit = DebentureModel.BelkaTax ? monthlyProfitPerDebenture - monthlyTaxPerDebenture : monthlyProfitPerDebenture;
