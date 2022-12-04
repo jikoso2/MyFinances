@@ -30,17 +30,29 @@ namespace MyFinances.Data
 			double capital = DepositModel.Amount;
 			double interestSum = 0;
 			double interest;
-			double interestWithoutTax;
+			double interestWithoutTax = 0;
 
 			for (int i = 0; i < periods; i++)
 			{
 				periodRows[i] = (i + 1).ToString();
-				interestWithoutTax = Math.Round(capital * DepositModel.PercentageNumber * DepositModel.Period / 365,2);
+
+				switch (DepositModel.DurationType)
+				{
+					case TimeType.Dzień:
+						interestWithoutTax = Math.Round(capital * DepositModel.PercentageNumber * DepositModel.Period / 365, 2);
+						break;
+					case TimeType.Miesiąc:
+						interestWithoutTax = Math.Round(capital * DepositModel.PercentageNumber * DepositModel.Period / 12, 2);
+						break;
+					case TimeType.Rok:
+						interestWithoutTax = Math.Round(capital * DepositModel.PercentageNumber * DepositModel.Period, 2);
+						break;
+				}
 
 				if (DepositModel.BelkaTax)
 				{
 					interest = Math.Floor(interestWithoutTax * 0.81 * 100) - 1;
-					interest = Math.Round(interest<0?0:interest / 100, 2);
+					interest = Math.Round(interest < 0 ? 0 : interest / 100, 2);
 					interestRows[i] = Helper.MoneyFormat(interest);
 					interestSum += interest;
 					if (DepositModel.Capitalization)
@@ -55,8 +67,6 @@ namespace MyFinances.Data
 				}
 
 				profitRows[i] = Helper.MoneyFormat(interestSum);
-				
-				
 			}
 
 			depositResult.DepositData.DepositColumn = new DepositColumn[3]
@@ -80,7 +90,7 @@ namespace MyFinances.Data
 		public Deposit(DepositModel depositModel)
 		{
 			this.DepositData = new DepositResult();
-			this.DepositData.Head = new string[3] { "Okres", depositModel.Capitalization?"Kapitalizowane Odsetki":"Wypłata", "Zysk przy wypłacie" };
+			this.DepositData.Head = new string[3] { "Okres", depositModel.Capitalization ? "Kapitalizowane Odsetki" : "Wypłata", "Zysk przy wypłacie" };
 			this.DepositInfo = new List<Tuple<string, string>>();
 		}
 

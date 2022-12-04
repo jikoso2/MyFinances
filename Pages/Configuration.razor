@@ -3,7 +3,7 @@
 @using MyFinances.Data.DataBase
 @using MyFinances.Data
 
-@inherits OwningComponentBase<UserAccountService>
+@inherits OwningComponentBase<DataBaseConnService>
 @inject AuthenticationStateProvider authStateProvider;
 
 <AuthorizeView Roles="admin">
@@ -63,7 +63,7 @@
 
     protected override void OnInitialized()
     {
-        configurations = Service.GetConfiguration();
+        configurations = Service.GetConfiguration().OrderBy(a=>a.iid).ToList();
     }
 
     private void OnConfigurationModalClose(bool accepted)

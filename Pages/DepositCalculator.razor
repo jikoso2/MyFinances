@@ -39,7 +39,17 @@
                     <div class="col">
                         <div class="form-group">
                             <label>Czas trwania lokaty</label>
-                            <div class="input-group"><input @bind="model.Duration" class="form-control"><div class="input-group-append"><span class="input-group-text">dni</span></div></div>
+                            <div class="input-group">
+                                <input @bind="model.Duration" class="form-control">
+                                <div class="input-group-append">
+                                    <InputSelect class="input-group-text" id="durationType" @bind-Value="model.DurationType">
+                                        @foreach (var DurationType in Enum.GetValues(typeof(TimeType)))
+                                        {
+                                            <option value="@DurationType">@DurationType</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -53,7 +63,7 @@
                     <div class="col">
                         <div class="form-group">
                             <label>Okres kapitalizacji</label>
-                            <div class="input-group"><input @bind="model.Period" class="form-control"><div class="input-group-append"><span class="input-group-text">dni</span></div></div>
+                            <div class="input-group"><input @bind="model.Period" class="form-control"><div class="input-group-append"><span class="input-group-text">@model.DurationType</span></div></div>
                         </div>
                     </div>
 
@@ -96,10 +106,10 @@
                     @foreach (var column in calculatedDeposit.DepositData.DepositColumn)
                     {
                     <td>
-                        @foreach (var row in column.Rows)
-                        {
-                            <tr>@row</tr>
-                        }
+                            @foreach (var row in column.Rows)
+                            {
+                        <tr>@row</tr>
+                            }
                     </td>
                     }
                 </tbody>

@@ -36,7 +36,7 @@ namespace MyFinances
 			services.AddServerSideBlazor();
 
 			services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
-			services.AddScoped<UserAccountService>();
+			services.AddScoped<DataBaseConnService>();
 
 			services.AddScoped<AuthenticationStateProvider, StateProvider>();
 			services.AddAuthenticationCore();

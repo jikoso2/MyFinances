@@ -9,7 +9,7 @@ namespace MyFinances.Models
 	public class DepositModel
 	{
 		[Required]
-		[Range(0.01, 100000000, ErrorMessage = "Kwota deponowana na lokacie musi być dodatnia")]
+		[Range(0.01, 100000000, ErrorMessage = "Kwota deponowana na lokacie musi być dodatnia i mniejsza od 100 milionów")]
 		public long Amount { get; set; } = 10000;
 
 		[Required]
@@ -27,19 +27,17 @@ namespace MyFinances.Models
 		[Range(1, 365, ErrorMessage = "Okres kapitalizacji musi zawierać się w przedziale od 1 do 365")]
 		public int Period { get; set; } = 30;
 
-		[Required]
-		public TimeType PeriodType { get; set; }
-
 		public bool BelkaTax { get; set; }
 
 		public bool Capitalization { get; set; }
 
 		public double PercentageNumber { get { return Percentage / 100; } }
 	}
+
 	public enum TimeType
 	{
-		Day,
-		Month,
-		Year
+		Dzień,
+		Miesiąc,
+		Rok
 	}
 }

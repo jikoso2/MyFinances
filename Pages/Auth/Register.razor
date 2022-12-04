@@ -7,7 +7,7 @@
 
 @page "/auth/register"
 
-@inject Data.UserAccountService userAccountService;
+@inject Data.DataBaseConnService userAccountService;
 
 <AuthorizeView Roles="admin" Context="another_context">
     <Authorized>

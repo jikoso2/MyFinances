@@ -11,9 +11,11 @@ namespace MyFinances.Data.DataBase
 		public int iid { get; set; }
 
 		[DataMember]
+		[Required]
 		public string name { get; set; }
 
 		[DataMember]
+		[Required]
 		public string value { get; set; }
 	}
 }

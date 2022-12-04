@@ -1,5 +1,5 @@
 ﻿@using MyFinances.Data.DataBase
-@inject Data.UserAccountService userAccountService
+@inject Data.DataBaseConnService userAccountService
 
 <div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
     <div class="modal-dialog">
@@ -16,11 +16,11 @@
                             <table class="table">
                                 <tr>
                                     <td>Nazwa</td>
-                                    <td><input type="text" placeholder="E-mail" @bind="Configuration.name" /></td>
+                                    <td><input type="text" placeholder="Nazwa konfiguracji" @bind="Configuration.name" /></td>
                                 </tr>
                                 <tr>
                                     <td>Wartość</td>
-                                    <td><input type="text" placeholder="Fullname" @bind="Configuration.value" /></td>
+                                    <td><input type="text" placeholder="Wartość konfiguracji" @bind="Configuration.value" /></td>
                                 </tr>
                             </table>
                         </div>
@@ -36,11 +36,11 @@
                             <table class="table">
                                 <tr>
                                     <td>Nazwa</td>
-                                    <td><input type="text" placeholder="E-mail" @bind="Configuration.name" /></td>
+                                    <td><input type="text" placeholder="Nazwa konfiguracji" @bind="Configuration.name" /></td>
                                 </tr>
                                 <tr>
                                     <td>Wartość</td>
-                                    <td><input type="text" placeholder="Fullname" @bind="Configuration.value" /></td>
+                                    <td><input type="text" placeholder="Wartość konfiguracji" @bind="Configuration.value" /></td>
                                 </tr>
                             </table>
                         </div>
@@ -55,12 +55,8 @@
 </div>
 
 @code {
-
-    [Parameter]
-    public Configuration Configuration
-    {
-        get; set;
-    }
+    [Parameter, EditorRequired]
+    public Configuration Configuration { get; set; }
 
     [Parameter]
     public List<Configuration> Configurations { get; set; }
@@ -75,7 +71,10 @@
 
     public Task InsertConfiguration()
     {
+        if (Configurations.FirstOrDefault(a => a.name == Configuration.name) != null || String.IsNullOrEmpty(Configuration.name) || String.IsNullOrEmpty(Configuration.value))
+            return OnClose.InvokeAsync(false);
         userAccountService.InsertConfiguration(Configuration);
+        Configurations.Add(Configuration);
         return OnClose.InvokeAsync(false);
     }
 

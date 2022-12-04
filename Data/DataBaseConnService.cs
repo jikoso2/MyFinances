@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace MyFinances.Data
 {
-	public class UserAccountService
+	public class DataBaseConnService
 	{
 		private List<UserAccount> _userAccountList;
 		private List<LoanCalculation> _loanCalculationsList;
 		private List<Configuration> _configuration;
 		protected readonly ApplicationDbContext _dbcontext;
 
-		public UserAccountService(ApplicationDbContext dbcontext)
+		public DataBaseConnService(ApplicationDbContext dbcontext)
 		{
 			_dbcontext = dbcontext;
 			RefreshUserAccounts();

@@ -7,7 +7,7 @@
 @using MyFinances.Data.Auth
 @using System.Threading
 
-@inject Data.UserAccountService userAccountService
+@inject Data.DataBaseConnService userAccountService
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager NavigationManager
 @inject Data.LoanService LoanService
@@ -148,11 +148,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var column in excessPayments)
+                                @foreach (var excessPayment in excessPayments)
                                 {
                                     <tr>
-                                        <th style="font-weight:normal"> @column.Month </th>
-                                        <th style="font-weight:normal"> @Helper.MoneyFormat(column.Amount) </th>
+                                        <th style="font-weight:normal"> @excessPayment.Month </th>
+                                        <th style="font-weight:normal"> @Helper.MoneyFormat(excessPayment.Amount) </th>
+                                        <td style="width:100px"><button class="btn btn-danger" style="width:100%;max-width:100px" type="submit" @onclick="(()=>DeleteExcessPayment(excessPayment))">Usuń</button></td>
                                     </tr>
                                 }
                             </tbody>
@@ -206,7 +207,7 @@
         </div>
         @if (isVariableInterestVisible)
         {
-            @if (variableInterest.Count > 0)
+            @if (variableInterests.Count > 0)
             {
                 <div class="card-body" style="padding:12px;align-content:center">
                     <div class="row justify-content-center">
@@ -222,11 +223,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var column in variableInterest)
+                                @foreach (var variableInterest in variableInterests)
                                 {
                                     <tr>
-                                        <th style="font-weight:normal"> @column.Key </th>
-                                        <th style="font-weight:normal"> @Helper.PercentFormat(column.Value)</th>
+                                        <th style="font-weight:normal"> @variableInterest.Key </th>
+                                        <th style="font-weight:normal"> @Helper.PercentFormat(variableInterest.Value)</th>
                                     </tr>
                                 }
                             </tbody>
@@ -300,12 +301,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var column in periodicExcessPayments)
+                                @foreach (var periodicExcessPayment in periodicExcessPayments)
                                 {
                                     <tr>
-                                        <th style="font-weight:normal"> @column.StartMonth </th>
-                                        <th style="font-weight:normal"> @column.EndMonth </th>
-                                        <th style="font-weight:normal"> @Helper.MoneyFormat(column.Amount)</th>
+                                        <th style="font-weight:normal"> @periodicExcessPayment.StartMonth </th>
+                                        <th style="font-weight:normal"> @periodicExcessPayment.EndMonth </th>
+                                        <th style="font-weight:normal"> @Helper.MoneyFormat(periodicExcessPayment.Amount)</th>
+                                        <td style="width:100px"><button class="btn btn-danger" style="width:100%;max-width:100px" type="submit" @onclick="(()=>DeletePeriodicExcessPayment(periodicExcessPayment))">Usuń</button></td>
                                     </tr>
                                 }
                             </tbody>
@@ -415,7 +417,7 @@
     private void ChangeLoanCalculationEditModal() => isOpenLoanCalculationEditor = !isOpenLoanCalculationEditor;
 
     private List<ExcessPayment> excessPayments = new();
-    private Dictionary<int, double> variableInterest = new();
+    private Dictionary<int, double> variableInterests = new();
     private List<PeriodicExcessPaymentModel> periodicExcessPayments = new();
 
     private ExcessPaymentModel excessPaymentModel = new();
@@ -442,7 +444,7 @@
             model.ExcessPayments = new List<ExcessPayment>();
 
         if (isVariableInterest)
-            model.VariableInterest = variableInterest;
+            model.VariableInterest = variableInterests;
         else
             model.VariableInterest = new Dictionary<int, double>();
 
@@ -479,14 +481,14 @@
     {
         if (variableInterestModel.Month > 0 && variableInterestModel.Percentage > 0 && variableInterestModel.Percentage < 30)
         {
-            if (variableInterest.ContainsKey(variableInterestModel.Month))
-                variableInterest[variableInterestModel.Month] = variableInterestModel.Percentage;
+            if (variableInterests.ContainsKey(variableInterestModel.Month))
+                variableInterests[variableInterestModel.Month] = variableInterestModel.Percentage;
             else
-                variableInterest.Add(variableInterestModel.Month, variableInterestModel.Percentage);
+                variableInterests.Add(variableInterestModel.Month, variableInterestModel.Percentage);
         }
-        variableInterest = variableInterest.OrderBy(o => o.Key).ToDictionary(a => a.Key, b => b.Value);
-        if (model.MinDuration < variableInterest.Last().Key)
-            model.MinDuration = variableInterest.Last().Key;
+        variableInterests = variableInterests.OrderBy(o => o.Key).ToDictionary(a => a.Key, b => b.Value);
+        if (model.MinDuration < variableInterests.Last().Key)
+            model.MinDuration = variableInterests.Last().Key;
     }
 
     private void AddPeriodicExcessPayment()
@@ -511,6 +513,11 @@
         excessPayments.Clear();
     }
 
+    private void DeleteExcessPayment(ExcessPayment excessPayment)
+    {
+        excessPayments.Remove(excessPayment);
+    }
+
     private void ClearPeriodicExcessPayments()
     {
         if (periodicExcessPayments.Last().EndMonth == model.MinDuration)
@@ -525,7 +532,12 @@
         periodicExcessPayments.Clear();
     }
 
-    private void ClearVariableInterest() => variableInterest.Clear();
+    private void DeletePeriodicExcessPayment(PeriodicExcessPaymentModel periodicExcessPayment)
+    {
+        periodicExcessPayments.Remove(periodicExcessPayment);
+    }
+
+    private void ClearVariableInterest() => variableInterests.Clear();
 
     void GetLoanCalculation(LoanCalculation loanCalculation)
     {
