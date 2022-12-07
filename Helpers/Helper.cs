@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace MyFinances.Helpers
 {
@@ -20,6 +22,13 @@ namespace MyFinances.Helpers
 			return Math.Round(valueNumber,5).ToString() + " %";
 		}
 
+		public static string ComputeHash(string input)
+        {
+			var sha = SHA256.Create();
+			var asByteArray = Encoding.Default.GetBytes(input);
+			var hashedInput = sha.ComputeHash(asByteArray);
+			return Convert.ToBase64String(hashedInput);
+        }
 	}
 
 	public static class DefaultValue
