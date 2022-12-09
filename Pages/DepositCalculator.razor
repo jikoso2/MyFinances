@@ -1,6 +1,8 @@
 ﻿@page "/depositcalculator"
 
 @using MyFinances.Models
+@using MyFinances.Components.Modals
+
 @inject Data.DepositService DepositService
 
 
@@ -83,8 +85,8 @@
                 @foreach (var depositInfo in calculatedDeposit.DepositInfo)
                 {
                     <div class="row" id="rowinfoot">
-                        <div class="col-8">@depositInfo.Item1</div>
-                        <div class="col-4 text-right">@depositInfo.Item2</div>
+                        <div class="col-7">@depositInfo.Item1</div>
+                        <div class="col-5 text-right" style="white-space:nowrap" >@depositInfo.Item2</div>
                     </div>
                 }
             </div>

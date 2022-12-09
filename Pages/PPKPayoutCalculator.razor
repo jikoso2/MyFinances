@@ -3,8 +3,10 @@
 @using MyFinances.Models
 @using MyFinances.Data
 @using MyFinances.Helpers
+@using MyFinances.Components.Modals
 @using System.Threading
 @using Microsoft.AspNetCore.Components.Web
+
 
 @inject Data.PPKPayoutService PPKPayoutService
 
@@ -27,7 +29,7 @@
                     <label class="btn btn-secondary @toggleGroup.GetActive(optionName)" style="color:white">
                         <input type="radio" name="options" autocomplete="off"
                            checked="@(toggleGroup.SelectedOption == optionName)"
-                           @onchange="()=>toggleGroup.SelectedOption = optionName" /> @optionName
+                           @onchange="()=>OnChangeButton(optionName)" /> @optionName
                     </label>
                 }
             </div>
@@ -97,8 +99,8 @@
                 @foreach (var ppkInfo in ppkResult.PPKPayoutInfo)
                 {
                     <div class="row" id="rowinfoot">
-                        <div class="col-8">@ppkInfo.Item1</div>
-                        <div class="col-4 text-right">@ppkInfo.Item2</div>
+                        <div class="col-7">@ppkInfo.Item1</div>
+                        <div class="col-5 text-right">@ppkInfo.Item2</div>
                     </div>
                 }
             </div>
@@ -120,6 +122,13 @@
     {
         model.PayoutType = toggleGroup.SelectedOption;
         ppkResult = await PPKPayoutService.GetPPKPayoutCalculatedAsync(model);
+    }
+
+    private void OnChangeButton(PayoutType optionName)
+    {
+        toggleGroup.SelectedOption = optionName;
+        if (ppkResult != null && ppkResult.PPKPayoutInfo != null)
+            ppkResult.PPKPayoutInfo.Clear();
     }
 
     Helpers.TogglePayoutType toggleGroup = new Helpers.TogglePayoutType()

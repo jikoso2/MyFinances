@@ -2,6 +2,7 @@
 
 @using MyFinances.Data.DataBase
 @using MyFinances.Data
+@using MyFinances.Components.Modals
 
 @inherits OwningComponentBase<DataBaseConnService>
 @inject AuthenticationStateProvider authStateProvider;
@@ -80,7 +81,7 @@
     {
         userAccounts = Service.GetUserAccounts();
         var authState = await authStateProvider.GetAuthenticationStateAsync();
-        if(Service.isUsernameExist(authState.User.Identity.Name))
+        if (Service.isUsernameExist(authState.User.Identity.Name))
             admin = await Service.GetUserAccountByUsername(authState.User.Identity.Name);
     }
 

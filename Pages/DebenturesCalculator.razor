@@ -3,6 +3,9 @@
 @using MyFinances.Models
 @using MyFinances.Helpers
 @using MyFinances.Components
+@using MyFinances.Components.Modals
+@using MyFinances.Components.Views
+
 @inject Data.DebentureService DebentureService
 
 
@@ -137,8 +140,8 @@
                 @foreach (var debentureInfo in debentureResult.DebentureInfo)
                 {
                     <div class="row" id="rowinfoot">
-                        <div class="col-8">@debentureInfo.Item1</div>
-                        <div class="col-4 text-right">@debentureInfo.Item2</div>
+                        <div class="col-7">@debentureInfo.Item1</div>
+                        <div class="col-5 text-right">@debentureInfo.Item2</div>
                     </div>
                 }
             </div>

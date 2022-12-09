@@ -5,6 +5,7 @@
 @using MyFinances.Helpers
 @using MyFinances.Data.DataBase
 @using MyFinances.Data.Auth
+@using MyFinances.Components.Modals
 @using System.Threading
 
 @inject Data.DataBaseConnService userAccountService
@@ -360,8 +361,8 @@
                 @for (int i = 0; i < loanCalculateResult.LoanInfo.Count(); i++)
                 {
                     <div class="row" id="rowinfoot">
-                        <div class="col-8">@loanCalculateResult.LoanInfo[i].Item1</div>
-                        <div class="col-4 text-right" style="white-space:nowrap">@loanCalculateResult.LoanInfo[i].Item2</div>
+                        <div class="col-7">@loanCalculateResult.LoanInfo[i].Item1</div>
+                        <div class="col-5 text-right" style="white-space:nowrap">@loanCalculateResult.LoanInfo[i].Item2</div>
                     </div>
                 }
             </div>
@@ -400,7 +401,6 @@
     private LoanCalculation currentLoanCalculation;
 
     bool isHidePieChart = true;
-    bool isLoaded = false;
 
     bool isExcessPayment = false;
     bool isVariableInterest = false;
@@ -437,7 +437,6 @@
 
     private async Task CalculateLoan()
     {
-        isLoaded = true;
         if (isExcessPayment)
             model.ExcessPayments = excessPayments;
         else

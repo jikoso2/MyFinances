@@ -3,6 +3,7 @@
 @using MyFinances.Models
 @using MyFinances.Data
 @using MyFinances.Helpers
+@using MyFinances.Components.Modals
 @using System.Threading
 @using Microsoft.AspNetCore.Components.Web
 
@@ -87,8 +88,8 @@
                 @foreach (var ppkInfo in ppkResult.PPKInfo)
                 {
                     <div class="row" id="rowinfoot">
-                        <div class="col-8">@ppkInfo.Item1</div>
-                        <div class="col-4 text-right">@ppkInfo.Item2</div>
+                        <div class="col-7">@ppkInfo.Item1</div>
+                        <div class="col-5 text-right">@ppkInfo.Item2</div>
                     </div>
                 }
             </div>

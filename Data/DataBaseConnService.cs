@@ -74,9 +74,9 @@ namespace MyFinances.Data
 			return user != null ? true : false;
 		}
 
-		public Task<UserAccount> GetUserAccountByUsernameAndPassword(string userName, string password)
+		public Task<UserAccount> GetUserAccountByUsernameAndHash(string userName, string hashedPassword)
 		{
-			var user = _userAccountList.Where(a => a.username == userName && a.password == password).FirstOrDefault();
+			var user = _userAccountList.Where(a => a.username == userName && a.password == hashedPassword).FirstOrDefault();
 
 			if (user != null)
 			{
@@ -102,6 +102,7 @@ namespace MyFinances.Data
 			{
 				user.role = "user";
 				user.created = DateTime.UtcNow;
+				user.password = Helpers.Helper.ComputeHash(user.password);
 				_dbcontext.user.Add(user);
 				_dbcontext.SaveChanges();
 				RefreshUserAccounts();
@@ -125,7 +126,7 @@ namespace MyFinances.Data
 					userDB = _userAccountList.FirstOrDefault(a => a.id == user.id);
 					userDB.fullname = user.fullname;
 					userDB.email = user.email;
-					userDB.password = user.password;
+					userDB.password = Helpers.Helper.ComputeHash(user.password);
 					userDB.modified = DateTime.UtcNow;
 					userDB.modified_by = admin.username;
 					_dbcontext.SaveChanges();
@@ -147,9 +148,9 @@ namespace MyFinances.Data
 						result.Add("E-mail");
 					}
 
-					if (!Equals(userDB.password, user.password) && user.password != String.Empty && user.password != null)
+					if (!Equals(userDB.password, Helpers.Helper.ComputeHash(user.password)) && user.password != String.Empty && user.password != null)
 					{
-						userDB.password = user.password;
+						userDB.password = Helpers.Helper.ComputeHash(user.password);
 						result.Add("Hasło");
 					}
 

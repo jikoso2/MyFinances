@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
+
 namespace MyFinances.Helpers
 {
 	public class TogglePayoutType

@@ -2,6 +2,7 @@
 @using MyFinances.Data
 @using MyFinances.Helpers
 @using MyFinances.Data.DataBase
+@using MyFinances.Components.Modals
 @using System.Threading
 @using Microsoft.AspNetCore.Components.Web
 @using MyFinances.Data.Auth
@@ -61,7 +62,7 @@
     {
         try
         {
-            var user = await userAccountService.GetUserAccountByUsernameAndPassword(model.username, model.password);
+            var user = await userAccountService.GetUserAccountByUsernameAndHash(model.username, Helper.ComputeHash(model.password));
             var stateProvider = (StateProvider)authStateProvider;
             await stateProvider.UpdateAuthenticationState(new UserSession { UserName = user.username, Role = user.role, Id = user.id.ToString() });
             navManager.NavigateTo("/", true);
