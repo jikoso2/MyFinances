@@ -4,6 +4,7 @@
 @using MyFinances.Data
 @using MyFinances.Helpers
 @using MyFinances.Components.Modals
+@using MyFinances.Components.Views
 @using System.Threading
 @using Microsoft.AspNetCore.Components.Web
 
@@ -94,17 +95,7 @@
 
     @if (ppkResult != null && ppkResult.PPKPayoutInfo != null)
     {
-        <p>
-            <div class="card-footer">
-                @foreach (var ppkInfo in ppkResult.PPKPayoutInfo)
-                {
-                    <div class="row" id="rowinfoot">
-                        <div class="col-7">@ppkInfo.Item1</div>
-                        <div class="col-5 text-right">@ppkInfo.Item2</div>
-                    </div>
-                }
-            </div>
-        </p>
+        <SummaryTable Content="ppkResult.PPKPayoutInfo"></SummaryTable>
     }
 
 </div>

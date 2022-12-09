@@ -6,6 +6,7 @@
 @using MyFinances.Data.DataBase
 @using MyFinances.Data.Auth
 @using MyFinances.Components.Modals
+@using MyFinances.Components.Views
 @using System.Threading
 
 @inject Data.DataBaseConnService userAccountService
@@ -356,17 +357,8 @@
     @if (loanCalculateResult == null || loanCalculateResult.LoanData == null) { }
     else
     {
-        <p>
-            <div class="card-footer">
-                @for (int i = 0; i < loanCalculateResult.LoanInfo.Count(); i++)
-                {
-                    <div class="row" id="rowinfoot">
-                        <div class="col-7">@loanCalculateResult.LoanInfo[i].Item1</div>
-                        <div class="col-5 text-right" style="white-space:nowrap">@loanCalculateResult.LoanInfo[i].Item2</div>
-                    </div>
-                }
-            </div>
-        </p>
+        <SummaryTable Content="loanCalculateResult.LoanInfo"></SummaryTable>
+
         <div class="table-responsive" style="max-height:300px">
             <table class="table table-bordered " style="align-content:center">
                 <thead>

@@ -135,17 +135,8 @@
     </div>
     @if (debentureResult != null && debentureResult.DebentureInfo != null)
     {
-        <p>
-            <div class="card-footer">
-                @foreach (var debentureInfo in debentureResult.DebentureInfo)
-                {
-                    <div class="row" id="rowinfoot">
-                        <div class="col-7">@debentureInfo.Item1</div>
-                        <div class="col-5 text-right">@debentureInfo.Item2</div>
-                    </div>
-                }
-            </div>
-        </p>
+        <SummaryTable Content="debentureResult.DebentureInfo"></SummaryTable>
+
         @if (debentureResult.DebentureData.DebentureColumns != null)
         {
             <div class="table-responsive" style="max-height:300px">

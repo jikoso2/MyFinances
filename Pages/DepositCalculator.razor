@@ -2,6 +2,7 @@
 
 @using MyFinances.Models
 @using MyFinances.Components.Modals
+@using MyFinances.Components.Views
 
 @inject Data.DepositService DepositService
 
@@ -80,17 +81,7 @@
 
     @if (calculatedDeposit != null && calculatedDeposit.DepositData != null)
     {
-        <p>
-            <div class="card-footer">
-                @foreach (var depositInfo in calculatedDeposit.DepositInfo)
-                {
-                    <div class="row" id="rowinfoot">
-                        <div class="col-7">@depositInfo.Item1</div>
-                        <div class="col-5 text-right" style="white-space:nowrap" >@depositInfo.Item2</div>
-                    </div>
-                }
-            </div>
-        </p>
+        <SummaryTable Content="calculatedDeposit.DepositInfo"></SummaryTable>
 
         <div class="table-responsive" style="max-height:300px">
             <table class="table table-bordered " style="align-content:center">

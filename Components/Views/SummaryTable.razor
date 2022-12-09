@@ -1,0 +1,16 @@
+﻿<p>
+    <div class="card-footer">
+        @foreach (var item in Content)
+        {
+            <div class="row" id="rowinfoot">
+                <div class="col-7">@item.Item1</div>
+                <div class="col-5 text-right" style="white-space:nowrap">@item.Item2</div>
+            </div>
+        }
+    </div>
+</p>
+
+@code {
+    [Parameter]
+    public List<Tuple<string, string>> Content { get; set; }
+}
