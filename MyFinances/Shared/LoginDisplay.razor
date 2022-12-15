@@ -1,32 +1,44 @@
 ﻿@inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navManager
+@inject IConfiguration AppSettings
+
 @using MyFinances.Data.Auth
+@using Microsoft.Extensions.Configuration;
 
+@if (authenticateModeOn)
+{
+    <AuthorizeView>
+        <Authorized>
+            <a>Cześć, @context.User.Identity?.Name!</a>
+            <form>
+                <NavLink class="nav-link" href="accountmanagement">
+                    <span aria-hidden="true"></span> Zarządzanie kontem
+                </NavLink>
+            </form>
+            <form>
+                <button type="submit" class="nav-link btn btn-link" @onclick="Logout">Wylogowanie</button>
+            </form>
+        </Authorized>
+        <NotAuthorized>
+            <a href="auth/login">Zaloguj się</a>
+        </NotAuthorized>
+    </AuthorizeView>
 
-<AuthorizeView>
-    <Authorized>
-        <a>Cześć, @context.User.Identity?.Name!</a>
-        <form>
-            <NavLink class="nav-link" href="accountmanagement">
-                <span aria-hidden="true"></span> Zarządzanie kontem
-            </NavLink>
-        </form>
-        <form>
-            <button type="submit" class="nav-link btn btn-link" @onclick="Logout">Wylogowanie</button>
-        </form>
-    </Authorized>
-    <NotAuthorized>
-        <a href="auth/login">Zaloguj się</a>
-    </NotAuthorized>
-</AuthorizeView>
-
-<AuthorizeView Roles="admin">
-    <Authorized>
-        <a href="auth/register">Nowe Konto</a>
-    </Authorized>
-</AuthorizeView>
+    <AuthorizeView Roles="admin">
+        <Authorized>
+            <a href="auth/register">Nowe Konto</a>
+        </Authorized>
+    </AuthorizeView>
+}
 
 @code {
+    private bool authenticateModeOn = false;
+
+    protected override void OnInitialized()
+    {
+        authenticateModeOn = AppSettings.GetValue<bool>("Database:Available");
+    }
+
     private void AccManagement()
     {
         navManager.NavigateTo("/accountmanagement", true);

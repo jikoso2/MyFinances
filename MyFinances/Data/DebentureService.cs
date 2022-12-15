@@ -217,8 +217,10 @@ namespace MyFinances.Data
 
 			for (int i = 0; i <= 3; i++)
 			{
-				var profit = Math.Round(DebentureModel.Amount * interestRate[i] * ((double)i / 12), 2);
-				var calculatedTax = (Math.Floor(profit * 19) + 1) / 100 < 0.01 ? 0 : (Math.Floor(profit * 19) + 1) / 100;
+				var profitPerDebenture = Math.Round(100 * interestRate[i] / 100 * ((double)i / 12), 2);
+				var profit = profitPerDebenture * DebentureModel.Amount;
+				var calculatedTaxPerDebenture = (Math.Floor(profitPerDebenture * 19) + 1) / 100 < 0.01 ? 0 : (Math.Floor(profitPerDebenture * 19) + 1) / 100;
+				var calculatedTax = calculatedTaxPerDebenture * DebentureModel.Amount;
 
 				tax[i] = i == 3 && DebentureModel.BelkaTax ? calculatedTax : 0;
 				interestProfit[i] = i == 3 ? profit : 0;
@@ -260,8 +262,8 @@ namespace MyFinances.Data
 
 			for (int i = 0; i < 11; i++)
 			{
-				if(i >= 1 && i < 10)
-					interestRate[i] = interestRate[i] <= 0 ? DebentureModel.EDOAdditionalPercentage/100 : DebentureModel.EDOAdditionalPercentage/100 + interestRate[i];
+				if (i >= 1 && i < 10)
+					interestRate[i] = interestRate[i] <= 0 ? DebentureModel.EDOAdditionalPercentage / 100 : DebentureModel.EDOAdditionalPercentage / 100 + interestRate[i];
 
 				double profit = i <= 10 ? Math.Round(totalValue[i] * interestRate[i], 2) : 0;
 

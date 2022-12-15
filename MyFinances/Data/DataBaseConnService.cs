@@ -1,4 +1,5 @@
-﻿using MyFinances.Data.DataBase;
+﻿using Microsoft.Extensions.Configuration;
+using MyFinances.Data.DataBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,12 +14,19 @@ namespace MyFinances.Data
 		private List<Configuration> _configuration;
 		protected readonly ApplicationDbContext _dbcontext;
 
-		public DataBaseConnService(ApplicationDbContext dbcontext)
+		private readonly IConfiguration _appSettings;
+
+		public DataBaseConnService(ApplicationDbContext dbcontext, IConfiguration appSettings)
 		{
-			_dbcontext = dbcontext;
-			RefreshUserAccounts();
-			RefreshLoanCalculations();
-			RefreshConfiguration();
+			_appSettings = appSettings;
+			var databaseAvailable = _appSettings.GetValue<bool>("Database:Available");
+			if (databaseAvailable)
+			{
+				_dbcontext = dbcontext;
+				RefreshUserAccounts();
+				RefreshLoanCalculations();
+				RefreshConfiguration();
+			}
 		}
 
 		public void RefreshUserAccounts()
