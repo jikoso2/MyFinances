@@ -10,41 +10,41 @@ namespace MyFinances.Models
 	{
 		[Required]
 		[Range(1, 100000, ErrorMessage = "Liczba zakupionych obligacji musi być całkowita i dodatnia")]
-		public int Amount { get; set; } = DefaultValue.Amount;
+		public int Amount { get; set; } = DefaultValue.Debenture.Amount;
 
 		[Required]
 		public DebentureType Type { get; set; }
 
 		[Range(0.001, 30, ErrorMessage = "Wysokość oprocentowania nie może być mniejsza od zera lub większa od 30")]
-		public double OTSPercentage { get; set; } = DefaultValue.OTSPercentage;
+		public double OTSPercentage { get; set; } = DefaultValue.Debenture.OTSPercentage;
 
 		[Range(0.001, 30, ErrorMessage = "Wysokość oprocentowania nie może być mniejsza od zera lub większa od 30")]
-		public double DOSPercentage { get; set; } = DefaultValue.DOSPercentage;
+		public double DOSPercentage { get; set; } = DefaultValue.Debenture.DOSPercentage;
 
 		[Required]
 		public bool BelkaTax { get; set; } = true;
 
 		[DebentureModelValidation.TOZPercentage]
-		public List<double> TOZPercentage { get; set; } = DefaultValue.TOZPercentage;
+		public List<double> TOZPercentage { get; set; } = DefaultValue.Debenture.TOZPercentage;
 
 		[DebentureModelValidation.EDOPercentage]
-		public List<double> EDOPercentage { get; set; } = DefaultValue.EDOPercentage;
+		public List<double> EDOPercentage { get; set; } = DefaultValue.Debenture.EDOPercentage;
 
 		[Range(0, 2.5, ErrorMessage = "Dodatkowe oprocentowanie nie może być mniejsze od zera lub większe od 2.5")]
-		public double EDOAdditionalPercentage { get; set; } = DefaultValue.EDOAdditionalPercentage;
+		public double EDOAdditionalPercentage { get; set; } = DefaultValue.Debenture.EDOAdditionalPercentage;
 
 		[DebentureModelValidation.COIPercentage]
-		public List<double> COIPercentage { get; set; } = DefaultValue.COIPercentage;
+		public List<double> COIPercentage { get; set; } = DefaultValue.Debenture.COIPercentage;
 
-		double rORPercentage = DefaultValue.RORPercentage;
+		double rORPercentage = DefaultValue.Debenture.RORPercentage;
 		[Range(0, 15)]
 		public double RORPercentage { get => rORPercentage; set => rORPercentage = value > 15.0 ? 15.0 : value; }
 
-		double dORPercentage = DefaultValue.DORPercentage;
+		double dORPercentage = DefaultValue.Debenture.DORPercentage;
 		[Range(0, 15)]
 		public double DORPercentage { get => dORPercentage; set => dORPercentage = value > 15.0 ? 15.0 : value; }
 
-		double tOSPercentage = DefaultValue.TOSPercentage;
+		double tOSPercentage = DefaultValue.Debenture.TOSPercentage;
 		[Range(0, 15)]
 		public double TOSPercentage { get => tOSPercentage; set => tOSPercentage = value > 15.0 ? 15.0 : value; }
 	}

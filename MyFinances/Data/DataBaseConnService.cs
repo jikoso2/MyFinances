@@ -250,40 +250,40 @@ namespace MyFinances.Data
 
 		public void LoadConfiguration()
 		{
-			if (_configuration.FirstOrDefault(a => a.name.Equals("Amount")) != null)
+			if (_configuration.FirstOrDefault(a => a.name.Equals("Debenture.Amount")) != null)
 			{
-				if (int.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Amount")).value, out int val))
-					Helpers.DefaultValue.Amount = val;
+				if (int.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Debenture.Amount")).value, out int val))
+					Helpers.DefaultValue.Debenture.Amount = val;
 			}
 			if (_configuration.FirstOrDefault(a => a.name.Equals("OTSPercentage")) != null)
 			{
 				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("OTSPercentage")).value, out double val))
-					Helpers.DefaultValue.OTSPercentage = val;
+					Helpers.DefaultValue.Debenture.OTSPercentage = val;
 			}
 			if (_configuration.FirstOrDefault(a => a.name.Equals("DOSPercentage")) != null)
 			{
 				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("DOSPercentage")).value, out double val))
-					Helpers.DefaultValue.DOSPercentage = val;
+					Helpers.DefaultValue.Debenture.DOSPercentage = val;
 			}
 			if (_configuration.FirstOrDefault(a => a.name.Equals("TOSPercentage")) != null)
 			{
 				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("TOSPercentage")).value, out double val))
-					Helpers.DefaultValue.TOSPercentage = val;
+					Helpers.DefaultValue.Debenture.TOSPercentage = val;
 			}
 			if (_configuration.FirstOrDefault(a => a.name.Equals("RORPercentage")) != null)
 			{
 				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("RORPercentage")).value, out double val))
-					Helpers.DefaultValue.RORPercentage = val;
+					Helpers.DefaultValue.Debenture.RORPercentage = val;
 			}
 			if (_configuration.FirstOrDefault(a => a.name.Equals("DORPercentage")) != null)
 			{
 				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("DORPercentage")).value, out double val))
-					Helpers.DefaultValue.DORPercentage = val;
+					Helpers.DefaultValue.Debenture.DORPercentage = val;
 			}
 			if (_configuration.FirstOrDefault(a => a.name.Equals("EDOAdditionalPercentage")) != null)
 			{
 				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("EDOAdditionalPercentage")).value, out double val))
-					Helpers.DefaultValue.EDOAdditionalPercentage = val;
+					Helpers.DefaultValue.Debenture.EDOAdditionalPercentage = val;
 			}
 			if (_configuration.FirstOrDefault(a => a.name.Equals("TOZPercentage")) != null)
 			{
@@ -296,7 +296,7 @@ namespace MyFinances.Data
 				}
 
 				if (TOZPercentage.Count == 6)
-					Helpers.DefaultValue.TOZPercentage = val.Split(',').Select(a => double.Parse(a)).ToList();
+					Helpers.DefaultValue.Debenture.TOZPercentage = val.Split(',').Select(a => double.Parse(a)).ToList();
 			}
 			if (_configuration.FirstOrDefault(a => a.name.Equals("EDOPercentage")) != null)
 			{
@@ -309,7 +309,7 @@ namespace MyFinances.Data
 				}
 
 				if (EDOPercentage.Count == 10)
-					Helpers.DefaultValue.EDOPercentage = val.Split(',').Select(a => double.Parse(a)).ToList();
+					Helpers.DefaultValue.Debenture.EDOPercentage = val.Split(',').Select(a => double.Parse(a)).ToList();
 			}
 			if (_configuration.FirstOrDefault(a => a.name.Equals("COIPercentage")) != null)
 			{
@@ -322,7 +322,22 @@ namespace MyFinances.Data
 				}
 
 				if (COIPercentage.Count == 4)
-					Helpers.DefaultValue.COIPercentage = val.Split(',').Select(a => double.Parse(a)).ToList();
+					Helpers.DefaultValue.Debenture.COIPercentage = val.Split(',').Select(a => double.Parse(a)).ToList();
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("Loan.Amount")) != null)
+			{
+				if (long.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Loan.Amount")).value, out long val))
+					Helpers.DefaultValue.Loan.Amount = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("Loan.Percentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Loan.Percentage")).value, out double val))
+					Helpers.DefaultValue.Loan.Percentage = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("Loan.Duration")) != null)
+			{
+				if (int.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Loan.Duration")).value, out int val))
+					Helpers.DefaultValue.Loan.Duration = val;
 			}
 		}
 

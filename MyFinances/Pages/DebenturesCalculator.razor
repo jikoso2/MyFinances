@@ -157,12 +157,10 @@
                     <tbody>
                         @foreach (var column in debentureResult.DebentureData.DebentureColumns)
                         {
-                        <td>
-                                @foreach (var row in column.Rows)
+                        <td> @foreach (var row in column.Rows)
                                 {
                             <tr>@row</tr>
-                                }
-                        </td>
+                                } </td>
                         }
                     </tbody>
                 </table>
@@ -200,13 +198,13 @@
 
     private void SwitchDebentureTypeAction()
     {
-        model.DOSPercentage = model.Type != DebentureType.DOS ? DefaultValue.DOSPercentage : model.DOSPercentage;
-        model.OTSPercentage = model.Type != DebentureType.OTS ? DefaultValue.OTSPercentage : model.OTSPercentage;
-        model.TOZPercentage = model.Type != DebentureType.TOZ ? DefaultValue.TOZPercentage : model.TOZPercentage;
-        model.RORPercentage = model.Type != DebentureType.ROR ? DefaultValue.RORPercentage : model.RORPercentage;
-        model.COIPercentage = model.Type != DebentureType.COI ? DefaultValue.COIPercentage : model.COIPercentage;
-        model.EDOPercentage = model.Type != DebentureType.EDO ? DefaultValue.EDOPercentage : model.EDOPercentage;
-        model.DORPercentage = model.Type != DebentureType.DOR ? DefaultValue.DORPercentage : model.DORPercentage;
+        model.DOSPercentage = model.Type != DebentureType.DOS ? DefaultValue.Debenture.DOSPercentage : model.DOSPercentage;
+        model.OTSPercentage = model.Type != DebentureType.OTS ? DefaultValue.Debenture.OTSPercentage : model.OTSPercentage;
+        model.TOZPercentage = model.Type != DebentureType.TOZ ? DefaultValue.Debenture.TOZPercentage : model.TOZPercentage;
+        model.RORPercentage = model.Type != DebentureType.ROR ? DefaultValue.Debenture.RORPercentage : model.RORPercentage;
+        model.COIPercentage = model.Type != DebentureType.COI ? DefaultValue.Debenture.COIPercentage : model.COIPercentage;
+        model.EDOPercentage = model.Type != DebentureType.EDO ? DefaultValue.Debenture.EDOPercentage : model.EDOPercentage;
+        model.DORPercentage = model.Type != DebentureType.DOR ? DefaultValue.Debenture.DORPercentage : model.DORPercentage;
 
         if (debentureResult != null)
         {

@@ -98,12 +98,10 @@
                 <tbody>
                     @foreach (var column in calculatedDeposit.DepositData.DepositColumn)
                     {
-                    <td>
-                            @foreach (var row in column.Rows)
+                    <td> @foreach (var row in column.Rows)
                             {
                         <tr>@row</tr>
-                            }
-                    </td>
+                            } </td>
                     }
                 </tbody>
 

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using MyFinances.Data;
+using MyFinances.Helpers;
 
 namespace MyFinances.Models
 {
@@ -11,16 +12,16 @@ namespace MyFinances.Models
 	{
 		[Required]
 		[Range(1, 10000000, ErrorMessage = "Wysokość kredytu nie może być mniejsza od złotówki lub większa od 10 milionów złotych")]
-		public long Amount { get; set; } = 400000;
+		public long Amount { get; set; } = DefaultValue.Loan.Amount;
 
 		[Required]
 		[Range(0.01, 30, ErrorMessage = "Wysokość oprocentowania nie może być ujemna, mniejsza od 0,01 % lub większa od 30 %")]
-		public double Percentage { get; set; } = 7.5;
+		public double Percentage { get; set; } = DefaultValue.Loan.Percentage;
 
 		[Required]
 		[Range(12, 420, ErrorMessage = "Długość kredytu musi zawierać się w przedziale od 12 do 420 miesięcy")]
 		[LoanModelValidation.Duration]
-		public int Duration { get; set; } = 360;
+		public int Duration { get; set; } = DefaultValue.Loan.Duration;
 
 		public List<ExcessPayment> ExcessPayments { get; set; } = new List<ExcessPayment>();
 
