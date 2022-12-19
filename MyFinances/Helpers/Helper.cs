@@ -60,5 +60,13 @@ namespace MyFinances.Helpers
 			public static double Percentage = 9;
 			public static int Duration = 360;
 		}
+
+		public class Deposit
+		{
+			public static long Amount = 30000;
+			public static double Percentage = 8;
+			public static int Duration = 3;
+			public static int Period = 3;
+		}
 	}
 }

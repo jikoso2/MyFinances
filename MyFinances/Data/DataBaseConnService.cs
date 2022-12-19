@@ -324,6 +324,7 @@ namespace MyFinances.Data
 				if (COIPercentage.Count == 4)
 					Helpers.DefaultValue.Debenture.COIPercentage = val.Split(',').Select(a => double.Parse(a)).ToList();
 			}
+
 			if (_configuration.FirstOrDefault(a => a.name.Equals("Loan.Amount")) != null)
 			{
 				if (long.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Loan.Amount")).value, out long val))
@@ -338,6 +339,27 @@ namespace MyFinances.Data
 			{
 				if (int.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Loan.Duration")).value, out int val))
 					Helpers.DefaultValue.Loan.Duration = val;
+			}
+
+			if (_configuration.FirstOrDefault(a => a.name.Equals("Deposit.Amount")) != null)
+			{
+				if (long.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Deposit.Amount")).value, out long val))
+					Helpers.DefaultValue.Deposit.Amount = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("Deposit.Percentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Deposit.Percentage")).value, out double val))
+					Helpers.DefaultValue.Deposit.Percentage = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("Deposit.Duration")) != null)
+			{
+				if (int.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Deposit.Duration")).value, out int val))
+					Helpers.DefaultValue.Deposit.Duration = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("Deposit.Period")) != null)
+			{
+				if (int.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Deposit.Period")).value, out int val))
+					Helpers.DefaultValue.Deposit.Period = val;
 			}
 		}
 
