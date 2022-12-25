@@ -62,12 +62,15 @@ namespace MyFinances.Data
 
 			var firstProfitPerDebenture = Math.Round(oneDebentureVal * DebentureModel.DOSPercentage / 100, 2);
 			var firstTaxPerDebenture = (Math.Floor(firstProfitPerDebenture * 19) + 1) / 100;
+
 			tax[0] = DebentureModel.BelkaTax ? firstTaxPerDebenture * DebentureModel.Amount : 0;
 			interestProfit[0] = firstProfitPerDebenture * DebentureModel.Amount;
 			totalProfit[1] = (firstProfitPerDebenture - 0.7) * DebentureModel.Amount - tax[0];
 			totalValue[1] += firstProfitPerDebenture * DebentureModel.Amount;
+
 			var secondProfitPerDebenture = Math.Round((oneDebentureVal + firstProfitPerDebenture) * DebentureModel.DOSPercentage / 100, 2);
 			var secondTaxPerDebenture = (Math.Floor(secondProfitPerDebenture * 19) + 1) / 100;
+
 			tax[1] = DebentureModel.BelkaTax ? secondTaxPerDebenture * DebentureModel.Amount : 0;
 			totalValue[2] = totalValue[1] + secondProfitPerDebenture * DebentureModel.Amount;
 			interestProfit[1] = secondProfitPerDebenture * DebentureModel.Amount;
@@ -110,7 +113,7 @@ namespace MyFinances.Data
 
 			for (int i = 0; i < 7; i++)
 			{
-				double profit = i <= 6 ? Math.Round(totalValue[i] * interestRate[i] / 2, 2) : 0;
+				double profit = i <= 6 ? Math.Round(totalValue[i]/DebentureModel.Amount * interestRate[i] / 2, 2) * DebentureModel.Amount : 0;
 
 				interestProfit[i] = profit;
 
@@ -121,9 +124,10 @@ namespace MyFinances.Data
 
 				if (DebentureModel.BelkaTax)
 				{
-					calculatedTax = (Math.Ceiling(Math.Max(totalProfit[i] - 0.70, 0) * 19)) / 100;
+					var sumPerDebenture = interestProfit.ToList().Select(a => Math.Floor(a / DebentureModel.Amount * 19) / 100).Sum();
+					calculatedTax = Math.Max((sumPerDebenture - 0.70) * DebentureModel.Amount, 0);
 					if (i == 6)
-						calculatedTax = Math.Ceiling(totalProfit[i] * 19) / 100;
+						calculatedTax = sumPerDebenture * DebentureModel.Amount;
 
 				}
 				totalProfitRes[i] = totalProfit[i] - calculatedTax;
