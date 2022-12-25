@@ -58,19 +58,21 @@ namespace MyFinances.Data
 			var tax = new double[3];
 			var totalProfit = new double[3];
 
-			interestProfit[0] = 0;
-			interestProfit[1] = totalValue[1] * interestRate[1] / 100;
-			totalValue[2] += interestProfit[1];
-			interestProfit[2] = totalValue[2] * interestRate[1] / 100;
+			var oneDebentureVal = 100.0;
 
-			tax[0] = 0;
-			tax[1] = DebentureModel.BelkaTax ? (Math.Floor((interestProfit[1] - 0.7) * 19) + 1) / 100 < 0.01 ? 0 : (Math.Floor((interestProfit[1] - 0.7) * 19) + 1) / 100 : 0;
-			tax[2] = DebentureModel.BelkaTax ? (Math.Floor((interestProfit[1] + interestProfit[2]) * 19) + 1) / 100 < 0.01 ? 0 : (Math.Floor((interestProfit[1] + interestProfit[2]) * 19) + 1) / 100 : 0;
-
-			totalProfit[0] = 0;
-			totalProfit[1] = DebentureModel.BelkaTax ? interestProfit[1] - 0.7 - tax[1] : interestProfit[1] - 0.7;
-			totalProfit[2] = DebentureModel.BelkaTax ? interestProfit[2] - tax[2] + interestProfit[1] : interestProfit[2] + interestProfit[1];
-
+			var firstProfitPerDebenture = Math.Round(oneDebentureVal * DebentureModel.DOSPercentage / 100, 2);
+			var firstTaxPerDebenture = (Math.Floor(firstProfitPerDebenture * 19) + 1) / 100;
+			tax[0] = DebentureModel.BelkaTax ? firstTaxPerDebenture * DebentureModel.Amount : 0;
+			interestProfit[0] = firstProfitPerDebenture * DebentureModel.Amount;
+			totalProfit[1] = (firstProfitPerDebenture - 0.7) * DebentureModel.Amount - tax[0];
+			totalValue[1] += firstProfitPerDebenture * DebentureModel.Amount;
+			var secondProfitPerDebenture = Math.Round((oneDebentureVal + firstProfitPerDebenture) * DebentureModel.DOSPercentage / 100, 2);
+			var secondTaxPerDebenture = (Math.Floor(secondProfitPerDebenture * 19) + 1) / 100;
+			tax[1] = DebentureModel.BelkaTax ? secondTaxPerDebenture * DebentureModel.Amount : 0;
+			totalValue[2] = totalValue[1] + secondProfitPerDebenture * DebentureModel.Amount;
+			interestProfit[1] = secondProfitPerDebenture * DebentureModel.Amount;
+			totalProfit[2] = DebentureModel.BelkaTax ? Math.Floor((secondProfitPerDebenture + firstProfitPerDebenture) * 81) / 100 : secondProfitPerDebenture + firstProfitPerDebenture;
+			totalProfit[2] *= DebentureModel.Amount;
 
 			var interestRateRows = interestRate.Select(a => Helper.PercentFormat(a)).ToArray();
 			var yearRows = Enumerable.Range(0, 3).Select(a => a.ToString()).ToArray();
@@ -89,7 +91,7 @@ namespace MyFinances.Data
 				new DebentureColumn() { Rows = totalProfitRows }
 			};
 
-			debentureResult.DebentureInfo.Add(Tuple.Create("Całkowity Zysk", totalProfitRows[2]));
+			debentureResult.DebentureInfo.Add(Tuple.Create("Całkowity zysk", totalProfitRows[2]));
 		}
 
 		private void CalculateTOZ(Debenture debentureResult)

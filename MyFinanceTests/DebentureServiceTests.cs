@@ -9,10 +9,62 @@ namespace MyFinanceTests
 	public class DebentureServiceTests
 	{
 		[Fact]
+		public void CorrectRenderViews()
+		{
+			var ctx = new TestContext();
+			ctx.Services.AddSingleton(new DebentureService());
+			var cut = ctx.RenderComponent<DebenturesCalculator>();
+
+			foreach (DebentureType type in (DebentureType[])Enum.GetValues(typeof(DebentureType)))
+			{
+				var debentureTypeInput = cut.Find("select");
+				debentureTypeInput.Change(type);
+				var allButtons = cut.FindAll("button");
+
+				var infoButton = allButtons.Where(x => x.TextContent.Contains($"Informacje dotyczące obligacji {type}")).FirstOrDefault();
+				Assert.NotNull(infoButton);
+
+				var calculateButton = allButtons.Where(x => x.TextContent.Equals("Oblicz")).FirstOrDefault();
+				Assert.NotNull(calculateButton);
+
+				var inputs = cut.FindAll("input");
+				switch (type)
+				{
+					case DebentureType.OTS:
+						Assert.Equal(3, inputs.Count);
+						break;
+					case DebentureType.DOS:
+						Assert.Equal(3, inputs.Count);
+						break;
+					case DebentureType.TOZ:
+						Assert.Equal(8, inputs.Count);
+						break;
+					case DebentureType.COI:
+						Assert.Equal(6, inputs.Count);
+						break;
+					case DebentureType.EDO:
+						Assert.Equal(14, inputs.Count);
+						break;
+					case DebentureType.ROR:
+						Assert.Equal(4, inputs.Count);
+						break;
+					case DebentureType.DOR:
+						Assert.Equal(4, inputs.Count);
+						break;
+					case DebentureType.TOS:
+						Assert.Equal(4, inputs.Count);
+						break;
+					default:
+						break;
+				}
+			}
+		}
+
+		[Fact]
 		public void OTSServiceTest()
 		{
 			var service = new DebentureService();
-			var testModel = new DebentureModel();
+			var testModel = new DebentureModel() { Type = DebentureType.OTS };
 
 			var result = service.GetDebentureAsync(testModel).Result;
 
@@ -21,6 +73,7 @@ namespace MyFinanceTests
 			Assert.Equal(6, result.DebentureData.Head.Length);
 			Assert.Single(result.DebentureInfo);
 
+			testModel.Type = DebentureType.OTS;
 			testModel.OTSPercentage = 3;
 			testModel.Amount = 85;
 			testModel.BelkaTax = false;
@@ -89,54 +142,82 @@ namespace MyFinanceTests
 		}
 
 		[Fact]
-		public void CorrectRenderViews()
+		public void DOSServiceTest()
+		{
+			var service = new DebentureService();
+			var testModel = new DebentureModel() { Type = DebentureType.DOS };
+
+			var result = service.GetDebentureAsync(testModel).Result;
+
+			Assert.NotNull(result);
+			Assert.Equal(6, result.DebentureData.DebentureColumns.Length);
+			Assert.Equal(6, result.DebentureData.Head.Length);
+			Assert.Single(result.DebentureInfo);
+
+			testModel.DOSPercentage = 6;
+			testModel.Amount = 85;
+			testModel.BelkaTax = false;
+			result = service.GetDebentureAsync(testModel).Result;
+			var expected = new Tuple<string, string>("Całkowity zysk", "1 050.60 zł");
+			Assert.Equal(expected, result.DebentureInfo.First());
+
+			testModel.DOSPercentage = 6;
+			testModel.Amount = 85;
+			testModel.BelkaTax = true;
+			result = service.GetDebentureAsync(testModel).Result;
+			expected = new Tuple<string, string>("Całkowity zysk", "850.85 zł");
+			Assert.Equal(expected, result.DebentureInfo.First());
+
+			testModel.DOSPercentage = 4.5;
+			testModel.Amount = 33;
+			testModel.BelkaTax = false;
+			result = service.GetDebentureAsync(testModel).Result;
+			expected = new Tuple<string, string>("Całkowity zysk", "303.60 zł");
+			Assert.Equal(expected, result.DebentureInfo.First());
+
+			testModel.DOSPercentage = 4.5;
+			testModel.Amount = 33;
+			testModel.BelkaTax = true;
+			result = service.GetDebentureAsync(testModel).Result;
+			expected = new Tuple<string, string>("Całkowity zysk", "245.85 zł");
+			Assert.Equal(expected, result.DebentureInfo.First());
+		}
+
+		[Fact]
+		public void DOSServiceRenderTest()
 		{
 			var ctx = new TestContext();
 			ctx.Services.AddSingleton(new DebentureService());
 			var cut = ctx.RenderComponent<DebenturesCalculator>();
 
-			foreach (DebentureType type in (DebentureType[])Enum.GetValues(typeof(DebentureType)))
+			var debentureTypeInput = cut.Find("select");
+			debentureTypeInput.Change(DebentureType.DOS);
+			var allButtons = cut.FindAll("button");
+
+			var calculateButton = allButtons.Where(x => x.TextContent.Equals("Oblicz")).FirstOrDefault();
+			Assert.NotNull(calculateButton);
+			var inputs = cut.FindAll("input");
+
+			if (inputs.Any() && calculateButton != null)
 			{
-				var debentureTypeInput = cut.Find("select");
-				debentureTypeInput.Change(type);
-				var allButtons = cut.FindAll("button");
+				var amountInput = inputs[0];
+				var percentageInput = inputs[1];
 
-				var infoButton = allButtons.Where(x => x.TextContent.Contains($"Informacje dotyczące obligacji {type}")).FirstOrDefault();
-				Assert.NotNull(infoButton);
+				amountInput.Change(100);
+				percentageInput.Change(3.25);
+				calculateButton.Click();
 
-				var calculateButton = allButtons.Where(x => x.TextContent.Equals("Oblicz")).FirstOrDefault();
-				Assert.NotNull(calculateButton);
+				var output = cut.FindAll("th");
+				Assert.Equal("Rok", output[0].TextContent);
+				Assert.Equal("Całkowita wartość", output[1].TextContent);
+				Assert.Equal("Oprocentowanie", output[2].TextContent);
+				Assert.Equal("Odsetki", output[3].TextContent);
+				Assert.Equal("Podatek", output[4].TextContent);
+				Assert.Equal("Zysk netto", output[5].TextContent);
 
-				var inputs = cut.FindAll("input");
-				switch (type)
-				{
-					case DebentureType.OTS:
-						Assert.Equal(3, inputs.Count);
-						break;
-					case DebentureType.DOS:
-						Assert.Equal(3, inputs.Count);
-						break;
-					case DebentureType.TOZ:
-						Assert.Equal(8, inputs.Count);
-						break;
-					case DebentureType.COI:
-						Assert.Equal(6, inputs.Count);
-						break;
-					case DebentureType.EDO:
-						Assert.Equal(14, inputs.Count);
-						break;
-					case DebentureType.ROR:
-						Assert.Equal(4, inputs.Count);
-						break;
-					case DebentureType.DOR:
-						Assert.Equal(4, inputs.Count);
-						break;
-					case DebentureType.TOS:
-						Assert.Equal(4, inputs.Count);
-						break;
-					default:
-						break;
-				}
+				Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "Całkowity zysk"));
+				Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "<div class=\"col - 5\">Całkowity zysk</div>"));
+
 			}
 		}
 	}

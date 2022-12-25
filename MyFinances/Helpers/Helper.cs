@@ -68,5 +68,23 @@ namespace MyFinances.Helpers
 			public static int Duration = 3;
 			public static int Period = 3;
 		}
+
+		public class PPKCalc
+		{
+			public static double EmployeePercentage = 2;
+			public static double EmployerPercentage = 1.5;
+			public static double DepositPercentage = 2;
+			public static long Amount = 5000;
+			public static int Duration = 12;
+		}
+
+		public class PPKPayout
+		{
+			public static double Amount = 2000;
+			public static double CountryAmount = 240;
+			public static double EmployeeAmount = 600;
+			public static double EmployerAmount = 450;
+			public static double Percentage = 1;
+		}
 	}
 }

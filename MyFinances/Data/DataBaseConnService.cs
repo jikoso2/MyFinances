@@ -361,6 +361,59 @@ namespace MyFinances.Data
 				if (int.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("Deposit.Period")).value, out int val))
 					Helpers.DefaultValue.Deposit.Period = val;
 			}
+
+			if (_configuration.FirstOrDefault(a => a.name.Equals("PPKCalc.EmployerPercentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("PPKCalc.EmployerPercentage")).value, out double val))
+					Helpers.DefaultValue.PPKCalc.EmployeePercentage = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("PPKCalc.EmployerPercentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("PPKCalc.EmployerPercentage")).value, out double val))
+					Helpers.DefaultValue.PPKCalc.EmployerPercentage = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("PPKCalc.DepositPercentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("PPKCalc.DepositPercentage")).value, out double val))
+					Helpers.DefaultValue.PPKCalc.DepositPercentage = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("PPKCalc.Amount")) != null)
+			{
+				if (long.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("PPKCalc.Amount")).value, out long val))
+					Helpers.DefaultValue.PPKCalc.Amount = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("PPKCalc.Duration")) != null)
+			{
+				if (int.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("PPKCalc.Duration")).value, out int val))
+					Helpers.DefaultValue.PPKCalc.Duration = val;
+			}
+
+			if (_configuration.FirstOrDefault(a => a.name.Equals("PPKPayout.Amount")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("PPKPayout.Amount")).value, out double val))
+					Helpers.DefaultValue.PPKPayout.Amount = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("PPKPayout.CountryAmount")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("PPKPayout.CountryAmount")).value, out double val))
+					Helpers.DefaultValue.PPKPayout.CountryAmount = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("PPKPayout.EmployeeAmount")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("PPKPayout.EmployeeAmount")).value, out double val))
+					Helpers.DefaultValue.PPKPayout.EmployeeAmount = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("PPKPayout.EmployerAmount")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("PPKPayout.EmployerAmount")).value, out double val))
+					Helpers.DefaultValue.PPKPayout.EmployerAmount = val;
+			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("PPKPayout.Percentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("PPKPayout.Percentage")).value, out double val))
+					Helpers.DefaultValue.PPKPayout.Percentage = val;
+			}
+
 		}
 
 		public void InsertConfiguration(Configuration configuration)

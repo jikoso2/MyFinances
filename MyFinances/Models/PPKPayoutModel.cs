@@ -12,20 +12,20 @@ namespace MyFinances.Models
 	{
 		[Required]
 		[Range(0.0, 1000000, ErrorMessage = "Zgromadzony kapitał musi być dodatni")]
-		public double Amount { get; set; } = 2000;
+		public double Amount { get; set; } = Helpers.DefaultValue.PPKPayout.Amount;
 
 		[Range(0.0, 1000000, ErrorMessage = "Zgromadzony kapitał Państwa musi być dodatni")]
-		public double CountryAmount { get; set; } = 240;
+		public double CountryAmount { get; set; } = Helpers.DefaultValue.PPKPayout.CountryAmount;
 
 		[Range(0.0, 1000000, ErrorMessage = "Zgromadzony kapitał pracownika musi być dodatni")]
-		public double EmployeeAmount { get; set; } = 600;
+		public double EmployeeAmount { get; set; } = Helpers.DefaultValue.PPKPayout.EmployeeAmount;
 
 		[Range(0.0, 10000000, ErrorMessage = "Zgromadzony kapitał pracodawcy musi być dodatni")]
-		public double EmployerAmount { get; set; } = 450;
+		public double EmployerAmount { get; set; } = Helpers.DefaultValue.PPKPayout.EmployerAmount;
 
 		[Required]
 		[Range(-30, 30, ErrorMessage = "Procent od -30 do 30")]
-		public double Percentage { get; set; } = 1;
+		public double Percentage { get; set; } = Helpers.DefaultValue.PPKPayout.Percentage;
 
 		[Required]
 		public bool EarlyPayment { get; set; } = true;
