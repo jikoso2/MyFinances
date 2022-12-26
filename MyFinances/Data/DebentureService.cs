@@ -113,26 +113,35 @@ namespace MyFinances.Data
 
 			for (int i = 0; i < 7; i++)
 			{
-				double profit = i <= 6 ? Math.Round(totalValue[i]/DebentureModel.Amount * interestRate[i] / 2, 2) * DebentureModel.Amount : 0;
+				double profit = i <= 6 ? Math.Round(totalValue[i] / DebentureModel.Amount * interestRate[i] / 2, 2) * DebentureModel.Amount : 0;
 
 				interestProfit[i] = profit;
 
 				//interestSum[i + 1] = i > 0 ? interestSum[i - 1] + profit : profit;
 
 				if (i < 6)
+				{
 					totalProfit[i + 1] = i == 0 ? profit : totalProfit[i] + profit;
 
-				if (DebentureModel.BelkaTax)
-				{
-					var sumPerDebenture = interestProfit.ToList().Select(a => Math.Floor(a / DebentureModel.Amount * 19) / 100).Sum();
-					calculatedTax = Math.Max((sumPerDebenture - 0.70) * DebentureModel.Amount, 0);
-					if (i == 6)
-						calculatedTax = sumPerDebenture * DebentureModel.Amount;
+					if (DebentureModel.BelkaTax)
+					{
+						//var sumPerDebenture = interestProfit.ToList().Where(a => a > 0).Select(a => Math.Ceiling((a - 0.7) / DebentureModel.Amount * 19) / 100).Sum();
+						var sumPerDebenture = Math.Ceiling((totalProfit[i + 1] / DebentureModel.Amount - 0.7) * 19) / 100;
+						if (i == 5)
+							sumPerDebenture = Math.Ceiling((totalProfit[i + 1] / DebentureModel.Amount) * 19) / 100;
 
+						calculatedTax = Math.Max(sumPerDebenture * DebentureModel.Amount, 0);
+					}
 				}
-				totalProfitRes[i] = totalProfit[i] - calculatedTax;
-				if (i < 6)
-					totalProfitRes[i] = totalProfitRes[i] - 0.7 > 0 ? totalProfitRes[i] - 0.7 : 0;
+
+				if (i < 5)
+					totalProfitRes[i + 1] = Math.Max(totalProfit[i + 1] - (0.7 * DebentureModel.Amount), 0);
+				else if (i < 6)
+					totalProfitRes[i + 1] = totalProfit[i + 1];
+
+				if(i < 6)
+					totalProfitRes[i + 1] -= calculatedTax;
+
 			}
 
 			var interestRateRows = interestRate.Select(a => Helper.PercentFormat(a * 100)).ToArray();

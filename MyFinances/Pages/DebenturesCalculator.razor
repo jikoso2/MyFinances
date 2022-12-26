@@ -44,7 +44,12 @@
 
             <div class="form-group" style="margin: 15px">
                 <label>Ilość obligacji</label>
-                <div class="input-group"><input @bind="model.Amount" class="form-control"><div class="input-group-append"><span class="input-group-text">sztuk</span></div></div>
+                <div class="input-group"><input @bind="model.Amount" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">sztuk</span></div></div>
+            </div>
+
+            <div class="alert alert-secondary" role="alert" style="width:fit-content;margin: 15px">
+                <span class="mr-2" aria-hidden="true"></span>
+                <span id="AmountCalc" class="text-nowrap"> Kwota inwestycji: @(100*model.Amount) zł </span>
             </div>
 
             @switch (model.Type)
@@ -157,7 +162,8 @@
                     <tbody>
                         @foreach (var column in debentureResult.DebentureData.DebentureColumns)
                         {
-                        <td> @foreach (var row in column.Rows)
+                        <td>
+                                @foreach (var row in column.Rows)
                                 {
                             <tr>@row</tr>
                                 } </td>

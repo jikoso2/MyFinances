@@ -15,6 +15,8 @@ namespace MyFinanceTests
 			ctx.Services.AddSingleton(new DebentureService());
 			var cut = ctx.RenderComponent<DebenturesCalculator>();
 
+			Assert.Equal(" Kwota inwestycji: 100 zł ", cut.Find("[id=\"AmountCalc\"]").TextContent);
+
 			foreach (DebentureType type in (DebentureType[])Enum.GetValues(typeof(DebentureType)))
 			{
 				var debentureTypeInput = cut.Find("select");
@@ -124,7 +126,7 @@ namespace MyFinanceTests
 				var percentageInput = inputs[1];
 
 				amountInput.Change(100);
-				percentageInput.Change(3.25);
+				percentageInput.Input(3.25);
 				calculateButton.Click();
 
 				var output = cut.FindAll("th");
@@ -204,7 +206,7 @@ namespace MyFinanceTests
 				var percentageInput = inputs[1];
 
 				amountInput.Change(100);
-				percentageInput.Change(3.25);
+				percentageInput.Input(3.25);
 				calculateButton.Click();
 
 				var output = cut.FindAll("th");
@@ -239,7 +241,7 @@ namespace MyFinanceTests
 			testModel.BelkaTax = false;
 			var expected = new Tuple<string, string>("Całkowity zysk", "1 530.00 zł");
 			result = service.GetDebentureAsync(testModel).Result;
-			
+
 			Assert.Equal(expected, result.DebentureInfo.First());
 
 			testModel.TOZPercentage = new List<double>() { 6, 6, 6, 6, 6, 6 };
@@ -260,7 +262,7 @@ namespace MyFinanceTests
 			testModel.Amount = 33;
 			testModel.BelkaTax = true;
 			result = service.GetDebentureAsync(testModel).Result;
-			expected = new Tuple<string, string>("Całkowity zysk", "295.68 zł");
+			expected = new Tuple<string, string>("Całkowity zysk", "295.02 zł");
 			Assert.Equal(expected, result.DebentureInfo.First());
 		}
 
