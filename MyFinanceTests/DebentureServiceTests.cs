@@ -9,13 +9,13 @@ namespace MyFinanceTests
 	public class DebentureServiceTests
 	{
 		[Fact]
-		public void CorrectRenderViews()
+		public void RenderServiceTest()
 		{
 			var ctx = new TestContext();
 			ctx.Services.AddSingleton(new DebentureService());
 			var cut = ctx.RenderComponent<DebenturesCalculator>();
 
-			Assert.Equal(" Kwota inwestycji: 100 zł ", cut.Find("[id=\"AmountCalc\"]").TextContent);
+			Assert.Equal(" Kwota inwestycji: 100.00 zł", cut.Find("[id=\"AmountCalc\"]").TextContent);
 
 			foreach (DebentureType type in (DebentureType[])Enum.GetValues(typeof(DebentureType)))
 			{

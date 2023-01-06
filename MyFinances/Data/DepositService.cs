@@ -90,7 +90,7 @@ namespace MyFinances.Data
 		public Deposit(DepositModel depositModel)
 		{
 			this.DepositData = new DepositResult();
-			this.DepositData.Head = new string[3] { "Okres", depositModel.Capitalization ? "Kapitalizowane Odsetki" : "Wypłata", "Zysk przy wypłacie" };
+			this.DepositData.Head = new string[3] { "Okres", depositModel.Capitalization ? "Kapitalizowane odsetki" : "Wypłata", "Zysk przy wypłacie" };
 			this.DepositInfo = new List<Tuple<string, string>>();
 		}
 

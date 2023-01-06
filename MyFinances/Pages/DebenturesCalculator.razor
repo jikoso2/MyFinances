@@ -49,7 +49,7 @@
 
             <div class="alert alert-secondary" role="alert" style="width:fit-content;margin: 15px">
                 <span class="mr-2" aria-hidden="true"></span>
-                <span id="AmountCalc" class="text-nowrap"> Kwota inwestycji: @(100*model.Amount) zł </span>
+                <span id="AmountCalc" class="text-nowrap"> Kwota inwestycji: @(Helper.MoneyFormat(100*model.Amount)) </span>
             </div>
 
             @switch (model.Type)
