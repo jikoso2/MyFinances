@@ -39,10 +39,10 @@ namespace MyFinances.Data
 				switch (DepositModel.DurationType)
 				{
 					case TimeType.Dzień:
-						interestWithoutTax = Math.Round(capital * DepositModel.PercentageNumber * DepositModel.Period / 365, 2);
+						interestWithoutTax = Math.Round(capital * DepositModel.PercentageNumber * DepositModel.Period / 365.0, 2);
 						break;
 					case TimeType.Miesiąc:
-						interestWithoutTax = Math.Round(capital * DepositModel.PercentageNumber * DepositModel.Period / 12, 2);
+						interestWithoutTax = Math.Round(capital * DepositModel.PercentageNumber * DepositModel.Period / 12.0, 2);
 						break;
 					case TimeType.Rok:
 						interestWithoutTax = Math.Round(capital * DepositModel.PercentageNumber * DepositModel.Period, 2);
@@ -51,7 +51,7 @@ namespace MyFinances.Data
 
 				if (DepositModel.BelkaTax)
 				{
-					interest = Math.Floor(interestWithoutTax * 0.81 * 100) - 1;
+					interest = Math.Floor(interestWithoutTax * 0.81 * 100);
 					interest = Math.Round(interest < 0 ? 0 : interest / 100, 2);
 					interestRows[i] = Helper.MoneyFormat(interest);
 					interestSum += interest;
@@ -77,7 +77,7 @@ namespace MyFinances.Data
 			};
 
 			depositResult.DepositInfo.Add(Tuple.Create("Kwota na lokacie", Helper.MoneyFormat(DepositModel.Amount)));
-			depositResult.DepositInfo.Add(Tuple.Create("Ilość Okresów rozliczeniowych", periods.ToString()));
+			depositResult.DepositInfo.Add(Tuple.Create("Ilość okresów rozliczeniowych", periods.ToString()));
 			//depositResult.DepositInfo.Add(Tuple.Create("Całkowita wartość odsetek", ));
 
 
@@ -90,7 +90,7 @@ namespace MyFinances.Data
 		public Deposit(DepositModel depositModel)
 		{
 			this.DepositData = new DepositResult();
-			this.DepositData.Head = new string[3] { "Okres", depositModel.Capitalization ? "Kapitalizowane odsetki" : "Wypłata", "Zysk przy wypłacie" };
+			this.DepositData.Head = new string[3] { "Okres", depositModel.Capitalization ? "Kapitalizowane odsetki" : "Wypłacone odsetki", "Zysk przy wypłacie" };
 			this.DepositInfo = new List<Tuple<string, string>>();
 		}
 
