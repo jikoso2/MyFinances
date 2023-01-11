@@ -25,7 +25,7 @@ namespace MyFinances.Data
 
 			var employeePayment = Math.Round(PPKModel.Amount * PPKModel.EmployeePercentage / 100, 2);
 			var employerPayment = Math.Round(PPKModel.Amount * PPKModel.EmployerPercentage / 100, 2);
-			var employeePaymentWithTax = Math.Round(employerPayment * 1.17, 2);
+			var employeePaymentWithTax = Math.Round(employerPayment * 0.12 + employeePayment, 2);
 
 			var interestSum = 0.0;
 			var finalAmount = 0.0;
@@ -40,7 +40,7 @@ namespace MyFinances.Data
 			}
 
 
-			ppkResult.PPKInfo.Add(Tuple.Create("Miesięczny koszt pracownika", Helper.MoneyFormat(employeePaymentWithTax)));
+			ppkResult.PPKInfo.Add(Tuple.Create("Miesięczny koszt pracownika (+12% podatek dochodowy)", Helper.MoneyFormat(employeePaymentWithTax)));
 			ppkResult.PPKInfo.Add(Tuple.Create("Miesięczna wysokość wpłaty pracownika", Helper.MoneyFormat(employeePayment)));
 			ppkResult.PPKInfo.Add(Tuple.Create("Miesięczna wysokość wpłaty pracodawcy", Helper.MoneyFormat(employerPayment)));
 
@@ -60,7 +60,7 @@ namespace MyFinances.Data
 
 				ppkResult.PPKInfo.Add(Tuple.Create("Podatek od zgromadzonych odsetek", Helper.MoneyFormat(taxFromOdsetki)));
 				ppkResult.PPKInfo.Add(Tuple.Create("Część odprowadzona do ZUSu", Helper.MoneyFormat(amountToZUS)));
-				ppkResult.PPKInfo.Add(Tuple.Create("Kwota Wypłaty", Helper.MoneyFormat(amountEarlyPayment)));
+				ppkResult.PPKInfo.Add(Tuple.Create("Kwota wypłaty", Helper.MoneyFormat(amountEarlyPayment)));
 				ppkResult.PPKInfo.Add(Tuple.Create("Zysk netto przy wcześniejszej wypłacie", Helper.MoneyFormat(totalProfit)));
 			}
 

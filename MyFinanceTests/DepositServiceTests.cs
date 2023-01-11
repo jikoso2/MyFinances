@@ -68,10 +68,8 @@ namespace MyFinanceTests
 			Assert.Equal("Wypłacone odsetki", output[1].TextContent);
 			Assert.Equal("Zysk przy wypłacie", output[2].TextContent);
 
-			Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "Kwota na lokacie"));
-			Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "<div class=\"col - 5\">Kwota na lokacie</div>"));
-			Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "Ilość okresów rozliczeniowych"));
-			Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "<div class=\"col - 5\">Ilość okresów rozliczeniowych</div>"));
+			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Kwota na lokacie")).Any());
+			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Ilość okresów rozliczeniowych")).Any());
 		}
 
 		[Fact]
@@ -101,10 +99,8 @@ namespace MyFinanceTests
 			Assert.Equal("Kapitalizowane odsetki", output[1].TextContent);
 			Assert.Equal("Zysk przy wypłacie", output[2].TextContent);
 
-			Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "Kwota na lokacie"));
-			Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "<div class=\"col - 5\">Kwota na lokacie</div>"));
-			Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "Ilość okresów rozliczeniowych"));
-			Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "<div class=\"col - 5\">Ilość okresów rozliczeniowych</div>"));
+			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Kwota na lokacie")).Any());
+			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Ilość okresów rozliczeniowych")).Any());
 		}
 
 		[Fact]

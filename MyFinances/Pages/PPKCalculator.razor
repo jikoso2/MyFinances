@@ -24,7 +24,7 @@
 
     <div class="card-body">
 
-        <button class="btn btn-primary" style="margin:15px" @onclick="() => OpenInfoDialog()" data="@model"> Informacje dotyczące obliczania PPK </button>
+        <button class="btn btn-primary" style="margin:15px" @onclick="() => OpenInfoDialog()" data="@model">Informacje dotyczące obliczania PPK</button>
 
         <EditForm Model="model" OnValidSubmit="CalculatePPK">
 
@@ -38,17 +38,17 @@
 
             <div class="form-check-label" style="margin:15px">
                 <InputCheckbox @bind-Value="model.EarlyPayment" class="form-check-label" id="checkbox" />
-                <label class="form-check-label" id="checkbox-label"> Wypłata przed 60 rokiem życia </label>
+                <label class="form-check-label" id="checkbox-label">Wypłata przed 60 rokiem życia</label>
             </div>
 
             <div class="form-group" style="margin: 15px">
-                <label>Długość oszczędzenia</label>
+                <label>Długość oszczędzania</label>
                 <div class="input-group"><input @bind="model.Duration" class="form-control"><div class="input-group-append"><span class="input-group-text">mies.</span></div></div>
             </div>
 
 
             <section class="w-100 p-4 pb-4">
-                <label for="percentageRange" class="form-label">Procent wypłaty wpłacany przez przacownika</label>
+                <label for="percentageRange" class="form-label">Procent wypłaty wpłacany przez pracownika</label>
                 <div class="range">
                     <input type="range" class="form-range" min="0.5" max="4" step="0.5" id="percentageRange" @onchange="CalculatePPK" @bind="model.EmployeePercentage" @bind:event="oninput" />
                 </div>
@@ -77,7 +77,7 @@
                 </div>
             </section>
 
-            <button type="submit" class="btn btn-primary btn-center"> Oblicz </button>
+            <button type="submit" class="btn btn-primary btn-center">Oblicz</button>
 
         </EditForm>
     </div>

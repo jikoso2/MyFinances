@@ -137,9 +137,7 @@ namespace MyFinanceTests
 				Assert.Equal("Podatek", output[4].TextContent);
 				Assert.Equal("Zysk netto", output[5].TextContent);
 
-				Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "Całkowity zysk"));
-				Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "<div class=\"col - 5\">Całkowity zysk</div>"));
-
+				Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Całkowity zysk")).Any());
 			}
 		}
 
@@ -217,9 +215,7 @@ namespace MyFinanceTests
 				Assert.Equal("Podatek", output[4].TextContent);
 				Assert.Equal("Zysk netto", output[5].TextContent);
 
-				Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "Całkowity zysk"));
-				Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "<div class=\"col - 5\">Całkowity zysk</div>"));
-
+				Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Całkowity zysk")).Any());
 			}
 		}
 
@@ -303,9 +299,7 @@ namespace MyFinanceTests
 				Assert.Equal("Suma odsetek", output[4].TextContent);
 				Assert.Equal("Zysk netto", output[5].TextContent);
 
-				Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "Całkowity zysk"));
-				Assert.NotNull(cut.FindAll("div").Select(a => a.TextContent == "<div class=\"col - 5\">Całkowity zysk</div>"));
-
+				Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Całkowity zysk")).Any());
 			}
 		}
 	}
