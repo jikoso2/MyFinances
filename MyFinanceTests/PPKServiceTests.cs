@@ -57,7 +57,8 @@ namespace MyFinanceTests
 			inputs[1].Change(true);
 			allButtons[1].Click();
 
-			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Podatek od zgromadzonych odsetek")).Any());
+			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Zgromadzone odsetki z wpłat pracownika minus podatek")).Any());
+			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Zgromadzone odsetki z wpłat pracodawcy minus podatek")).Any());
 			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Część odprowadzona do ZUSu")).Any());
 			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Kwota wypłaty")).Any());
 			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Zysk netto przy wcześniejszej wypłacie")).Any());
@@ -90,6 +91,59 @@ namespace MyFinanceTests
 			Assert.Equal("15", result.PPKInfo[3].Item2);
 			Assert.Equal("Zgromadzony kapitał", result.PPKInfo[4].Item1);
 			Assert.Equal("15 935.08 zł", result.PPKInfo[4].Item2);
+			Assert.Equal("Wielkość odsetek w kapitale", result.PPKInfo[5].Item1);
+			Assert.Equal("185.08 zł", result.PPKInfo[5].Item2);
+			Assert.Equal("Zgromadzone odsetki z wpłat pracownika minus podatek", result.PPKInfo[6].Item1);
+			Assert.Equal("45.12 zł", result.PPKInfo[6].Item2);
+			Assert.Equal("Zgromadzone odsetki z wpłat pracodawcy minus podatek", result.PPKInfo[7].Item1);
+			Assert.Equal("85.45 zł", result.PPKInfo[7].Item2);
+			Assert.Equal("Część odprowadzona do ZUSu", result.PPKInfo[8].Item1);
+			Assert.Equal("2 025.00 zł", result.PPKInfo[8].Item2);
+			Assert.Equal("Kwota wypłaty", result.PPKInfo[9].Item1);
+			Assert.Equal("13 855.57 zł", result.PPKInfo[9].Item2);
+			Assert.Equal("Zysk netto przy wcześniejszej wypłacie", result.PPKInfo[10].Item1);
+			Assert.Equal("4 045.57 zł", result.PPKInfo[10].Item2);
+
+		}
+
+		[Fact]
+		public void ServiceTestScenario2()
+		{
+			var service = new PPKService();
+			var testModel = new PPKModel()
+			{
+				Amount = 8000,
+				EarlyPayment = true,
+				Duration = 2,
+				DepositPercentage = 2,
+				EmployeePercentage = 2,
+				EmployerPercentage = 1.5
+			};
+
+			var result = service.GetPPKCalculatedAsync(testModel).Result;
+
+			Assert.Equal("Miesięczny koszt pracownika (+12% podatek dochodowy)", result.PPKInfo[0].Item1);
+			Assert.Equal("174.40 zł", result.PPKInfo[0].Item2);
+			Assert.Equal("Miesięczna wysokość wpłaty pracownika", result.PPKInfo[1].Item1);
+			Assert.Equal("160.00 zł", result.PPKInfo[1].Item2);
+			Assert.Equal("Miesięczna wysokość wpłaty pracodawcy", result.PPKInfo[2].Item1);
+			Assert.Equal("120.00 zł", result.PPKInfo[2].Item2);
+			Assert.Equal("Ilość okresów", result.PPKInfo[3].Item1);
+			Assert.Equal("2", result.PPKInfo[3].Item2);
+			Assert.Equal("Zgromadzony kapitał", result.PPKInfo[4].Item1);
+			Assert.Equal("560.47 zł", result.PPKInfo[4].Item2);
+			Assert.Equal("Wielkość odsetek w kapitale", result.PPKInfo[5].Item1);
+			Assert.Equal("0.47 zł", result.PPKInfo[5].Item2);
+			Assert.Equal("Zgromadzone odsetki z wpłat pracownika minus podatek", result.PPKInfo[6].Item1);
+			Assert.Equal("0.11 zł", result.PPKInfo[6].Item2);
+			Assert.Equal("Zgromadzone odsetki z wpłat pracodawcy minus podatek", result.PPKInfo[7].Item1);
+			Assert.Equal("0.21 zł", result.PPKInfo[7].Item2);
+			Assert.Equal("Część odprowadzona do ZUSu", result.PPKInfo[8].Item1);
+			Assert.Equal("72.00 zł", result.PPKInfo[8].Item2);
+			Assert.Equal("Kwota wypłaty", result.PPKInfo[9].Item1);
+			Assert.Equal("488.32 zł", result.PPKInfo[9].Item2);
+			Assert.Equal("Zysk netto przy wcześniejszej wypłacie", result.PPKInfo[10].Item1);
+			Assert.Equal("139.52 zł", result.PPKInfo[10].Item2);
 
 		}
 	}
