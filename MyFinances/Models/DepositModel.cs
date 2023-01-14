@@ -11,7 +11,7 @@ namespace MyFinances.Models
 	{
 		[Required]
 		[Range(0.01, 100000000, ErrorMessage = "Kwota deponowana na lokacie musi być dodatnia i mniejsza od 100 milionów")]
-		public long Amount { get; set; } = DefaultValue.Deposit.Amount;
+		public double Amount { get; set; } = DefaultValue.Deposit.Amount;
 
 		[Required]
 		[Range(0.001, 30, ErrorMessage = "Wysokość oprocentowania nie może być mniejsza od zera lub większa od 30")]

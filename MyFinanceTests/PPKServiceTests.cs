@@ -84,6 +84,12 @@ namespace MyFinanceTests
 			Assert.Equal("654.00 zł", result.PPKInfo[0].Item2);
 			Assert.Equal("Miesięczna wysokość wpłaty pracownika", result.PPKInfo[1].Item1);
 			Assert.Equal("600.00 zł", result.PPKInfo[1].Item2);
+			Assert.Equal("Miesięczna wysokość wpłaty pracodawcy", result.PPKInfo[2].Item1);
+			Assert.Equal("450.00 zł", result.PPKInfo[2].Item2);
+			Assert.Equal("Ilość okresów", result.PPKInfo[3].Item1);
+			Assert.Equal("15", result.PPKInfo[3].Item2);
+			Assert.Equal("Zgromadzony kapitał", result.PPKInfo[4].Item1);
+			Assert.Equal("15 935.08 zł", result.PPKInfo[4].Item2);
 
 		}
 	}
