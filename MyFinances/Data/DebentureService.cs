@@ -139,7 +139,7 @@ namespace MyFinances.Data
 				else if (i < 6)
 					totalProfitRes[i + 1] = totalProfit[i + 1];
 
-				if(i < 6)
+				if (i < 6)
 					totalProfitRes[i + 1] -= calculatedTax;
 
 			}
@@ -331,19 +331,18 @@ namespace MyFinances.Data
 			var realPercentage = monthlyProfit >= 0.01 ? Math.Round(monthlyProfit * 12, 3) : 0;
 			int totalLength = DebentureModel.Type == DebentureType.DOR ? 24 : 12;
 
-			debentureResult.DebentureInfo.Add(Tuple.Create("Koszt obligacji", Helper.MoneyFormat(totalValue)));
 			debentureResult.DebentureInfo.Add(Tuple.Create("Miesięczny zysk", Helper.MoneyFormat(monthlyProfit * DebentureModel.Amount)));
 			debentureResult.DebentureInfo.Add(Tuple.Create($"Całkowity zysk ({totalLength} msc)", Helper.MoneyFormat(monthlyProfit * totalLength * DebentureModel.Amount)));
 
 			if (DebentureModel.BelkaTax)
 			{
 				debentureResult.DebentureInfo.Add(Tuple.Create("Miesięczny podatek", Helper.MoneyFormat(monthlyTaxPerDebenture * DebentureModel.Amount)));
-				debentureResult.DebentureInfo.Add(Tuple.Create("Całkowity podatek", Helper.MoneyFormat(monthlyTaxPerDebenture * 12 * DebentureModel.Amount)));
-				debentureResult.DebentureInfo.Add(Tuple.Create("Rzeczywiste oprocentowanie bez podatku", Helper.PercentFormat(realPercentage)));
+				debentureResult.DebentureInfo.Add(Tuple.Create($"Całkowity podatek ({totalLength} msc)", Helper.MoneyFormat(monthlyTaxPerDebenture * totalLength * DebentureModel.Amount)));
+				debentureResult.DebentureInfo.Add(Tuple.Create("Rzeczywiste oprocentowanie po odprowadzeniu podatku", Helper.PercentFormat(realPercentage)));
 			}
-			if (DebentureModel.Type == DebentureType.DOR)
+			else
 			{
-				debentureResult.DebentureInfo.Add(Tuple.Create("Obliczone oprocentowanie (DOR)", Helper.PercentFormat(percentage)));
+				debentureResult.DebentureInfo.Add(Tuple.Create("Rzeczywiste oprocentowanie", Helper.PercentFormat(realPercentage)));
 			}
 		}
 
@@ -354,9 +353,9 @@ namespace MyFinances.Data
 
 			var totalValue = new double[4];
 			Array.Fill(totalValue, DebentureModel.Amount * 100);
-			var interestRate = DebentureModel.TOSPercentage / 100;
 			var interestRates = new double[4];
 			Array.Fill(interestRates, DebentureModel.TOSPercentage / 100);
+
 			var interestProfit = new double[4];
 			var totalProfit = new double[4];
 			var totalProfitRes = new double[4];
@@ -366,7 +365,7 @@ namespace MyFinances.Data
 
 			for (int i = 0; i < 4; i++)
 			{
-				double profit = i <= 3 ? Math.Round(totalValue[i] * interestRate, 2) : 0;
+				double profit = i <= 3 ? Math.Round((totalValue[i] / DebentureModel.Amount) * interestRates[i], 2) * DebentureModel.Amount : 0;
 
 				if (i < 3)
 					interestProfit[i] = profit;
@@ -378,22 +377,21 @@ namespace MyFinances.Data
 
 				if (DebentureModel.BelkaTax)
 				{
-					calculatedTax = (Math.Ceiling(Math.Max(totalProfit[i] - 0.70, 0) * 19)) / 100;
+					calculatedTax = (Math.Ceiling(Math.Max(totalProfit[i] / DebentureModel.Amount - 0.70 , 0) * 19)) / 100 * DebentureModel.Amount;
 					if (i == 3)
-						calculatedTax = Math.Ceiling(totalProfit[i] * 19) / 100;
-
+						calculatedTax = Math.Ceiling(totalProfit[i] / DebentureModel.Amount * 19) / 100 * DebentureModel.Amount;
 				}
-				totalProfitRes[i] = totalProfit[i] - calculatedTax;
-				if (i < 3)
-					totalProfitRes[i] = totalProfitRes[i] - 0.7 > 0 ? totalProfitRes[i] - 0.7 : 0;
 
-				if (i > 0)
-					totalValue[i] = totalValue[i - 1] + profit;
+				totalProfitRes[i] = totalProfit[i] - calculatedTax;
+				totalProfitRes[i] = i != 3 && i != 0 ? totalProfitRes[i] - 0.70 * DebentureModel.Amount : totalProfitRes[i];
+
+				if (i < 3)
+					totalValue[i+1] = totalValue[i] + profit;
 			}
 
 			var yearRows = Enumerable.Range(0, 4).Select(a => (Math.Round((double)a, 1)).ToString()).ToArray();
 			var totalValueRows = totalValue.Select(a => Helper.MoneyFormat(a)).ToArray();
-			var totalRateRows = interestRates.Select(a => Helper.PercentFormat(a)).ToArray();
+			var totalRateRows = interestRates.Select(a => Helper.PercentFormat(a * 100)).ToArray();
 			var interestProfitRows = interestProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
 			var totalProfitRows = totalProfitRes.Select(a => Helper.MoneyFormat(a)).ToArray();
 			var interestSumRows = totalProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
@@ -408,7 +406,6 @@ namespace MyFinances.Data
 				new DebentureColumn() { Rows = totalProfitRows }
 			};
 
-			debentureResult.DebentureInfo.Add(Tuple.Create("Koszt obligacji", Helper.MoneyFormat(totalValue[0])));
 			debentureResult.DebentureInfo.Add(Tuple.Create("Całkowity zysk", totalProfitRows[3]));
 			debentureResult.DebentureInfo.Add(Tuple.Create("Wysokość rocznego procentu składanego (długosc: 3 lata, kapitalizacja: roczna)", Helper.PercentFormat(percentageCompound * 100)));
 		}

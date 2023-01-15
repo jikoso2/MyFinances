@@ -22,6 +22,7 @@ namespace MyFinances.Data
 		private PPK CalculatePPKResult()
 		{
 			var ppkResult = new PPK();
+			var magicRelation = Math.Round(PPKModel.EmployerPercentage / (PPKModel.EmployeePercentage + PPKModel.EmployerPercentage), 2);
 
 			var employeePayment = Math.Round(PPKModel.Amount * PPKModel.EmployeePercentage / 100, 2);
 			var employerPayment = Math.Round(PPKModel.Amount * PPKModel.EmployerPercentage / 100, 2);
@@ -30,13 +31,16 @@ namespace MyFinances.Data
 			var interestSum = 0.0;
 			var finalAmount = 0.0;
 			var employerAmount = 0.0;
+			var odsetki = 0.0;
+			var allPayments = 0.0;
 
 			for (int i = 1; i <= PPKModel.Duration; i++)
 			{
-				var odsetki = Math.Round(finalAmount / 12 * PPKModel.DepositPercentage / 100, 2);
+				odsetki = Math.Round(finalAmount / 12 * PPKModel.DepositPercentage / 100, 2);
 				interestSum += odsetki;
 				employerAmount += employeePayment;
 				finalAmount += Math.Round(odsetki + employeePayment + employerPayment, 2);
+				allPayments += employeePayment + employerPayment;
 			}
 
 
@@ -50,15 +54,28 @@ namespace MyFinances.Data
 
 			if (PPKModel.EarlyPayment)
 			{
-				var taxFromOdsetki = 0.0;
-				if (interestSum > 0)
-					taxFromOdsetki = Math.Round(interestSum * 0.19, 2);
+				var amountToZUS = 0.0;
+				var amountEarlyPayment = 0.0;
+				var totalProfit = 0.0;
+				if (PPKModel.DepositPercentage > 0)
+				{
+					var interestFromEmployer = Math.Round(interestSum * magicRelation * 0.7, 2);
+					var interestFromEmployee = Math.Round(interestSum * (1 - magicRelation), 2);
+					var interestFromEmployerWithoutTax = Math.Floor(interestFromEmployer * 0.81 * 100) / 100;
+					var interestFromEmployeeWithoutTax = Math.Floor(interestFromEmployee * 0.81 * 100) / 100;
+					amountToZUS = Math.Round(employerPayment * 0.3 * PPKModel.Duration, 2);
+					amountEarlyPayment = Math.Round(allPayments - amountToZUS + interestFromEmployerWithoutTax + interestFromEmployeeWithoutTax, 2);
+					totalProfit = amountEarlyPayment - (PPKModel.Duration * employeePaymentWithTax);
+					ppkResult.PPKInfo.Add(Tuple.Create("Zgromadzone odsetki z wpłat pracownika minus podatek", Helper.MoneyFormat(interestFromEmployerWithoutTax)));
+					ppkResult.PPKInfo.Add(Tuple.Create("Zgromadzone odsetki z wpłat pracodawcy minus podatek", Helper.MoneyFormat(interestFromEmployeeWithoutTax)));
+				}
+				else
+				{
+					amountToZUS = Math.Round(employerPayment * 0.3 * PPKModel.Duration, 2);
+					amountEarlyPayment = Math.Round(finalAmount - amountToZUS, 2);
+					totalProfit = amountEarlyPayment - (PPKModel.Duration * employeePaymentWithTax);
+				}
 
-				var amountToZUS = Math.Round(employerPayment * 0.3 * PPKModel.Duration, 2);
-				var amountEarlyPayment = Math.Round(finalAmount - amountToZUS - taxFromOdsetki, 2);
-				var totalProfit = amountEarlyPayment - (PPKModel.Duration * employeePaymentWithTax);
-
-				ppkResult.PPKInfo.Add(Tuple.Create("Podatek od zgromadzonych odsetek", Helper.MoneyFormat(taxFromOdsetki)));
 				ppkResult.PPKInfo.Add(Tuple.Create("Część odprowadzona do ZUSu", Helper.MoneyFormat(amountToZUS)));
 				ppkResult.PPKInfo.Add(Tuple.Create("Kwota wypłaty", Helper.MoneyFormat(amountEarlyPayment)));
 				ppkResult.PPKInfo.Add(Tuple.Create("Zysk netto przy wcześniejszej wypłacie", Helper.MoneyFormat(totalProfit)));
@@ -72,6 +89,7 @@ namespace MyFinances.Data
 			return HelperInformations.GetPPKInformation();
 		}
 	}
+
 	public class PPK
 	{
 		public PPK()
