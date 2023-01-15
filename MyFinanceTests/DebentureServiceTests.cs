@@ -302,5 +302,89 @@ namespace MyFinanceTests
 				Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Całkowity zysk")).Any());
 			}
 		}
+
+		[Fact]
+		public void RORServiceTest()
+		{
+			var service = new DebentureService();
+			var testModel = new DebentureModel() { Type = DebentureType.ROR };
+
+			var result = service.GetDebentureAsync(testModel).Result;
+			Assert.NotNull(result);
+
+			testModel.RORPercentage = 5.0;
+			testModel.Amount = 85;
+			testModel.BelkaTax = false;
+			result = service.GetDebentureAsync(testModel).Result;
+			Assert.Equal(3, result.DebentureInfo.Count);
+			Assert.Equal(new Tuple<string, string>("Miesięczny zysk", "35.70 zł"), result.DebentureInfo[0]);
+			Assert.Equal(new Tuple<string, string>("Całkowity zysk (12 msc)", "428.40 zł"), result.DebentureInfo[1]);
+			Assert.Equal(new Tuple<string, string>("Rzeczywiste oprocentowanie", "5.04 %"), result.DebentureInfo[2]);
+
+			testModel.RORPercentage = 5.0;
+			testModel.Amount = 85;
+			testModel.BelkaTax = true;
+			result = service.GetDebentureAsync(testModel).Result;
+			Assert.Equal(5, result.DebentureInfo.Count);
+			Assert.Equal(new Tuple<string, string>("Miesięczny zysk", "28.90 zł"), result.DebentureInfo[0]);
+			Assert.Equal(new Tuple<string, string>("Całkowity zysk (12 msc)", "346.80 zł"), result.DebentureInfo[1]);
+			Assert.Equal(new Tuple<string, string>("Miesięczny podatek", "6.80 zł"), result.DebentureInfo[2]);
+			Assert.Equal(new Tuple<string, string>("Całkowity podatek (12 msc)", "81.60 zł"), result.DebentureInfo[3]);
+			Assert.Equal(new Tuple<string, string>("Rzeczywiste oprocentowanie po odprowadzeniu podatku", "4.08 %"), result.DebentureInfo[4]);
+
+			testModel.RORPercentage = 6.70;
+			testModel.Amount = 33;
+			testModel.BelkaTax = false;
+			result = service.GetDebentureAsync(testModel).Result;
+			Assert.Equal(3, result.DebentureInfo.Count);
+			Assert.Equal(new Tuple<string, string>("Miesięczny zysk", "18.48 zł"), result.DebentureInfo[0]);
+			Assert.Equal(new Tuple<string, string>("Całkowity zysk (12 msc)", "221.76 zł"), result.DebentureInfo[1]);
+			Assert.Equal(new Tuple<string, string>("Rzeczywiste oprocentowanie", "6.72 %"), result.DebentureInfo[2]);
+
+			testModel.RORPercentage = 6.70;
+			testModel.Amount = 33;
+			testModel.BelkaTax = true;
+			result = service.GetDebentureAsync(testModel).Result;
+			Assert.Equal(5, result.DebentureInfo.Count);
+			Assert.Equal(new Tuple<string, string>("Miesięczny zysk", "14.85 zł"), result.DebentureInfo[0]);
+			Assert.Equal(new Tuple<string, string>("Całkowity zysk (12 msc)", "178.20 zł"), result.DebentureInfo[1]);
+			Assert.Equal(new Tuple<string, string>("Miesięczny podatek", "3.63 zł"), result.DebentureInfo[2]);
+			Assert.Equal(new Tuple<string, string>("Całkowity podatek (12 msc)", "43.56 zł"), result.DebentureInfo[3]);
+			Assert.Equal(new Tuple<string, string>("Rzeczywiste oprocentowanie po odprowadzeniu podatku", "5.4 %"), result.DebentureInfo[4]);
+		}
+
+		[Fact]
+		public void RORServiceRenderTest()
+		{
+			var ctx = new TestContext();
+			ctx.Services.AddSingleton(new DebentureService());
+			var cut = ctx.RenderComponent<DebenturesCalculator>();
+
+			var debentureTypeInput = cut.Find("select");
+			debentureTypeInput.Change(DebentureType.ROR);
+			var allButtons = cut.FindAll("button");
+
+			var calculateButton = allButtons.Where(x => x.TextContent.Equals("Oblicz")).FirstOrDefault();
+			Assert.NotNull(calculateButton);
+			var inputs = cut.FindAll("input");
+			Assert.Equal(4,inputs.Count);
+
+			if (inputs.Any() && calculateButton != null)
+			{
+				var belkaTaxInput = inputs[1];
+				var amountInput = inputs[2];
+				var percentageInput = inputs[3];
+
+				belkaTaxInput.Input(true);
+				amountInput.Change(100);
+				calculateButton.Click();
+
+				Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Miesięczny zysk")).Any());
+				Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Całkowity zysk (12 msc)")).Any());
+				Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Miesięczny podatek")).Any());
+				Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Całkowity podatek (12 msc)")).Any());
+				Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Rzeczywiste oprocentowanie po odprowadzeniu podatku")).Any());
+			}
+		}
 	}
 }

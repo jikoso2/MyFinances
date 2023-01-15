@@ -139,7 +139,7 @@ namespace MyFinances.Data
 				else if (i < 6)
 					totalProfitRes[i + 1] = totalProfit[i + 1];
 
-				if(i < 6)
+				if (i < 6)
 					totalProfitRes[i + 1] -= calculatedTax;
 
 			}
@@ -331,16 +331,20 @@ namespace MyFinances.Data
 			var realPercentage = monthlyProfit >= 0.01 ? Math.Round(monthlyProfit * 12, 3) : 0;
 			int totalLength = DebentureModel.Type == DebentureType.DOR ? 24 : 12;
 
-			debentureResult.DebentureInfo.Add(Tuple.Create("Koszt obligacji", Helper.MoneyFormat(totalValue)));
 			debentureResult.DebentureInfo.Add(Tuple.Create("Miesięczny zysk", Helper.MoneyFormat(monthlyProfit * DebentureModel.Amount)));
 			debentureResult.DebentureInfo.Add(Tuple.Create($"Całkowity zysk ({totalLength} msc)", Helper.MoneyFormat(monthlyProfit * totalLength * DebentureModel.Amount)));
 
 			if (DebentureModel.BelkaTax)
 			{
 				debentureResult.DebentureInfo.Add(Tuple.Create("Miesięczny podatek", Helper.MoneyFormat(monthlyTaxPerDebenture * DebentureModel.Amount)));
-				debentureResult.DebentureInfo.Add(Tuple.Create("Całkowity podatek", Helper.MoneyFormat(monthlyTaxPerDebenture * 12 * DebentureModel.Amount)));
-				debentureResult.DebentureInfo.Add(Tuple.Create("Rzeczywiste oprocentowanie bez podatku", Helper.PercentFormat(realPercentage)));
+				debentureResult.DebentureInfo.Add(Tuple.Create($"Całkowity podatek ({totalLength} msc)", Helper.MoneyFormat(monthlyTaxPerDebenture * 12 * DebentureModel.Amount)));
+				debentureResult.DebentureInfo.Add(Tuple.Create("Rzeczywiste oprocentowanie po odprowadzeniu podatku", Helper.PercentFormat(realPercentage)));
 			}
+			else
+			{
+				debentureResult.DebentureInfo.Add(Tuple.Create("Rzeczywiste oprocentowanie", Helper.PercentFormat(realPercentage)));
+			}
+
 			if (DebentureModel.Type == DebentureType.DOR)
 			{
 				debentureResult.DebentureInfo.Add(Tuple.Create("Obliczone oprocentowanie (DOR)", Helper.PercentFormat(percentage)));
