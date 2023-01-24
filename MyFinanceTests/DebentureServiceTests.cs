@@ -565,5 +565,103 @@ namespace MyFinanceTests
 			Assert.Equal("Suma odsetek", output[4].TextContent);
 			Assert.Equal("Zysk netto", output[5].TextContent);
 		}
+
+		[Fact]
+		public void COIServiceTest()
+		{
+			var service = new DebentureService();
+			var testModel = new DebentureModel() { Type = DebentureType.COI };
+
+			var result = service.GetDebentureAsync(testModel).Result;
+			Assert.NotNull(result);
+
+			testModel.COIPercentage = new List<double>() { 5.0, 3.0, 4.0, 1.0 };
+			testModel.Amount = 85;
+			testModel.BelkaTax = false;
+			result = service.GetDebentureAsync(testModel).Result;
+			Assert.Single(result.DebentureInfo);
+			Assert.Equal(new Tuple<string, string>("Całkowity zysk", "1 105.00 zł"), result.DebentureInfo[0]);
+			Assert.Equal(new[] { "0", "1", "2", "3", "4" }, result.DebentureData.DebentureColumns[0].Rows);
+			Assert.Equal(new[] { "8 500.00 zł", "8 500.00 zł", "8 500.00 zł", "8 500.00 zł", "8 500.00 zł" }, result.DebentureData.DebentureColumns[1].Rows);
+			Assert.Equal(new[] { "5 %", "3 %", "4 %", "1 %", "0 %" }, result.DebentureData.DebentureColumns[2].Rows);
+			Assert.Equal(new[] { "425.00 zł", "255.00 zł", "340.00 zł", "85.00 zł", "0.00 zł" }, result.DebentureData.DebentureColumns[3].Rows);
+			Assert.Equal(new[] { "0.00 zł", "425.00 zł", "680.00 zł", "1 020.00 zł", "1 105.00 zł" }, result.DebentureData.DebentureColumns[4].Rows);
+			Assert.Equal(new[] { "0.00 zł", "365.50 zł", "620.50 zł", "960.50 zł", "1 105.00 zł" }, result.DebentureData.DebentureColumns[5].Rows);
+
+			testModel.COIPercentage = new List<double>() { 5.0, 3.0, 4.0, 1.0 };
+			testModel.Amount = 85;
+			testModel.BelkaTax = true;
+			result = service.GetDebentureAsync(testModel).Result;
+			Assert.Single(result.DebentureInfo);
+			Assert.Equal(new Tuple<string, string>("Całkowity zysk", "895.05 zł"), result.DebentureInfo[0]);
+			Assert.Equal(new[] { "0", "1", "2", "3", "4" }, result.DebentureData.DebentureColumns[0].Rows);
+			Assert.Equal(new[] { "8 500.00 zł", "8 500.00 zł", "8 500.00 zł", "8 500.00 zł", "8 500.00 zł" }, result.DebentureData.DebentureColumns[1].Rows);
+			Assert.Equal(new[] { "5 %", "3 %", "4 %", "1 %", "0 %" }, result.DebentureData.DebentureColumns[2].Rows);
+			Assert.Equal(new[] { "425.00 zł", "255.00 zł", "340.00 zł", "85.00 zł", "0.00 zł" }, result.DebentureData.DebentureColumns[3].Rows);
+			Assert.Equal(new[] { "0.00 zł", "344.25 zł", "550.80 zł", "826.20 zł", "895.05 zł" }, result.DebentureData.DebentureColumns[4].Rows);
+			Assert.Equal(new[] { "0.00 zł", "284.75 zł", "491.30 zł", "766.70 zł", "895.05 zł" }, result.DebentureData.DebentureColumns[5].Rows);
+
+			testModel.COIPercentage = new List<double>() { 7.0, 11.3, 7.2, 3.1 };
+			testModel.Amount = 33;
+			testModel.BelkaTax = false;
+			result = service.GetDebentureAsync(testModel).Result;
+			Assert.Single(result.DebentureInfo);
+			Assert.Equal(new Tuple<string, string>("Całkowity zysk", "943.80 zł"), result.DebentureInfo[0]);
+			Assert.Equal(new[] { "0", "1", "2", "3", "4" }, result.DebentureData.DebentureColumns[0].Rows);
+			Assert.Equal(new[] { "3 300.00 zł", "3 300.00 zł", "3 300.00 zł", "3 300.00 zł", "3 300.00 zł" }, result.DebentureData.DebentureColumns[1].Rows);
+			Assert.Equal(new[] { "7 %", "11.3 %", "7.2 %", "3.1 %", "0 %" }, result.DebentureData.DebentureColumns[2].Rows);
+			Assert.Equal(new[] { "231.00 zł", "372.90 zł", "237.60 zł", "102.30 zł", "0.00 zł" }, result.DebentureData.DebentureColumns[3].Rows);
+			Assert.Equal(new[] { "0.00 zł", "231.00 zł", "603.90 zł", "841.50 zł", "943.80 zł" }, result.DebentureData.DebentureColumns[4].Rows);
+			Assert.Equal(new[] { "0.00 zł", "207.90 zł", "580.80 zł", "818.40 zł", "943.80 zł" }, result.DebentureData.DebentureColumns[5].Rows);
+
+			testModel.COIPercentage = new List<double>() { 7.0, 11.3, 7.2, 3.1 };
+			testModel.Amount = 33;
+			testModel.BelkaTax = true;
+			result = service.GetDebentureAsync(testModel).Result;
+			Assert.Single(result.DebentureInfo);
+			Assert.Equal(new Tuple<string, string>("Całkowity zysk", "764.28 zł"), result.DebentureInfo[0]);
+			Assert.Equal(new[] { "0", "1", "2", "3", "4" }, result.DebentureData.DebentureColumns[0].Rows);
+			Assert.Equal(new[] { "3 300.00 zł", "3 300.00 zł", "3 300.00 zł", "3 300.00 zł", "3 300.00 zł" }, result.DebentureData.DebentureColumns[1].Rows);
+			Assert.Equal(new[] { "7 %", "11.3 %", "7.2 %", "3.1 %", "0 %" }, result.DebentureData.DebentureColumns[2].Rows);
+			Assert.Equal(new[] { "231.00 zł", "372.90 zł", "237.60 zł", "102.30 zł", "0.00 zł" }, result.DebentureData.DebentureColumns[3].Rows);
+			Assert.Equal(new[] { "0.00 zł", "187.11 zł", "489.06 zł", "681.45 zł", "764.28 zł" }, result.DebentureData.DebentureColumns[4].Rows);
+			Assert.Equal(new[] { "0.00 zł", "164.01 zł", "465.96 zł", "658.35 zł", "764.28 zł" }, result.DebentureData.DebentureColumns[5].Rows);
+		}
+
+		[Fact]
+		public void COIServiceRenderTest()
+		{
+			var ctx = new TestContext();
+			ctx.Services.AddSingleton(new DebentureService());
+			var cut = ctx.RenderComponent<DebenturesCalculator>();
+
+			var debentureTypeInput = cut.Find("select");
+			debentureTypeInput.Change(DebentureType.TOS);
+			var allButtons = cut.FindAll("button");
+
+			var calculateButton = allButtons.Where(x => x.TextContent.Equals("Oblicz")).FirstOrDefault();
+			Assert.NotNull(calculateButton);
+			var inputs = cut.FindAll("input");
+			Assert.Equal(4, inputs.Count);
+
+			var belkaTaxInput = inputs[1];
+			var amountInput = inputs[2];
+			var percentageInput = inputs[3];
+
+			belkaTaxInput.Input(true);
+			amountInput.Change(100);
+			calculateButton.Click();
+
+			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Całkowity zysk")).Any());
+			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Wysokość rocznego procentu składanego (długosc: 3 lata, kapitalizacja: roczna)")).Any());
+
+			var output = cut.FindAll("th");
+			Assert.Equal("Rok", output[0].TextContent);
+			Assert.Equal("Całkowita wartość", output[1].TextContent);
+			Assert.Equal("Oprocentowanie", output[2].TextContent);
+			Assert.Equal("Odsetki", output[3].TextContent);
+			Assert.Equal("Suma odsetek", output[4].TextContent);
+			Assert.Equal("Zysk netto", output[5].TextContent);
+		}
 	}
 }
