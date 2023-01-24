@@ -177,34 +177,27 @@ namespace MyFinances.Data
 
 			double calculatedTax = 0;
 
-
 			for (int i = 0; i < 5; i++)
 			{
-				double profit = i <= 4 ? Math.Round(totalValue[i] * interestRate[i], 2) : 0;
+				double profitPerDebenture = i <= 4 ? Math.Round(totalValue[i] / DebentureModel.Amount * interestRate[i], 2) : 0;
 
-				interestProfit[i] = profit;
-
-				if (i < 4)
-					totalProfit[i + 1] = i == 0 ? profit : totalProfit[i] + profit;
+				interestProfit[i] = profitPerDebenture * DebentureModel.Amount;
 
 				if (DebentureModel.BelkaTax)
-				{
-					calculatedTax = (Math.Ceiling(Math.Max(totalProfit[i] - 0.70, 0) * 19)) / 100;
-					if (i == 4)
-						calculatedTax = Math.Ceiling(totalProfit[i] * 19) / 100;
-				}
+					calculatedTax = (Math.Ceiling(profitPerDebenture * 19) * DebentureModel.Amount) / 100;
 
-				totalProfitRes[i] = totalProfit[i] - calculatedTax;
 				if (i < 4)
-					totalProfitRes[i] = totalProfitRes[i] - 0.7 > 0 ? totalProfitRes[i] - 0.7 : 0;
+					totalProfit[i + 1] = profitPerDebenture * DebentureModel.Amount - calculatedTax + totalProfit[i];
+
+				totalProfitRes[i] = totalProfit[i] - 0.7 * DebentureModel.Amount > 0 && i < 4 ? totalProfit[i] - 0.7 * DebentureModel.Amount : totalProfit[i];
 			}
 
 			var interestRateRows = interestRate.Select(a => Helper.PercentFormat(a * 100)).ToArray();
 			var yearRows = Enumerable.Range(0, 5).Select(a => a.ToString()).ToArray();
 			var totalValueRows = totalValue.Select(a => Helper.MoneyFormat(a)).ToArray();
 			var interestProfitRows = interestProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
-			var totalProfitRows = totalProfitRes.Select(a => Helper.MoneyFormat(a)).ToArray();
 			var interestSumRows = totalProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var totalProfitRows = totalProfitRes.Select(a => Helper.MoneyFormat(a)).ToArray();
 
 			debentureResult.DebentureData.DebentureColumns = new DebentureColumn[6]
 			{
@@ -377,7 +370,7 @@ namespace MyFinances.Data
 
 				if (DebentureModel.BelkaTax)
 				{
-					calculatedTax = (Math.Ceiling(Math.Max(totalProfit[i] / DebentureModel.Amount - 0.70 , 0) * 19)) / 100 * DebentureModel.Amount;
+					calculatedTax = (Math.Ceiling(Math.Max(totalProfit[i] / DebentureModel.Amount - 0.70, 0) * 19)) / 100 * DebentureModel.Amount;
 					if (i == 3)
 						calculatedTax = Math.Ceiling(totalProfit[i] / DebentureModel.Amount * 19) / 100 * DebentureModel.Amount;
 				}
@@ -386,7 +379,7 @@ namespace MyFinances.Data
 				totalProfitRes[i] = i != 3 && i != 0 ? totalProfitRes[i] - 0.70 * DebentureModel.Amount : totalProfitRes[i];
 
 				if (i < 3)
-					totalValue[i+1] = totalValue[i] + profit;
+					totalValue[i + 1] = totalValue[i] + profit;
 			}
 
 			var yearRows = Enumerable.Range(0, 4).Select(a => (Math.Round((double)a, 1)).ToString()).ToArray();
@@ -415,6 +408,7 @@ namespace MyFinances.Data
 			return HelperInformations.GetInformation(type);
 		}
 	}
+
 	public class Debenture
 	{
 		public Debenture(DebentureModel debentureModel)
