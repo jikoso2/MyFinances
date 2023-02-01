@@ -30,11 +30,14 @@ namespace MyFinances.Models
 		[DebentureModelValidation.EDOPercentage]
 		public List<double> EDOPercentage { get; set; } = DefaultValue.Debenture.EDOPercentage;
 
-		[Range(0, 2.5, ErrorMessage = "Dodatkowe oprocentowanie nie może być mniejsze od zera lub większe od 2.5")]
+		[Range(0, 3, ErrorMessage = "Dodatkowe oprocentowanie nie może być mniejsze od zera lub większe od 3")]
 		public double EDOAdditionalPercentage { get; set; } = DefaultValue.Debenture.EDOAdditionalPercentage;
 
 		[DebentureModelValidation.COIPercentage]
 		public List<double> COIPercentage { get; set; } = DefaultValue.Debenture.COIPercentage;
+
+		[Range(0, 3, ErrorMessage = "Dodatkowe oprocentowanie nie może być mniejsze od zera lub większe od 3")]
+		public double COIAdditionalPercentage { get; set; } = DefaultValue.Debenture.COIAdditionalPercentage;
 
 		double rORPercentage = DefaultValue.Debenture.RORPercentage;
 		[Range(0, 15)]

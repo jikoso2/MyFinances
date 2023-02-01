@@ -285,6 +285,11 @@ namespace MyFinances.Data
 				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("EDOAdditionalPercentage")).value, out double val))
 					Helpers.DefaultValue.Debenture.EDOAdditionalPercentage = val;
 			}
+			if (_configuration.FirstOrDefault(a => a.name.Equals("COIAdditionalPercentage")) != null)
+			{
+				if (double.TryParse(_configuration.FirstOrDefault(a => a.name.Equals("COIAdditionalPercentage")).value, out double val))
+					Helpers.DefaultValue.Debenture.COIAdditionalPercentage = val;
+			}
 			if (_configuration.FirstOrDefault(a => a.name.Equals("TOZPercentage")) != null)
 			{
 				var val = _configuration.FirstOrDefault(a => a.name.Equals("TOZPercentage")).value;
