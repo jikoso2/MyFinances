@@ -42,7 +42,7 @@ namespace MyFinanceTests
 						Assert.Equal(8, inputs.Count);
 						break;
 					case DebentureType.COI:
-						Assert.Equal(6, inputs.Count);
+						Assert.Equal(8, inputs.Count);
 						break;
 					case DebentureType.EDO:
 						Assert.Equal(14, inputs.Count);
@@ -575,7 +575,8 @@ namespace MyFinanceTests
 			var result = service.GetDebentureAsync(testModel).Result;
 			Assert.NotNull(result);
 
-			testModel.COIPercentage = new List<double>() { 5.0, 3.0, 4.0, 1.0 };
+			testModel.COIPercentage = new List<double>() { 5.0, 2.0, 3.0, 0.0 };
+			testModel.COIAdditionalPercentage = 1;
 			testModel.Amount = 85;
 			testModel.BelkaTax = false;
 			result = service.GetDebentureAsync(testModel).Result;
@@ -588,7 +589,8 @@ namespace MyFinanceTests
 			Assert.Equal(new[] { "0.00 zł", "425.00 zł", "680.00 zł", "1 020.00 zł", "1 105.00 zł" }, result.DebentureData.DebentureColumns[4].Rows);
 			Assert.Equal(new[] { "0.00 zł", "365.50 zł", "620.50 zł", "960.50 zł", "1 105.00 zł" }, result.DebentureData.DebentureColumns[5].Rows);
 
-			testModel.COIPercentage = new List<double>() { 5.0, 3.0, 4.0, 1.0 };
+			testModel.COIPercentage = new List<double>() { 5.0, 2.0, 3.0, 0.0 };
+			testModel.COIAdditionalPercentage = 1;
 			testModel.Amount = 85;
 			testModel.BelkaTax = true;
 			result = service.GetDebentureAsync(testModel).Result;
@@ -601,7 +603,8 @@ namespace MyFinanceTests
 			Assert.Equal(new[] { "0.00 zł", "344.25 zł", "550.80 zł", "826.20 zł", "895.05 zł" }, result.DebentureData.DebentureColumns[4].Rows);
 			Assert.Equal(new[] { "0.00 zł", "284.75 zł", "491.30 zł", "766.70 zł", "895.05 zł" }, result.DebentureData.DebentureColumns[5].Rows);
 
-			testModel.COIPercentage = new List<double>() { 7.0, 11.3, 7.2, 3.1 };
+			testModel.COIPercentage = new List<double>() { 7.0, 10.3, 6.2, 2.1 };
+			testModel.COIAdditionalPercentage = 1;
 			testModel.Amount = 33;
 			testModel.BelkaTax = false;
 			result = service.GetDebentureAsync(testModel).Result;
@@ -614,7 +617,8 @@ namespace MyFinanceTests
 			Assert.Equal(new[] { "0.00 zł", "231.00 zł", "603.90 zł", "841.50 zł", "943.80 zł" }, result.DebentureData.DebentureColumns[4].Rows);
 			Assert.Equal(new[] { "0.00 zł", "207.90 zł", "580.80 zł", "818.40 zł", "943.80 zł" }, result.DebentureData.DebentureColumns[5].Rows);
 
-			testModel.COIPercentage = new List<double>() { 7.0, 11.3, 7.2, 3.1 };
+			testModel.COIPercentage = new List<double>() { 7.0, 10.3, 6.2, 2.1 };
+			testModel.COIAdditionalPercentage = 1;
 			testModel.Amount = 33;
 			testModel.BelkaTax = true;
 			result = service.GetDebentureAsync(testModel).Result;
@@ -636,24 +640,88 @@ namespace MyFinanceTests
 			var cut = ctx.RenderComponent<DebenturesCalculator>();
 
 			var debentureTypeInput = cut.Find("select");
-			debentureTypeInput.Change(DebentureType.TOS);
+			debentureTypeInput.Change(DebentureType.COI);
 			var allButtons = cut.FindAll("button");
 
 			var calculateButton = allButtons.Where(x => x.TextContent.Equals("Oblicz")).FirstOrDefault();
 			Assert.NotNull(calculateButton);
 			var inputs = cut.FindAll("input");
-			Assert.Equal(4, inputs.Count);
+			Assert.Equal(8, inputs.Count);
 
 			var belkaTaxInput = inputs[1];
 			var amountInput = inputs[2];
 			var percentageInput = inputs[3];
 
-			belkaTaxInput.Input(true);
-			amountInput.Change(100);
 			calculateButton.Click();
 
 			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Całkowity zysk")).Any());
-			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Wysokość rocznego procentu składanego (długosc: 3 lata, kapitalizacja: roczna)")).Any());
+
+			var output = cut.FindAll("th");
+			Assert.Equal("Rok", output[0].TextContent);
+			Assert.Equal("Całkowita wartość", output[1].TextContent);
+			Assert.Equal("Oprocentowanie", output[2].TextContent);
+			Assert.Equal("Odsetki", output[3].TextContent);
+			Assert.Equal("Suma odsetek", output[4].TextContent);
+			Assert.Equal("Zysk netto", output[5].TextContent);
+		}
+
+		[Fact]
+		public void EDOServiceTest()
+		{
+			var service = new DebentureService();
+			var testModel = new DebentureModel() { Type = DebentureType.EDO };
+
+			var result = service.GetDebentureAsync(testModel).Result;
+			Assert.NotNull(result);
+
+			var expectedYearsColumn = Enumerable.Range(0, 11).Select(a => a.ToString()).ToArray();
+
+			testModel.EDOPercentage = new List<double>() { 7.25, 3.0, 4.0, 1.0, 5.0, 3.0, 4.0, 1.0, 8.25, 9.3 };
+			testModel.EDOAdditionalPercentage = 1;
+			testModel.Amount = 85;
+			testModel.BelkaTax = false;
+			result = service.GetDebentureAsync(testModel).Result;
+			Assert.Single(result.DebentureInfo);
+			Assert.Equal(new Tuple<string, string>("Całkowity zysk", "5 947.45 zł"), result.DebentureInfo[0]);
+			Assert.Equal(expectedYearsColumn, result.DebentureData.DebentureColumns[0].Rows);
+			Assert.Equal(new[] { "8 500.00 zł", "9 116.25 zł", "9 480.90 zł", "9 955.20 zł", "10 154.10 zł", "10 763.55 zł", "11 194.50 zł", "11 753.80 zł", "11 989.25 zł", "13 098.50 zł", "14 447.45 zł" }, result.DebentureData.DebentureColumns[1].Rows);
+			Assert.Equal(new[] { "7.25 %", "4 %", "5 %", "2 %", "6 %", "4 %", "5 %", "2 %", "9.25 %", "10.3 %", "0 %" }, result.DebentureData.DebentureColumns[2].Rows);
+			Assert.Equal(new[] { "616.25 zł", "364.65 zł", "474.30 zł", "198.90 zł", "609.45 zł", "430.95 zł", "559.30 zł", "235.45 zł", "1 109.25 zł", "1 348.95 zł", "0.00 zł" }, result.DebentureData.DebentureColumns[3].Rows);
+			Assert.Equal(new[] { "616.25 zł", "980.90 zł", "1 455.20 zł", "1 654.10 zł", "2 263.55 zł", "2 694.50 zł", "3 253.80 zł", "3 489.25 zł", "4 598.50 zł", "5 947.45 zł", "5 947.45 zł" }, result.DebentureData.DebentureColumns[4].Rows);
+			Assert.Equal(new[] { "0.00 zł", "446.25 zł", "810.90 zł", "1 285.20 zł", "1 484.10 zł", "2 093.55 zł", "2 524.50 zł", "3 083.80 zł", "3 319.25 zł", "4 428.50 zł", "5 947.45 zł" }, result.DebentureData.DebentureColumns[5].Rows);
+
+			testModel.EDOPercentage = new List<double>() { 7.25, 3.0, 4.0, 1.0, 5.0, 3.0, 4.0, 1.0, 8.25, 9.3 };
+			testModel.Amount = 85;
+			testModel.BelkaTax = true;
+			result = service.GetDebentureAsync(testModel).Result;
+			Assert.Single(result.DebentureInfo);
+			Assert.Equal(new Tuple<string, string>("Całkowity zysk", "4 816.95 zł"), result.DebentureInfo[0]);
+			Assert.Equal(expectedYearsColumn, result.DebentureData.DebentureColumns[0].Rows);
+			Assert.Equal(new[] { "8 500.00 zł", "9 116.25 zł", "9 480.90 zł", "9 955.20 zł", "10 154.10 zł", "10 763.55 zł", "11 194.50 zł", "11 753.80 zł", "11 989.25 zł", "13 098.50 zł", "14 447.45 zł" }, result.DebentureData.DebentureColumns[1].Rows);
+			Assert.Equal(new[] { "7.25 %", "4 %", "5 %", "2 %", "6 %", "4 %", "5 %", "2 %", "9.25 %", "10.3 %", "0 %" }, result.DebentureData.DebentureColumns[2].Rows);
+			Assert.Equal(new[] { "616.25 zł", "364.65 zł", "474.30 zł", "198.90 zł", "609.45 zł", "430.95 zł", "559.30 zł", "235.45 zł", "1 109.25 zł", "1 348.95 zł", "0.00 zł" }, result.DebentureData.DebentureColumns[3].Rows);
+			Assert.Equal(new[] { "616.25 zł", "980.90 zł", "1 455.20 zł", "1 654.10 zł", "2 263.55 zł", "2 694.50 zł", "3 253.80 zł", "3 489.25 zł", "4 598.50 zł", "5 947.45 zł", "5 947.45 zł" }, result.DebentureData.DebentureColumns[4].Rows);
+			Assert.Equal(new[] { "0.00 zł", "361.25 zł", "656.20 zł", "1 040.40 zł", "1 201.90 zł", "1 695.75 zł", "2 044.25 zł", "2 497.30 zł", "2 688.55 zł", "3 587.00 zł", "4 816.95 zł" }, result.DebentureData.DebentureColumns[5].Rows);
+		}
+
+		[Fact]
+		public void EDOServiceRenderTest()
+		{
+			var ctx = new TestContext();
+			ctx.Services.AddSingleton(new DebentureService());
+			var cut = ctx.RenderComponent<DebenturesCalculator>();
+
+			var debentureTypeInput = cut.Find("select");
+			debentureTypeInput.Change(DebentureType.EDO);
+			var allButtons = cut.FindAll("button");
+
+			var calculateButton = allButtons.Where(x => x.TextContent.Equals("Oblicz")).FirstOrDefault();
+			Assert.NotNull(calculateButton);
+			var inputs = cut.FindAll("input");
+			Assert.Equal(14, inputs.Count);
+			calculateButton.Click();
+
+			Assert.True(cut.FindAll("div").Where(a => a.TextContent.Equals("Całkowity zysk")).Any());
 
 			var output = cut.FindAll("th");
 			Assert.Equal("Rok", output[0].TextContent);

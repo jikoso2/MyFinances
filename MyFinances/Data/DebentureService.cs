@@ -179,6 +179,9 @@ namespace MyFinances.Data
 
 			for (int i = 0; i < 5; i++)
 			{
+				if (i >= 1 && i < 4)
+					interestRate[i] = interestRate[i] <= 0 ? DebentureModel.COIAdditionalPercentage / 100 : DebentureModel.COIAdditionalPercentage / 100 + interestRate[i];
+
 				double profitPerDebenture = i <= 4 ? Math.Round(totalValue[i] / DebentureModel.Amount * interestRate[i], 2) : 0;
 
 				interestProfit[i] = profitPerDebenture * DebentureModel.Amount;
@@ -262,52 +265,69 @@ namespace MyFinances.Data
 			var interestRate = DebentureModel.EDOPercentage.Select(a => Math.Round(a / 100, 5)).ToList();
 			interestRate.Add(0);
 			var interestProfit = new double[11];
+			var sumInterestProfit = new double[11];
 			var tax = new double[11];
 			var totalProfit = new double[11];
 			var totalProfitRes = new double[11];
 			double calculatedTax = 0.0;
-			double earlyRedemptionFee = 2 * DebentureModel.Amount;
+			double earlyRedemptionFee = 2.0;
+			var actualInterestRate = 0.0;
+			var interestRateToShow = new double[11];
 
 			for (int i = 0; i < 11; i++)
 			{
 				if (i >= 1 && i < 10)
-					interestRate[i] = interestRate[i] <= 0 ? DebentureModel.EDOAdditionalPercentage / 100 : DebentureModel.EDOAdditionalPercentage / 100 + interestRate[i];
+					actualInterestRate = interestRate[i] <= 0 ? DebentureModel.EDOAdditionalPercentage / 100 : DebentureModel.EDOAdditionalPercentage / 100 + interestRate[i];
+				else
+					actualInterestRate = interestRate[i];
 
-				double profit = i <= 10 ? Math.Round(totalValue[i] * interestRate[i], 2) : 0;
-
-				if (i < 10)
-					totalValue[i + 1] = totalValue[i] + profit;
-
-				interestProfit[i] = profit;
+				double profitPerDebenture = i <= 10 ? Math.Round(totalValue[i] / DebentureModel.Amount * actualInterestRate, 2) : 0;
 
 				if (i < 10)
-					totalProfit[i + 1] = i == 0 ? profit : totalProfit[i] + profit;
+					totalValue[i + 1] = totalValue[i] + profitPerDebenture * DebentureModel.Amount;
+
+				interestProfit[i] = profitPerDebenture * DebentureModel.Amount;
+
+				if (i > 0)
+					sumInterestProfit[i] = interestProfit[i] + sumInterestProfit[i - 1];
+				else
+					sumInterestProfit[i] = interestProfit[i];
+
+				if (i < 10)
+					totalProfit[i + 1] = i == 0 ? profitPerDebenture * DebentureModel.Amount : totalProfit[i] + profitPerDebenture * DebentureModel.Amount;
 
 				if (DebentureModel.BelkaTax)
 				{
-					calculatedTax = (Math.Ceiling(Math.Max(totalProfit[i] - earlyRedemptionFee, 0) * 19)) / 100;
+					calculatedTax = (Math.Ceiling(Math.Max(totalProfit[i] / DebentureModel.Amount - earlyRedemptionFee, 0) * 19)) / 100 * DebentureModel.Amount;
 					if (i == 10)
-						calculatedTax = Math.Ceiling(totalProfit[i] * 19) / 100;
+						calculatedTax = Math.Ceiling(totalProfit[i] / DebentureModel.Amount * 19) / 100 * DebentureModel.Amount;
 				}
 
-				totalProfitRes[i] = totalProfit[i] - calculatedTax;
+				totalProfitRes[i] = i < 10 ? totalProfit[i] - calculatedTax - earlyRedemptionFee * DebentureModel.Amount: totalProfit[i] - calculatedTax;
 				if (i < 10)
-					totalProfitRes[i] = totalProfitRes[i] - earlyRedemptionFee > 0 ? totalProfitRes[i] - earlyRedemptionFee : 0;
+					totalProfitRes[i] = totalProfitRes[i] > 0 ? totalProfitRes[i] : 0;
 
 			}
 
+			for (int i = 0; i < interestRateToShow.Length; i++)
+			{
+				interestRateToShow[i] = i != 0 && i != 10 ? interestRate[i] + DebentureModel.EDOAdditionalPercentage / 100 : interestRate[i];
+			}
+
 			var yearRows = Enumerable.Range(0, 11).Select(a => a.ToString()).ToArray();
-			var interestRateRows = interestRate.Select(a => Helper.PercentFormat(a * 100)).ToArray();
+			var interestRateRows = interestRateToShow.Select(a => Helper.PercentFormat(a * 100)).ToArray();
 			var totalValueRows = totalValue.Select(a => Helper.MoneyFormat(a)).ToArray();
 			var interestProfitRows = interestProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
+			var sumInterestProfitRows = sumInterestProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
 			var totalProfitRows = totalProfitRes.Select(a => Helper.MoneyFormat(a)).ToArray();
 
-			debentureResult.DebentureData.DebentureColumns = new DebentureColumn[5]
+			debentureResult.DebentureData.DebentureColumns = new DebentureColumn[6]
 			{
 				new DebentureColumn() { Rows = yearRows },
 				new DebentureColumn() { Rows = totalValueRows },
 				new DebentureColumn() { Rows = interestRateRows },
 				new DebentureColumn() { Rows = interestProfitRows },
+				new DebentureColumn() { Rows = sumInterestProfitRows },
 				new DebentureColumn() { Rows = totalProfitRows }
 			};
 
@@ -465,18 +485,19 @@ namespace MyFinances.Data
 						new DebentureHead() { Head = "Rok", ToolTip = "Czas od wykupienia danej obligacji w latach" },
 						new DebentureHead() { Head = "Całkowita wartość", ToolTip = "Wartość obligacji na początku danego okresu" },
 						new DebentureHead() { Head = "Oprocentowanie" },
-						new DebentureHead() { Head = "Odsetki" },
-						new DebentureHead() { Head = "Suma odsetek" },
+						new DebentureHead() { Head = "Odsetki", ToolTip = "Wysokość odsetek przed potrąceniem podatku"},
+						new DebentureHead() { Head = "Suma odsetek", ToolTip = "Suma odsetek po potrąceniem podatku" },
 						new DebentureHead() { Head = "Zysk netto", ToolTip = "Zysk przy wypłacie pod koniec danego okresu. (Z uwzględnieniem kosztów wykupu obligacji)" }
 					};
 					break;
 				case DebentureType.EDO:
-					this.Head = new DebentureHead[5]
+					this.Head = new DebentureHead[6]
 					{
 						new DebentureHead() { Head = "Rok", ToolTip = "Czas od wykupienia danej obligacji w latach" },
 						new DebentureHead() { Head = "Całkowita wartość", ToolTip = "Wartość obligacji na początku danego okresu" },
 						new DebentureHead() { Head = "Oprocentowanie" },
 						new DebentureHead() { Head = "Odsetki", ToolTip = "Naliczone odestki w danym okresie" },
+						new DebentureHead() { Head = "Suma odsetek", ToolTip = "Zsumowane odsetki" },
 						new DebentureHead() { Head = "Zysk netto", ToolTip = "Zysk przy wypłacie pod koniec danego okresu. (Z uwzględnieniem kosztów wykupu obligacji)"}
 					};
 					break;
