@@ -60,13 +60,13 @@ namespace MyFinances.Models
 			{
 				var debentureModel = (DebentureModel)validationContext.ObjectInstance;
 
-				if (debentureModel.TOZPercentage[0] < 0)
-					return new ValidationResult("Oprocentowanie w pierwszym okresie musi być dodatnie", new[] { validationContext.MemberName });
+				if (debentureModel.TOZPercentage[0] < 0 || debentureModel.TOZPercentage[0] > 30)
+					return new ValidationResult("Oprocentowanie w pierwszym okresie musi być dodatnie i mniejsze od 30%", new[] { validationContext.MemberName });
 
 				for (int i = 1; i < debentureModel.TOZPercentage.Count(); i++)
 				{
-					if (debentureModel.TOZPercentage[i] <= 0)
-						return new ValidationResult("Wskaźnik WIBOR 6M musi być dodatni", new[] { validationContext.MemberName });
+					if (debentureModel.TOZPercentage[i] <= 0 || debentureModel.TOZPercentage[i] > 30)
+						return new ValidationResult("Wskaźnik WIBOR 6M musi być dodatni i mniejszy od 30%", new[] { validationContext.MemberName });
 				}
 
 				return null;
@@ -79,9 +79,15 @@ namespace MyFinances.Models
 			{
 				var debentureModel = (DebentureModel)validationContext.ObjectInstance;
 
-				if (debentureModel.EDOPercentage[0] < 0)
-					return new ValidationResult("Oprocentowanie w pierwszym okresie musi być dodatnie", new[] { validationContext.MemberName });
+				if (debentureModel.EDOPercentage[0] < 0 || debentureModel.EDOPercentage[0] > 30)
+					return new ValidationResult("Oprocentowanie w pierwszym okresie musi być dodatnie i mniejsze od 30%", new[] { validationContext.MemberName });
 
+				foreach (var percentage in debentureModel.EDOPercentage)
+				{
+					if(percentage > 30 || percentage < -30)
+					return new ValidationResult("Odczyt inflacji nie może być większy od 30% i mniejszy od -30%", new[] { validationContext.MemberName });
+				}
+					
 				return null;
 			}
 		}
@@ -94,6 +100,12 @@ namespace MyFinances.Models
 
 				if (debentureModel.COIPercentage[0] < 0)
 					return new ValidationResult("Oprocentowanie w pierwszym okresie musi być dodatnie", new[] { validationContext.MemberName });
+
+				foreach (var percentage in debentureModel.COIPercentage)
+				{
+					if (percentage > 30 || percentage < -30)
+						return new ValidationResult("Odczyt inflacji nie może być większy od 30% i mniejszy od -30%", new[] { validationContext.MemberName });
+				}
 
 				return null;
 			}

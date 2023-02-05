@@ -24,7 +24,7 @@ namespace MyFinances.Models
 		public double EmployerAmount { get; set; } = Helpers.DefaultValue.PPKPayout.EmployerAmount;
 
 		[Required]
-		[Range(-30, 30, ErrorMessage = "Procent od -30 do 30")]
+		[Range(-50, 50, ErrorMessage = "Wartość oprocentowania musi być większa od -50  i mniejsza od 50")]
 		public double Percentage { get; set; } = Helpers.DefaultValue.PPKPayout.Percentage;
 
 		[Required]

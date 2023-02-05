@@ -42,8 +42,8 @@ namespace MyFinances.Data
 
 			if (PPKPayoutModel.Percentage > 0)
 			{
-				EmployerTax = EmployerAmount / (1 + PPKPayoutModel.Percentage / 100) * (PPKPayoutModel.Percentage / 100) * 0.19;
-				EmployeeTax = EmployeeAmount / (1 + PPKPayoutModel.Percentage / 100) * (PPKPayoutModel.Percentage / 100) * 0.19;
+				EmployerTax = Math.Ceiling(EmployerAmount / (1 + PPKPayoutModel.Percentage / 100) * (PPKPayoutModel.Percentage / 100) * 0.19 * 100) / 100;
+				EmployeeTax = Math.Ceiling((EmployeeAmount / (1 + PPKPayoutModel.Percentage / 100) * (PPKPayoutModel.Percentage / 100) * 0.19) * 100) / 100;
 			}
 
 			var totalPayout = EmployerAmount + EmployeeAmount - EmployerTax - EmployeeTax;
@@ -57,8 +57,8 @@ namespace MyFinances.Data
 				case PayoutType.Całość:
 					break;
 				case PayoutType.Cześciami:
-					ppkResult.PPKPayoutInfo.Add(Tuple.Create("Koszt netto pracownika", Helper.MoneyFormat(PPKPayoutModel.EmployerAmount * 0.17 + PPKPayoutModel.EmployeeAmount)));
-					ppkResult.PPKPayoutInfo.Add(Tuple.Create("Zysk netto pracownika", Helper.MoneyFormat(totalPayout - (PPKPayoutModel.EmployerAmount * 0.17 + PPKPayoutModel.EmployeeAmount))));
+					ppkResult.PPKPayoutInfo.Add(Tuple.Create("Koszt netto pracownika (uwzględnienie 12% podatku dochodowego)", Helper.MoneyFormat(PPKPayoutModel.EmployeeAmount * 0.12 + PPKPayoutModel.EmployerAmount )));
+					ppkResult.PPKPayoutInfo.Add(Tuple.Create("Zysk netto pracownika", Helper.MoneyFormat(totalPayout - (PPKPayoutModel.EmployeeAmount * 0.12 + PPKPayoutModel.EmployerAmount))));
 					break;
 			}
 
@@ -74,16 +74,9 @@ namespace MyFinances.Data
 	{
 		public PPKPayout()
 		{
-			this.PPKData = new PPKPayoutData();
 			this.PPKPayoutInfo = new List<Tuple<string, string>>();
 		}
 
-		public PPKPayoutData PPKData { get; set; }
 		public List<Tuple<string, string>> PPKPayoutInfo { get; set; }
-	}
-
-	public class PPKPayoutData
-	{
-		public string[] Head { get; set; }
 	}
 }

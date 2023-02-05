@@ -15,7 +15,7 @@
 <div class="card mx-auto mt-5">
 
     <div class="card-header">
-        Kalkulator PPK
+        Kalkulator wypłacenia PPK
     </div>
 
     <div class="card-body">
@@ -42,7 +42,7 @@
             <InfoModal Title="Wprowadzanie informacji dotyczących PPK" Text="@HelperInformations.GetPPKPayoutInformation()" OnClose="@OnInfoClose" Width="1200px"></InfoModal>
         }
 
-        <button class="btn btn-primary" style="margin:15px" @onclick="() => OpenInfoDialog()" data="@model"> Informacje dotyczące obliczania wypłat </button>
+        <button class="btn btn-primary" style="margin:15px" @onclick="() => OpenInfoDialog()" data="@model">Informacje dotyczące obliczania wypłat</button>
 
         <EditForm Model="model" OnValidSubmit="CalculatePPK">
 
@@ -60,11 +60,11 @@
 
                 case PayoutType.Cześciami:
                     <div class="form-group" style="margin: 15px">
-                        <label>Kwota wpłacona przez pracodawce</label>
+                        <label>Kwota wpłacona przez pracownika</label>
                         <div class="input-group"><input @bind="model.EmployerAmount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
                     </div>
                     <div class="form-group" style="margin: 15px">
-                        <label>Kwota wpłacona przez pracownika</label>
+                        <label>Kwota wpłacona przez pracodawce</label>
                         <div class="input-group"><input @bind="model.EmployeeAmount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
                     </div>
                     break;
@@ -88,7 +88,7 @@
                 <label class="form-check-label" id="checkbox-label">Wypłata przed 60 rokiem życia</label>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-center"> Oblicz </button>
+            <button type="submit" class="btn btn-primary btn-center">Oblicz</button>
 
         </EditForm>
     </div>
