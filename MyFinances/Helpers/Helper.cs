@@ -82,10 +82,10 @@ namespace MyFinances.Helpers
 		public class PPKPayout
 		{
 			public static double Amount = 2000;
-			public static double CountryAmount = 240;
-			public static double EmployeeAmount = 600;
-			public static double EmployerAmount = 450;
-			public static double Percentage = 1;
+			public static double CountryAmount = 250;
+			public static double EmployeeAmount = 375;
+			public static double EmployerAmount = 500;
+			public static double Percentage = 0;
 		}
 	}
 }

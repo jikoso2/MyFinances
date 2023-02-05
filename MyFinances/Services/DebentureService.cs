@@ -271,17 +271,15 @@ namespace MyFinances.Data
 			var totalProfitRes = new double[11];
 			double calculatedTax = 0.0;
 			double earlyRedemptionFee = 2.0;
-			var actualInterestRate = 0.0;
-			var interestRateToShow = new double[11];
 
 			for (int i = 0; i < 11; i++)
 			{
 				if (i >= 1 && i < 10)
-					actualInterestRate = interestRate[i] <= 0 ? DebentureModel.EDOAdditionalPercentage / 100 : DebentureModel.EDOAdditionalPercentage / 100 + interestRate[i];
+					interestRate[i] = interestRate[i] <= 0 ? DebentureModel.EDOAdditionalPercentage / 100 : DebentureModel.EDOAdditionalPercentage / 100 + interestRate[i];
 				else
-					actualInterestRate = interestRate[i];
+					interestRate[i] = interestRate[i];
 
-				double profitPerDebenture = i <= 10 ? Math.Round(totalValue[i] / DebentureModel.Amount * actualInterestRate, 2) : 0;
+				double profitPerDebenture = i <= 10 ? Math.Round(totalValue[i] / DebentureModel.Amount * interestRate[i], 2) : 0;
 
 				if (i < 10)
 					totalValue[i + 1] = totalValue[i] + profitPerDebenture * DebentureModel.Amount;
@@ -309,13 +307,8 @@ namespace MyFinances.Data
 
 			}
 
-			for (int i = 0; i < interestRateToShow.Length; i++)
-			{
-				interestRateToShow[i] = i != 0 && i != 10 ? interestRate[i] + DebentureModel.EDOAdditionalPercentage / 100 : interestRate[i];
-			}
-
 			var yearRows = Enumerable.Range(0, 11).Select(a => a.ToString()).ToArray();
-			var interestRateRows = interestRateToShow.Select(a => Helper.PercentFormat(a * 100)).ToArray();
+			var interestRateRows = interestRate.Select(a => Helper.PercentFormat(a * 100)).ToArray();
 			var totalValueRows = totalValue.Select(a => Helper.MoneyFormat(a)).ToArray();
 			var interestProfitRows = interestProfit.Select(a => Helper.MoneyFormat(a)).ToArray();
 			var sumInterestProfitRows = sumInterestProfit.Select(a => Helper.MoneyFormat(a)).ToArray();

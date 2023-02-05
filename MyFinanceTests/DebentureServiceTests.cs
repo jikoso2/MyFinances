@@ -25,9 +25,7 @@ namespace MyFinanceTests
 
 				var infoButton = allButtons.Where(x => x.TextContent.Contains($"Informacje dotyczące obligacji {type}")).FirstOrDefault();
 				Assert.NotNull(infoButton);
-
-				var calculateButton = allButtons.Where(x => x.TextContent.Equals("Oblicz")).FirstOrDefault();
-				Assert.NotNull(calculateButton);
+				Assert.NotNull(allButtons.FirstOrDefault(x => x.TextContent.Equals("Oblicz")));
 
 				var inputs = cut.FindAll("input");
 				switch (type)
@@ -59,6 +57,9 @@ namespace MyFinanceTests
 					default:
 						break;
 				}
+
+				infoButton.Click();
+				Assert.NotNull(cut.FindAll("h4").FirstOrDefault(a => a.TextContent == $"Obligacje {type}"));
 			}
 		}
 

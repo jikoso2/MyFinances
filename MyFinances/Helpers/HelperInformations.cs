@@ -13,19 +13,21 @@ namespace MyFinances.Helpers
 			switch (type)
 			{
 				case DebentureType.OTS:
-					return "Trzymiesięczne obligacje ze stałym oprocentowaniem z kapitalizacją na koniec okresu rozliczeniowego. <br/> Koszt wcześniejszego wykupu: 0 gr, został uwzględniony w obliczeniach.";
+					return "Trzymiesięczne obligacje ze stałym oprocentowaniem.<br/> Wypłata odsetek: na koniec okresu rozliczeniowego <br/> Koszt wcześniejszego wykupu: 0 gr.";
 				case DebentureType.DOS:
-					return "Dwuletnie obligacje ze stałym oprocentowaniem z roczną kapitalizacją odsetek.";
+					return "Dwuletnie obligacje ze stałym oprocentowaniem z roczną kapitalizacją odsetek. <br/> Wypłata odsetek: na koniec okresu rozliczeniowego. <br/> Koszt wcześniejszego wykupu: 0.70 zł.";
 				case DebentureType.TOZ:
-					return "Trzyletnie obligacje ze zmiennym oprocentowaniem z pół roczną kapitalizacją odsetek. <br/> Koszt wcześniejszego wykupu: 70 gr, został uwzględniony w obliczeniach.";
+					return "Trzyletnie obligacje ze zmiennym oprocentowaniem.<br/> Wypłata odsetek: co pół roku. <br/> Koszt wcześniejszego wykupu: 0.70 zł.";
 				case DebentureType.COI:
-					return "Czteroletnie obligacje ze zmiennym oprocentowaniem z co roczną wypłatą odsetek. <br/> Koszt wcześniejszego wykupu: 70 gr.";
+					return "Czteroletnie obligacje ze zmiennym oprocentowaniem. <br/> Wypłata odsetek: co miesiąc. <br/> Koszt wcześniejszego wykupu: 0.70 zł.";
 				case DebentureType.EDO:
-					return "Dziesięcioletnie obligacje ze zmiennym oprocentowaniem z co roczną kapitalizacją odsetek <br/> Koszt wcześniejszego wykupu: 2 zł, został uwzględniony w obliczeniach.";
+					return "Dziesięcioletnie obligacje ze zmiennym oprocentowaniem z co roczną kapitalizacją odsetek <br/> Wypłata odsetek: na koniec okresu rozliczeniowego <br/> Koszt wcześniejszego wykupu: 2 zł.";
 				case DebentureType.ROR:
-					return "Roczne obligacje ze zmiennym oprocentowaniem indeksowanym wskaźnikiem stopy referencyjnej. Odsetki wypłacane są co miesiąc. <br/> Koszt wcześniejszego wykupu: 50 gr.";
+					return "Roczne obligacje ze zmiennym oprocentowaniem indeksowanym wskaźnikiem stopy referencyjnej. <br/> Wypłata odsetek: co miesiąc. <br/> Koszt wcześniejszego wykupu: 0.50 zł.";
 				case DebentureType.DOR:
-					return "Dwuletnie obligacje ze zmiennym oprocentowaniem indeksowanym wskaźnikiem stopy referencyjnej z dodatkiem 0.25 punkta procentowego. <br/> Koszt wcześniejszego wykupu: 70 gr.";
+					return "Dwuletnie obligacje ze zmiennym oprocentowaniem indeksowanym wskaźnikiem stopy referencyjnej z dodatkiem 0.10 punkta procentowego.<br/> Wypłata odsetek: co miesiąc. <br/> Koszt wcześniejszego wykupu: 0.70 zł.";
+				case DebentureType.TOS:
+					return "Trzyletnie obligacje ze stałym oprocentowaniem z roczną kapitalizacją odsetek <br/> Wypłata odsetek: na koniec okresu rozliczeniowego <br/> Koszt wcześniejszego wykupu: 0.70 zł.";
 				default:
 					return "Podstawowe Informację dotyczące typu obligacji.";
 			}
