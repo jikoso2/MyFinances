@@ -17,4 +17,15 @@ namespace MyFinances.Helpers
 		}
 	}
 
+	public class ToggleDepositAccountType
+	{
+		public DepositAccountType[] Options { get; set; }
+		public DepositAccountType SelectedOption { get; set; }
+
+		public string GetActive(DepositAccountType option)
+		{
+			return option == SelectedOption ? "active" : "";
+		}
+	}
+
 }

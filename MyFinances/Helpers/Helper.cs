@@ -87,5 +87,13 @@ namespace MyFinances.Helpers
 			public static double EmployerAmount = 500;
 			public static double Percentage = 0;
 		}
+
+		public class DepositAccount
+		{
+			public static double StartAmount = 10000;
+			public static double Percentage = 3;
+			public static double MonthlyPayment = 500;
+			public static int Length = 6;
+		}
 	}
 }

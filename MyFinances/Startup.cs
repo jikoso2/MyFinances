@@ -57,6 +57,7 @@ namespace MyFinances
 			services.AddSingleton<PPKService>();
 			services.AddSingleton<MailService>();
 			services.AddSingleton<PPKPayoutService>();
+			services.AddSingleton<DepositAccountService>();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
