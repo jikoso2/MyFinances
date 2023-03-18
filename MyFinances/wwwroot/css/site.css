@@ -190,3 +190,16 @@ label {
 option:not(:checked) {
 	background-color: #fff;
 }
+
+.navbar {
+	background-image: url(../Images/NavBarLogo.png);
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+.main {
+	background-image: url(../Images/BackgroundLogo.png);
+	background-repeat: no-repeat;
+	background-position: center center;
+}

@@ -1,0 +1,116 @@
+﻿@page "/depositaccountcalculator"
+
+@using MyFinances.Models
+@using MyFinances.Data
+@using MyFinances.Helpers
+@using MyFinances.Components.Modals
+@using MyFinances.Components.Views
+@using System.Threading
+@using Microsoft.AspNetCore.Components.Web
+
+
+@inject Data.DepositAccountService DepositAccountService
+
+
+<div class="card mx-auto mt-5">
+
+    <div class="card-header">
+        Kalkulator konta oszczędnościowego
+    </div>
+
+    <div class="card-body">
+
+        <div class="card mx-auto" style="margin-top:20px">
+            <div class="card-header">
+                Wybierz rodzaj kalkulatora
+            </div>
+            <div class="btn-group btn-group-toggle" data-toggle="buttons" style="display:flex;margin:20px">
+                @foreach (var optionName in toggleGroup.Options)
+                {
+                    <label class="btn btn-secondary @toggleGroup.GetActive(optionName)" style="color:white">
+                        <input type="radio" name="options" autocomplete="off"
+                           checked="@(toggleGroup.SelectedOption == optionName)"
+                           @onchange="()=>OnChangeButton(optionName)" /> @optionName
+                    </label>
+                }
+            </div>
+        </div>
+        <p></p>
+
+        <EditForm Model="model" OnValidSubmit="CalculateDepositAccount">
+
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            @switch (toggleGroup.SelectedOption)
+            {
+                case DepositAccountType.Prosty:
+
+                    <div class="form-check-label">
+                        <InputCheckbox @bind-Value="model.BelkaTax" class="form-check-label" id="checkbox" />
+                        <label class="form-check-label" id="checkbox-label">Podatek 19%</label>
+                    </div>
+
+                    <div class="form-group" style="margin: 15px">
+                        <label>Kwota początkowa</label>
+                        <div class="input-group"><input @bind="model.StartAmount" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
+                    </div>
+                    <div class="form-group" style="margin: 15px">
+                        <label>Wysokość comiesięcznych wpłat</label>
+                        <div class="input-group"><input @bind="model.MonthlyPayment" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
+                    </div>
+                    <div class="form-group" style="margin: 15px">
+                        <label>Długość oszczędzania</label>
+                        <div class="input-group"><input @bind="model.Lenght" class="form-control"><div class="input-group-append"><span class="input-group-text">mieś</span></div></div>
+                    </div>
+                    <div class="form-group" style="margin: 15px">
+                        <label>Oprocentowanie konta oszczędnościowego (w skali roku)</label>
+                        <div class="input-group"><input @bind="model.Percentage" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                    </div>
+
+                    break;
+
+                case DepositAccountType.Rozbudowany:
+
+                    break;
+
+                default:
+                    break;
+            }
+
+            <button type="submit" class="btn btn-primary btn-center">Oblicz</button>
+
+        </EditForm>
+    </div>
+
+    @if (depositAccountResult != null && depositAccountResult.DepositAccountInfo != null)
+    {
+        <SummaryTable Content="depositAccountResult.DepositAccountInfo"></SummaryTable>
+    }
+
+</div>
+
+
+@code {
+    private DepositAccountModel model = new DepositAccountModel();
+    private DepositAccountResult depositAccountResult;
+
+    private async Task CalculateDepositAccount()
+    {
+        model.DepositAccountType = toggleGroup.SelectedOption;
+        depositAccountResult = await DepositAccountService.GetDepositAccountCalculationAsync(model);
+    }
+
+    private void OnChangeButton(DepositAccountType optionName)
+    {
+        toggleGroup.SelectedOption = optionName;
+        //if (depositAccountResult != null && ppkResult.PPKPayoutInfo != null)
+        //    ppkResult.PPKPayoutInfo.Clear();
+    }
+
+    Helpers.ToggleDepositAccountType toggleGroup = new Helpers.ToggleDepositAccountType()
+        {
+            SelectedOption = DepositAccountType.Prosty,
+            Options = new DepositAccountType[] { DepositAccountType.Prosty, DepositAccountType.Rozbudowany }
+        };
+}
