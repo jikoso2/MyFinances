@@ -1,0 +1,126 @@
+﻿@using Models
+@using Helpers
+
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
+    <div class="modal-dialog" style="width:500px">
+        <EditForm Model="@model" OnValidSubmit="CalculateCompoundInterest">
+
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" style="position:center">Procent Składany</h5>
+                    <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-group" style="margin: 30px">
+                        <label for="percentageRange" class="form-label">Oprocentowanie w skali roku</label>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0" max="15" step="0.05" id="percentageRange" @onclick="CalculateCompoundInterest" @bind="model.Percentage" @bind:event="oninput" />
+                        </div>
+
+                        <div class="form-group" style="width:25%">
+                            <div class="input-group"><input disabled="@true" @bind="model.Percentage" max="15" min="0" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin: 30px">
+                        <label for="types" class="form-label">Częstotliwość kapitalizacji:</label>
+
+                        <InputSelect id="debentureType" @onclick="CalculateCompoundInterest" @bind-Value="model.CapitalizationDurationType" style="height:35px;width:150px;margin:20px">
+                            @foreach (var timeType in Enum.GetValues(typeof(CapitalizationType)))
+                            {
+                                <option value="@timeType">@timeType</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-group" style="margin: 30px">
+                        <label>Długość oszczędzania</label>
+                        <div class="input-group">
+                            <input @bind="model.Duration" @onclick="CalculateCompoundInterest" class="form-control">
+                            <div class="input-group-append">
+                                <InputSelect class="input-group-text" id="durationTypes" @bind-Value="model.TotalDurationType" @onclick="CalculateCompoundInterest">
+                                    @foreach (var timeTypee in Enum.GetValues(typeof(TimeType)))
+                                    {
+                                        <option value="@timeTypee">@timeTypee</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin: 30px;margin-top:50px">
+                        <div class="form-check-label">
+                            <InputCheckbox @bind-Value="model.BelkaTax" @onclick="CalculateCompoundInterest" class="form-check-label" id="checkbox" />
+                            <label class="form-check-label" id="checkbox-label">Uwzględnienie podatku 19%</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-body" style="border-top:solid;width:100%;text-align:center">
+                    <div class="alert alert-secondary" role="alert" style="width:fit-content;margin: 15px;display:inline-block;padding:15px">
+                        <span class="mr-2" aria-hidden="true"></span>
+                        <span id="AmountCalc" class="text-nowrap"> Procent składany: @(Helper.PercentFormat(Result)) </span>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    public CompoundInterestModel model = new CompoundInterestModel();
+
+    public double Result;
+
+    private Task CalculateCompoundInterest()
+    {
+        if (model.BelkaTax)
+        {
+
+        }
+        else
+        {
+            double durationDays = 0.0;
+            switch (model.TotalDurationType)
+            {
+                case TimeType.Dzień:
+                    durationDays = model.Duration;
+                    break;
+                case TimeType.Miesiąc:
+                    durationDays = model.Duration * 30;
+                    break;
+                case TimeType.Rok:
+                    durationDays = model.Duration * 365;
+                    break;
+            }
+        }
+
+
+        Result = 100.0;
+        return Task.CompletedTask;
+    }
+
+    protected override void OnInitialized()
+    {
+        CalculateCompoundInterest();
+    }
+
+    private Task ModalCancel()
+    {
+        return OnClose.InvokeAsync(false);
+    }
+
+    public enum CapitalizationType
+    {
+        Dzienna,
+        Miesięczna,
+        Roczna
+    }
+}
