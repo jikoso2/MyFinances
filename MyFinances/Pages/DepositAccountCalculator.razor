@@ -20,6 +20,14 @@
 
     <div class="card-body">
 
+        @if (CompoundInterestModalOpen)
+        {
+            <CompoundInterest OnClose="@CompoundInterestModalClose"></CompoundInterest>
+        }
+
+        <button class="btn btn-primary btn-center" style="width:300px" @onclick="() => OpenCompoundInterestModal()"> Oblicz wysokość procentu składanego</button>
+
+
         <div class="card mx-auto" style="margin-top:20px">
             <div class="card-header">
                 Wybierz rodzaj kalkulatora
@@ -94,6 +102,17 @@
 @code {
     private DepositAccountModel model = new DepositAccountModel();
     private DepositAccountResult depositAccountResult;
+    private bool CompoundInterestModalOpen { get; set; }
+
+    private void CompoundInterestModalClose(bool accepted)
+    {
+        CompoundInterestModalOpen = false;
+    }
+
+    private void OpenCompoundInterestModal()
+    {
+        CompoundInterestModalOpen = true;
+    }
 
     private async Task CalculateDepositAccount()
     {
