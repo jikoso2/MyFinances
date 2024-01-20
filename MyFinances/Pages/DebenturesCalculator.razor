@@ -20,7 +20,7 @@
             <ValidationSummary />
 
             <label style="margin-bottom:20px;margin-right:5px;margin-left:15px">TypObligacji:</label>
-            <InputSelect id="debentureType" @bind-Value="model.Type" style="height:30px;width:75px">
+            <InputSelect id="debentureType" @bind-Value="model.Type" @onclick="UpdateEarlyRedemptionFee" style="height:30px;width:75px">
                 @foreach (var DebentureType in Enum.GetValues(typeof(DebentureType)))
                 {
                     <option value="@DebentureType">@DebentureType</option>
@@ -37,10 +37,6 @@
                 <InfoModal Title="@("Obligacje " + model.Type.ToString())" Text="@InformationAboutDebenture()" OnClose="@OnDebentureInfoClose"></InfoModal>
             }
 
-            <button class="btn btn-primary" style="margin:15px" @onclick="() => OpenDebentureInfoDialog()" data="@model"> Informacje dotyczące obligacji @model.Type.ToString()</button>
-
-            <p></p>
-
             <div class="form-group" style="margin: 15px">
                 <label>Ilość obligacji</label>
                 <div class="input-group"><input @bind="model.Amount" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">sztuk</span></div></div>
@@ -48,8 +44,24 @@
 
             <div class="alert alert-secondary" role="alert" style="width:fit-content;margin: 15px">
                 <span class="mr-2" aria-hidden="true"></span>
-                <span id="AmountCalc" class="text-nowrap"> Kwota inwestycji: @(Helper.MoneyFormat(100*model.Amount)) </span>
+                <span id="AmountCalc" class="text-nowrap"> Kwota inwestycji: @(Helper.MoneyFormat(100 * model.Amount)) </span>
             </div>
+
+            @switch (model.Type)
+            {
+                case DebentureType.EDO:
+                case DebentureType.TOS:
+                case DebentureType.COI:
+                     <section class="w-100 p-0 pb-1 pt-2">
+                        <div class="form-group" style="margin: 15px">
+                            <label>Opłata za wcześniejszy wykup</label>
+                            <div class="input-group"><input @bind="model.EarlyRedemptionFee" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">zł</span></div></div>
+                        </div>
+                    </section>
+                    break;
+                default:
+                    break;
+            }
 
             @switch (model.Type)
             {
@@ -96,7 +108,7 @@
 
 
                         <div class="form-group">
-                            <div class="input-group"><input disabled="@true" @bind="model.DORPercentage" max="15" min="0" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                            <div class="input-group"><input disabled="@false" @bind="model.DORPercentage" max="15" min="0" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
                         </div>
                     </section>
                     break;
@@ -110,7 +122,7 @@
                         </div>
 
                         <div class="form-group" style="width:25%">
-                            <div class="input-group"><input disabled="@true" @bind="model.RORPercentage" max="15" min="0" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                            <div class="input-group"><input disabled="@false" @bind="model.RORPercentage" max="15" min="0" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
                         </div>
                     </section>
                     break;
@@ -124,7 +136,7 @@
                         </div>
 
                         <div class="form-group" style="width:25%">
-                            <div class="input-group"><input disabled="@true" @bind="model.TOSPercentage" max="15" min="0" @bind:event="oninput" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
+                            <div class="input-group"><input disabled="@false" @bind="model.TOSPercentage" max="15" min="0" class="form-control"><div class="input-group-append"><span class="input-group-text">%</span></div></div>
                         </div>
                     </section>
                     break;
@@ -164,8 +176,9 @@
                         <td>
                                 @foreach (var row in column.Rows)
                                 {
-                            <tr>@row</tr>
-                                } </td>
+                                    <tr>@row</tr>
+                                } 
+                        </td>
                         }
                     </tbody>
                 </table>
@@ -219,4 +232,16 @@
         }
     }
 
+    private void UpdateEarlyRedemptionFee()
+    {
+        model.EarlyRedemptionFee = DefaultValue.Debenture.GetEarlyRedemptionFee(model.Type);
+    }
+
+    public void Enter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            CalculateDebentures().Wait();
+        }
+    }
 }

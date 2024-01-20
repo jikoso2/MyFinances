@@ -25,7 +25,7 @@
             <CompoundInterest OnClose="@CompoundInterestModalClose"></CompoundInterest>
         }
 
-        <button class="btn btn-primary btn-center" style="width:300px" @onclick="() => OpenCompoundInterestModal()"> Oblicz wysokość procentu składanego</button>
+        <button class="btn btn-primary btn-center" style="width:300px" disabled=true @onclick="() => OpenCompoundInterestModal()"> Oblicz wysokość procentu składanego</button>
 
 
         <div class="card mx-auto" style="margin-top:20px">
@@ -37,8 +37,8 @@
                 {
                     <label class="btn btn-secondary @toggleGroup.GetActive(optionName)" style="color:white">
                         <input type="radio" name="options" autocomplete="off"
-                           checked="@(toggleGroup.SelectedOption == optionName)"
-                           @onchange="()=>OnChangeButton(optionName)" /> @optionName
+                               checked="@(toggleGroup.SelectedOption == optionName)"
+                               @onchange="()=>OnChangeButton(optionName)" /> @optionName
                     </label>
                 }
             </div>
@@ -79,7 +79,9 @@
                     break;
 
                 case DepositAccountType.Rozbudowany:
-
+                    <div>
+                        Już wkrótce dostępny.
+                    </div>
                     break;
 
                 default:

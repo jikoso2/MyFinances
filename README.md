@@ -9,6 +9,7 @@ Aplikacja wspomaga wykonywanie wielu obliczeń związanych z finansami osobistym
 * [Funkcje](#features)
 * [Status](#status)
 * [Przewodnik](#guide)
+* [Testy](#tests)
 * [Przykłady Kodu](#examples)
 * [Inspiracja](#inspiration)
 * [Kontakt](#contact)
@@ -81,6 +82,7 @@ Jeśli jednak użytkownikowi uda się wprowadzić coś błędnie, dostanie o tym
 ##### Błędy w kalkulatorze obligacji
 ![Example Error2](./img_README/error_2.png)
 
+## Testy
 
 ## Przykłady Kodu
 Tabele podsumowywujące SummaryTable.razor
