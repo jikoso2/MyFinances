@@ -11,7 +11,8 @@ Stworzona głównie na użytek mieszkańców Polski ze względu na dostępność
 * [Status](#Status)
 * [Przewodnik](#Przewodnik)
 * [Testy](#Testy)
-* [Przykłady Kodu](#Przykłady)
+* [Przykłady Kodu](#PrzykładyKodu)
+* [Baza Danych](#BazaDanych)
 * [Inspiracja](#Inspiracja)
 * [Kontakt](#Kontakt)
 
@@ -23,6 +24,10 @@ W kalkulatorze kredytowym użytkownik ma możliwość zobaczyć i zrozumieć mec
 Kalkulator lokat i kont oszczędnościowych pozwala wyliczać przewidywane zyski z inwestycji w tego typu instrumenty.
 Każde z obliczeń można wykonać z uwzględnieniem podatku Belki lub bez niego (produkty jak IKE, IKZE, PPK).
 Kalkulator PPK pozwala oszacować wysokość wypłaty z PPK w zależności od wpłaconych środków oraz stan konta po określonym okresie oszczędzania.
+
+Aplikacja hostowana jest na platformie Azure, przyjemny proces releasowania nowych wersji:
+
+![image](https://github.com/jikoso2/MyFinances/assets/69644118/9039a3d9-fb17-4933-bfca-3f26fdea4e49)
 
 ## Technologie
 * .NET Core - version 6.0
@@ -202,6 +207,12 @@ services.AddSingleton<MailService>();
 services.AddSingleton<PPKPayoutService>();
 services.AddSingleton<DepositAccountService>();
 ```
+
+## Baza Danych
+
+Prosty schemat relacyjnej bazy danych w PostgreSQL, hosting bazy realizowany jest w serwisie AWS.
+
+![image](https://github.com/jikoso2/MyFinances/assets/69644118/08a7bcda-7e2f-4f93-8e8e-bb5d4363adb2)
 
 ## Inspiracja
 
