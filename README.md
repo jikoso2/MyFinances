@@ -167,7 +167,7 @@ Z uwagi na dosyć złożone procesy obliczeniowe dotyczace lokat,kredytów czy o
 Odpowiednie otestowanie kilku przykładowych scenariuszy obliczeń pozwoliło mi uzyskać pewność co do poprawności wyników, scenariusze przygotowywałem na podstawie swojej wiedzy oraz kalkulatora i arkusza excel.
 Dodatkowo stworzyłem kilka testów sprawdzających poprawność ładowania się poszczególnych stron, zmian interfejsu użytkownika w zależności od wybranego kalkulatora.
 
-![image](https://github.com/jikoso2/MyFinances/assets/69644118/35b42a24-7a81-41ab-85b7-7c3e225089e7)
+![image](https://github.com/jikoso2/MyFinances/assets/69644118/3c8a9f38-ed50-4f4e-ba92-f5a1f257bc35)
 
 ![image](https://github.com/jikoso2/MyFinances/assets/69644118/04dd9bde-2898-4b82-9a96-bd71752c6e7e)
 
