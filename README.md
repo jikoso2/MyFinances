@@ -4,15 +4,15 @@ Aplikacja wspomaga wykonywanie wielu obliczeń związanych z finansami osobistym
 Stworzona głównie na użytek mieszkańców Polski ze względu na dostępność obligacji skarbowych a także specyficzne prawo podatkowe.
 
 ## Spis Treści
-* [Ogólne Informacje](#general-info)
+* [Ogólne Informacje](#ogólne-Informacje)
 * [Technologie](#technologie)
 * [NuGets](#nugets)
 * [Funkcje](#Funkcje)
 * [Status](#Status)
 * [Przewodnik](#Przewodnik)
 * [Testy](#Testy)
-* [Przykłady Kodu](#PrzykładyKodu)
-* [Baza Danych](#BazaDanych)
+* [Przykłady Kodu](#Przykłady-Kodu)
+* [Baza Danych](#Baza-Danych)
 * [Inspiracja](#Inspiracja)
 * [Kontakt](#Kontakt)
 
